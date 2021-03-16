@@ -1,0 +1,532 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch' 
+#include "topconn.ch"
+#include 'tcfwfun.ch' 
+#include "tcfwdef.ch"
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWRH001   ºAutor  ³Tiago Luiz Mendonça º Data ³  05/09/12  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da solicitação de ferias - formulario            º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+local selectedDate    := "" 
+Local cNome           := ""
+Local cMat            := ""
+Local cMatSup         := "" 
+Local cEmpSup         := ""
+Local cFilSup         := "" 
+Local cQuery          := ""   
+Local cTmp            := ""
+
+Local lSessao    	  := .T.
+Local lSup      	  := .T.
+Local dInicio 
+    
+
+	If  ValType(HttpSession->_TCFWFIL)<> "C" 
+		lSessao:=.F.
+	EndIF     
+	   
+	If lSessao   
+	
+		//Posiciona no Funcionario  
+	   	SRA->(Dbseek( Alltrim(TCFWGetFil())+ TCFWGetMat())) 
+	   	  
+	   	HttpSession->cNome:=  Capital(AllTrim(SRA->RA_NOME))
+	   			
+		//Código do superior é composto por codigo da empresa + filial de origem + matricula  ex: CH01000399 
+		cMatSup  := Substr(SRA->RA_P_MATSU,5,6)
+        cEmpSup  := Substr(SRA->RA_P_MATSU,1,2)
+        cFilSup  := Substr(SRA->RA_P_MATSU,3,2)
+		cMat     := TCFWGetMat() 
+  
+		
+		If !Empty(cMatSup)  
+		
+			If Select("TempSup") > 0
+   	   			TempSup->(DbCloseArea())	               
+   	   		EndIf    
+	  
+ 			aStruSRA := SRA->(dbStruct())
+    
+ 			//Cria temporario da SRA do superior                        
+			cQuery:=" SELECT * "
+			cQuery+=" FROM SRA"+cEmpSup+"0" 
+			cQuery+=" WHERE  D_E_L_E_T_ <> '*'  " 
+			cQuery+=" AND RA_MAT = '"+cMatSup+"'"  
+			cQuery+=" AND RA_FILIAL = '"+cFilSup+"'"
+	
+			TCQuery cQuery ALIAS "TempSup" NEW
+
+			For nX := 1 To Len(aStruSRA)
+				If aStruSRA[nX,2]<>"C"
+			 		TcSetField("TempSup",aStruSRA[nX,1],aStruSRA[nX,2],aStruSRA[nX,3],aStruSRA[nX,4])
+			 	EndIf
+			Next nX
+			
+			cTMP := CriaTrab(NIL,.F.)
+			Copy To &cTMP
+			dbCloseArea()
+			dbUseArea(.T.,,cTMP,"TempSup",.T.)    
+				 
+			TempSup->(DbGoTop())	    
+       		If TempSup->(!BOF() .and. !EOF())
+				//Posiciona no superior 
+	   	   		HttpSession->cMatSup   := cMatSup 
+	   	   		HttpSession->cNomeSup  := Capital( AllTrim( TempSup->RA_NOME ))
+	   	   		HttpSession->cEmailSup := Capital( AllTrim( TempSup->RA_EMAIL ))		
+	   	   		//Posicona novamente no funcionanrio 
+	   	   		
+	   	   		TempSup->(DbCloseArea())
+	   	   		
+			Else
+				lSup:=.F.
+			EndIf   	   		  	   		       	
+		Else
+			lSup:=.F.
+	    EndIf
+	
+	EndIf
+	
+
+    If lSessao .And. lSup
+    
+		SRF->( dbSetOrder( RetOrdem("SRF") ) )
+		IF SRF->( MsSeek( xFilial( "SRF" , TCFWGetFil() ) + TCFWGetMat() ) )
+			dInicio :=  fCalcFimAq( SRF->RF_DATABAS ) +1 
+	    EndIf 	 	
+    
+		Z75->(DbGoTop()) 
+		Z75->(DbSetOrder(1))  
+		//Tenta posicionar no registro de solicitação de ferias
+   		If Z75->(DbSeek("  "+cEmpAnt+TCFWGetFil()+TCFWGetMat()) )
+		    
+		 	If Alltrim(Z75->Z75_STATUS) == "P" %> 
+				<html>  
+	   				<Head> 
+	   				<meta http-equiv="pragma" content="no-cache">
+					</Head>
+					<Body align='center'> 
+	   					<span class="dados">
+	   					<div  align='center'>	
+							<span class="dados">  
+   	   							<table border="0">
+   	   				 		   		<tr>
+   	   						   	  		<td>
+   	   							   			<img border="0" src="imagens/icon_solicitacoes.png" width="42" height="42">
+   	   							 		</td>
+   	   						   	  		<td>
+					   			   			Solicitação: <%=Z75->Z75_CODIGO%> | Data emissão : <%=DtoC(Z75->Z75_DTEMIS)%>
+   	   							  		</td>									
+   	   						   		</tr>
+   	   				   	   		</table>	
+   	   				   		</span>
+   	   				   		<hr>
+				  		</div>
+   	   					<div  align='left'> 	 
+						    <br> 
+						    &nbsp;&nbsp;&nbsp;&nbsp;Matricula: <%=cMat%> 
+						    <br>
+		 					&nbsp;&nbsp;&nbsp;&nbsp;Nome : <%=HttpSession->cNome%>   		   		   
+						    <br>
+						    &nbsp;&nbsp;&nbsp;&nbsp;Data inical: <%=DtoC(Z75->Z75_DTINI)%>
+						    <br>
+						    &nbsp;&nbsp;&nbsp;&nbsp;Data final : <%=DtoC(Z75->Z75_DTFIM)%>	
+					   		<br>  
+					   		<%If Alltrim(Z75->Z75_ADIAN13) == "1"%> 
+						    	&nbsp;&nbsp;&nbsp;&nbsp;Adianta 13º: Sim  
+						    <%Else%>
+						    	&nbsp;&nbsp;&nbsp;&nbsp;Adianta 13º: Não  
+						    <%EndIf%>
+						    <br>  
+						    <%If Alltrim(Z75->Z75_ABONA) == "1"%> 
+						    	&nbsp;&nbsp;&nbsp;&nbsp;Abono : Sim  
+						    <%Else%>
+						    	&nbsp;&nbsp;&nbsp;&nbsp;Abono : Não  
+						    <%EndIf%>				  
+					    	<br>  		   
+						    <br> 
+							<hr>   			
+							&nbsp;&nbsp;&nbsp;&nbsp;Status : Pendente de aprovação 
+							<br> 
+							&nbsp;&nbsp;&nbsp;&nbsp;Superior : <%=HttpSession->cNomeSup%>
+							<br>
+							<hr>    		
+						</div>
+						</span>   
+			   		</Body>
+				</html>  	    
+	 		<%Else%>
+				<!DOCTYPE html>
+				   
+					<html>
+					
+						<head>
+			   				<meta http-equiv="pragma" content="no-cache">
+							<script type="text/javascript" src="scripts/jquery.js">  </script> <% /*JavaScript padrão para utilizar JQuery */ %>
+							<script type="text/javascript" src="scripts/jquery-ui-1.8.21.custom.min.js"></script>    
+							<script type="text/javascript" src="scripts/date.js"></script>  <% /*JavaScript para tratamento de data */ %> 
+							<link rel="stylesheet" type=text/css href="css/rhonline.css" />		
+							<link rel="stylesheet" type=text/css href="css/jquery-ui.css" />
+							<script type="text/javascript" language="javascript"> 
+							
+								$(function() {
+								   	 //Calendario
+									$( "#calendario1" ).datepicker({ 
+									
+										showOn: "button",
+										buttonImage: "images/ico-calendario.gif", //Imagem do calendario
+										buttonImageOnly: true ,  
+										dateFormat: 'dd/mm/yy',   //Foramato
+										autoSize: true , 
+										javascript:dtA =  new Date(),
+										<%If dInicio < dDataBase+30%>
+									 		minDate: new Date( dtA .getFullYear(), dtA .getMonth(), dtA .getDate() + 30 ), // Minimo de 30 dias para selecão
+									 		MaxDate: new Date( dtA .getFullYear(), dtA .getMonth(), dtA .getDate() + 315 ),
+									 	<%Else%>
+									 		minDate: new Date(<%="'"+Substr(DTOC(dInicio),4,2)+"/"+Substr(DTOC(dInicio),1,2)+"/"+Substr(DTOC(dInicio),7,4)+"'"%>),
+									 		javascript:dtC =  new Date(<%="'"+Substr(DTOC(dInicio),4,2)+"/"+Substr(DTOC(dInicio),1,2)+"/"+Substr(DTOC(dInicio),7,4)+"'"%>),
+									 		maxDate: new Date( dtC .getFullYear(), dtC .getMonth(), dtC .getDate() + 315 ),
+									 	<%EndIf%>
+										changeMonth: true,
+										dayNames: 		['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
+										dayNamesMin:	['D','S','T','Q','Q','S','S','D'],
+										dayNamesShort:	['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+										MonthNames: 	['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+										monthNamesShort:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+										nextText: 'Próximo', 
+										prevText: 'Anterior ',
+					
+										onClose: function(selectedDate) { 					   			
+									   		
+									   		javascript:t = selectedDate.split('/');   //Retira as barras  
+									   		dtB = new Date(t[2], t[1]-1, t[0])        // Converte a data
+											
+					
+										//Valida a infomação digitada no abono
+										if ($( "#Dec2" ).val() != "Sim"){ //Não é inclusão de destinatário					
+											$("#calendario2").val(new Date( dtB .getFullYear(), dtB .getMonth(), dtB .getDate() + 30 ).toString('d/M/yyyy'));  //Soma 30 dias
+											}
+										else{
+											$("#calendario2").val(new Date( dtB .getFullYear(), dtB .getMonth(), dtB .getDate() + 20 ).toString('d/M/yyyy'));  //Soma 20 dias
+											}
+										}
+											
+									
+									});
+					
+								}); 
+								
+							</script> 
+							<script type="text/javascript" language="javascript" >
+								$(document).ready(function(){
+								  	$("#Dec2").change(function(){
+								   		//Valida alteração do controle abono
+										if ($( "#calendario2" ).val() != ""){	 
+											javascript:f = $("#calendario1").val().split('/');   
+										 	dtc = new Date(f[2], f[1]-1, f[0])
+														
+						     				if ($("#Dec2").val() != "Sim"){ 
+												//javascript:alert("Nao");
+												$("#calendario2").val(new Date( dtc .getFullYear(), dtc .getMonth(), dtc .getDate() + 30 ).toString('d/M/yyyy')); 
+											}     
+											
+											if ($("#Dec2").val() != "Não"){ 	 
+										   		$("#calendario2").val(new Date( dtc .getFullYear(), dtc .getMonth(), dtc .getDate() + 20 ).toString('d/M/yyyy'));					  
+												
+											}
+											
+											
+										}		    	 
+								    	 		    	 
+								  	});
+								});
+							</script>
+							<script type="text/javascript" language="javascript">
+					   			function cancelar(){
+									document.solicita.action="W_TCFW000.APW";
+									document.forms.solicita.submit();  	
+					  			 }
+					  		</script>
+					  		<script type="text/javascript" language="javascript">
+					   			function solicitar(){
+									if (document.getElementById('calendario1').value == "") {
+					    				javascript:alert("Data inicial invalida");  
+					     				return false; 
+					                }else{
+					                	document.solicita.action="U_GTWRHO02.APW";
+										document.forms.solicita.submit();  
+					     			}
+					     			
+					  			 }
+					 		</script>
+						</head> 	
+				 		<body>
+					 		<div>       
+			 					<span class="dados">  
+			 			   			<table border="0">
+			 							<tr>
+								   			<td>
+									   			<img border="0" src="imagens/icon_solicitacoes.png" width="42" height="42">
+								  			</td> 
+								   			<td>
+									   			<b>Selecione o periodo desejado</b> 
+								   			</td>									
+							   			</tr>
+						   			</table>	
+					   			</span>
+					   			<hr>
+							</div> 
+							<br>    
+							<form method="post" name="solicita" align="center">	
+								<div align="left"> 			
+									<label for="Combo">
+										<span class="dados">   
+											Adiantamento do 13º Salário</label>
+										</span>
+									<select id="Dec1" name="Dec1">
+										<option>Não</option>
+										<option>Sim</option>				
+									</select>
+								 </div> 
+								 <div align="left"> 
+							   		<label for="Combo">
+							   			<span class="dados"> 
+							   				Abono Pecuniario
+							   			</span>
+							   		</label>
+									<select id="Dec2" name="Dec2">
+										<option>Não</option>
+										<option>Sim</option>
+									</select>
+								 </div>
+						 		 <br>
+								<div align="left">				
+							   		<label for="calendario"><span class="dados">Dt. Inicio:</span></label>
+									<input type="text" name="calendario1" id="calendario1" size="10" readonly="readonly" >
+						   			&nbsp;
+									<label for="calendario"><span class="dados">Dt. Fim: </span></label>
+									<input type="text" name="calendario2" id="calendario2" size="10" readonly="readonly" >    
+						 		</div>
+						 		<br>
+								<hr> 
+								<div align="center" >  		
+						 			<button onclick="cancelar()" type="button" class="button-center" ><span class="dados"><font color="RED"><b>Cancelar</b></font></span></button>   	  	
+						   			<button onclick="solicitar()" type="button" class="button-center"><span class="dados"><b>Solicitar</b></span></button>     
+						     	</div>
+						     </form>
+						     <hr>
+						</body>
+				</html>
+	
+		 	<%EndIf%>					
+	
+		<%Else%>
+	
+			<!DOCTYPE html>
+			<html>
+				
+				<head>
+		   			<meta http-equiv="pragma" content="no-cache">
+					<script type="text/javascript" src="scripts/jquery.js">  </script> <% /*JavaScript padrão para utilizar JQuery */ %>
+					<script type="text/javascript" src="scripts/jquery-ui-1.8.21.custom.min.js"></script>    
+					<script type="text/javascript" src="scripts/date.js"></script>  <% /*JavaScript para tratamento de data */ %> 
+					<link rel="stylesheet" type=text/css href="css/rhonline.css" />		
+					<link rel="stylesheet" type=text/css href="css/jquery-ui.css" />
+					<script type="text/javascript" language="javascript"> 
+					
+						$(function() {
+						   	 //Calendario
+							$( "#calendario1" ).datepicker({ 
+							
+								showOn: "button",
+								buttonImage: "images/ico-calendario.gif", //Imagem do calendario
+								buttonImageOnly: true ,  
+								dateFormat: 'dd/mm/yy',   //Foramato
+								autoSize: true , 
+								javascript:dtA =  new Date(),
+								<%If dInicio < dDataBase+30%>
+							   		minDate: new Date( dtA .getFullYear(), dtA .getMonth(), dtA .getDate() + 30 ), // Minimo de 30 dias para selecão
+							 		MaxDate: new Date( dtA .getFullYear(), dtA .getMonth(), dtA .getDate() + 315 ),
+							 	<%Else%>
+							 		minDate: new Date(<%="'"+Substr(DTOC(dInicio),4,2)+"/"+Substr(DTOC(dInicio),1,2)+"/"+Substr(DTOC(dInicio),7,4)+"'"%>),
+							 		javascript:dtC =  new Date(<%="'"+Substr(DTOC(dInicio),4,2)+"/"+Substr(DTOC(dInicio),1,2)+"/"+Substr(DTOC(dInicio),7,4)+"'"%>),
+							 		maxDate: new Date( dtC .getFullYear(), dtC .getMonth(), dtC .getDate() + 315 ),
+							 	<%EndIf%>
+								changeMonth: true,
+								dayNames: 		['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
+								dayNamesMin:	['D','S','T','Q','Q','S','S','D'],
+								dayNamesShort:	['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+								MonthNames: 	['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+								monthNamesShort:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+								nextText: 'Próximo', 
+								prevText: 'Anterior ',
+			
+								onClose: function(selectedDate) { 					   			
+							   		
+							   		javascript:t = selectedDate.split('/');   //Retira as barras  
+							   		dtB = new Date(t[2], t[1]-1, t[0])        // Converte a data
+									
+			
+								//Valida a infomação digitada no abono
+								if ($( "#Dec2" ).val() != "Sim"){ //Não é inclusão de destinatário					
+									$("#calendario2").val(new Date( dtB .getFullYear(), dtB .getMonth(), dtB .getDate() + 30 ).toString('d/M/yyyy'));  //Soma 30 dias
+									}
+								else{
+									$("#calendario2").val(new Date( dtB .getFullYear(), dtB .getMonth(), dtB .getDate() + 20 ).toString('d/M/yyyy'));  //Soma 20 dias
+									}
+								}
+									
+							
+							});
+			
+						}); 
+							
+					</script> 
+					<script type="text/javascript" language="javascript" >
+					$(document).ready(function(){
+					  	$("#Dec2").change(function(){
+					   		//Valida alteração do controle abono
+							if ($( "#calendario2" ).val() != ""){	 
+								javascript:f = $("#calendario1").val().split('/');   
+							 	dtc = new Date(f[2], f[1]-1, f[0])
+											
+			     				if ($("#Dec2").val() != "Sim"){ 
+									//javascript:alert("Nao");
+									$("#calendario2").val(new Date( dtc .getFullYear(), dtc .getMonth(), dtc .getDate() + 30 ).toString('d/M/yyyy')); 
+								}     
+								
+								if ($("#Dec2").val() != "Não"){ 	 
+							   		$("#calendario2").val(new Date( dtc .getFullYear(), dtc .getMonth(), dtc .getDate() + 20 ).toString('d/M/yyyy'));					  
+									
+								}
+								
+								
+							}		    	 
+					    	 		    	 
+					  	});
+					});
+					</script>
+					<script type="text/javascript" language="javascript">
+			   			function cancelar(){
+							document.solicita.action="W_TCFW000.APW";
+							document.forms.solicita.submit();  	
+			  			 }
+			  		</script>
+			  		<script type="text/javascript" language="javascript">
+			   			function solicitar(){
+							if (document.getElementById('calendario1').value == "") {
+			    				javascript:alert("Data inicial invalida");  
+			     				return false; 
+			                }else{
+			                	document.solicita.action="U_GTWRHO02.APW";
+								document.forms.solicita.submit();  
+			     			}
+			     			
+			  			 }
+			 		 </script>
+				</head> 	
+			 	<body> 
+			 		<span class="dados">  
+			 		<div>   
+			 			<span class="dados">  
+			 				<table border="0">
+			 					<tr>
+									<td>
+										<img border="0" src="imagens/icon_solicitacoes.png" width="42" height="42">
+									</td> 
+									<td>
+										<b>Selecione o periodo desejado</b> 
+									</td>									
+								</tr>
+							</table>	
+						</span>
+						<hr>
+					</div> 
+					<br>    
+					<form method="post" name="solicita" align="center">	
+						<div align="left"> 			
+							<label for="Combo">
+								<span class="dados">   
+									Adiantamento do 13º Salário</label>
+								</span>
+							<select id="Dec1" name="Dec1">
+								<option>Não</option>
+								<option>Sim</option>				
+							</select>
+						 </div> 
+						 <div align="left"> 
+					   		<label for="Combo">
+					   			<span class="dados"> 
+					   				Abono Pecuniario
+					   			</span>
+					   		</label>
+							<select id="Dec2" name="Dec2">
+								<option>Não</option>
+								<option>Sim</option>
+							</select>
+						 </div>
+				 		 <br>
+						<div align="left">				
+					   		<label for="calendario"><span class="dados">Dt. Inicio:</span></label>
+							<input type="text" name="calendario1" id="calendario1" size="10" readonly="readonly" >
+				   			&nbsp;
+							<label for="calendario"><span class="dados">Dt. Fim: </span></label>
+							<input type="text" name="calendario2" id="calendario2" size="10" readonly="readonly" >    
+				 		</div>
+				 		<br>
+						<hr> 
+						<div align="center" >  		
+				 			<button onclick="cancelar()" type="button" class="button-center" ><span class="dados"><font color="RED"><b>Cancelar</b></font></span></button>   	  	
+				   			<button onclick="solicitar()" type="button" class="button-center"><span class="dados"><b>Solicitar</b></span></button>     
+				     	</div>
+				     </form>
+				     <hr>
+				     </span> 
+				</body>
+			</html> 
+			<%EndIf%> 
+		<%else%>  
+			<div align="center" >  	
+				<%//Valida a sessão
+				%>	
+		   		<%if !(lSessao)%>		
+	 		   		<span class="dados">  
+				   		<br>
+						<br>
+				   		<img border="0" src="imagens/icon_connectivity.png" width="96" height="96">
+				   		<br>
+				   		<br>
+				   		Sessão expirada
+						<br>
+				   		<br>
+				   		<br>
+					</span>   		
+		  		<%endif%>  
+				<%//Valida se o usuário possui superior cadastrado.
+				%>		   
+				<%if !(lSup)%>
+	 		   		<span class="dados">  
+						<br>
+						<br>
+						<br>
+						Seu cadastro de funcionário no módulo de gestão pessoal não possui o cadastro de superior para o controle de aprovação, entrar em contato com o RH para cadastro.
+						<br>
+						<br>
+						<br>
+					</span>		
+				<%endif%>  				
+			</div>
+		<%EndIf%>	

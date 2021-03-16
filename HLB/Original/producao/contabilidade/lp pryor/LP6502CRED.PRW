@@ -1,0 +1,34 @@
+#include "rwmake.ch"
+
+User Function lp6502CRED()
+
+SetPrvt("_CNTCRED,")
+
+
+_CNTCRED:=space(9)
+
+	If SM0->M0_CODIGO$'FF'
+		IF SD1->D1_TES$"02P"
+			_CNTCRED:=131110099
+			
+		ElseIF SD1->D1_TES$"05I"
+			_CNTCRED:=511128294
+			
+		ElseIF SD1->D1_TES$"10B/23B/"
+			_CNTCRED:=112224001    
+			
+		ElseIF SD1->D1_TES$"21L"
+			_CNTCRED:=611150506
+			
+		ElseIF SD1->D1_TES$"13I"
+			_CNTCRED:=211130001
+
+		ElseIF SD1->D1_TES$"48H"
+			_CNTCRED:=511136365
+			
+		Else
+			_CNTCRED:=SA2->A2_CONTA
+		EndIf
+    EndIf
+
+RETURN(_CNTCRED)

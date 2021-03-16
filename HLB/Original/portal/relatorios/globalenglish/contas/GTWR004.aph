@@ -1,0 +1,138 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR004   ºAutor  ³Daniel Fonseca Lira º Data ³  25/10/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Relatorio contas bancarias da globalenglish                 º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+%>
+
+<!DOCTYPE html>
+<html lang="pt-br" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>Relat&oacute;rio de contas - GlobalEnglish</title>
+	
+	<link href='portal_cliente_gt/css/jquery-ui.css' rel='stylesheet' type='text/css'>
+	<link href='portal_cliente_gt/css/relatorios.css' rel='stylesheet' type='text/css'>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('.export').hide();
+			
+			$('#banco').focusin(function(){
+				$.ajax({
+					type: 'POST',
+					url: 'u_WR004Bancos.apw',
+					dataType: 'html',
+					async: false,
+					success: function(data) {
+						$('#banco').html(data);
+					}
+				});
+				$.ajax({
+					type: 'POST',
+					url: 'u_WR004Agencias.apw',
+					data: {cBanco: $('#banco option:selected').attr('value')},
+					dataType: 'html',
+					async: false,
+					success: function(data) {
+						$('#agencia').html(data);
+					}
+				});
+				$('#bt_gerar').removeAttr('disabled');
+				$(this).off('focusin');
+			}).change(function(){
+				$.ajax({
+					type: 'POST',
+					url: 'u_WR004Agencias.apw',
+					data: {cBanco: $('#banco option:selected').attr('value')},
+					dataType: 'html',
+					async: false,
+					success: function(data) {
+						$('#agencia').html(data);
+					}
+				});
+				$('#bt_gerar').removeAttr('disabled');
+			});
+			
+			$('#bt_gerar').click(function(){
+				var banco = $('#banco option:selected').attr('value');
+				var agencia = $('#agencia option:selected').attr('value');
+				
+				// Esconde e mostra o load
+				$('.export').hide();
+				$('#relatorio').html($('<img src="portal_cliente_gt/Imagens/load.gif" /><span>&nbsp;&nbsp;&nbsp;&nbsp;Carregando. Por Favor aguarde...</span>'));
+				
+				// Faz a requisição
+				$.ajax({
+					type: 'POST',
+					url: 'u_wr004html.apw',
+					data: {cBanco: banco, cAgencia: agencia},
+					dataType: 'html',
+					success: function(data) {
+						$('.export').show();
+						$('#relatorio').html(data);
+					}
+				});
+			});
+			
+			$('.export').click(function(){
+				var banco = $('#banco option:selected').attr('value');
+				var agencia = $('#agencia option:selected').attr('value');
+				
+				url = 'u_wr004excel.apw';
+				url += '?cBanco=' + banco;
+				url += '&cAgencia=' + agencia;
+				
+				$(this).attr('href', url); 
+			});
+		});
+	</script> 
+</head>
+
+<body>
+	<% /*Título da Página*/ %>
+	<h1>Relat&oacute;rio de contas - GlobalEnglish</h1>
+	<hr/>
+ 	<fieldset>
+		<legend>Par&acirc;mentros do Relat&oacute;rio</legend>
+		<label>Banco:</label>
+		<select name="banco" id="banco">
+			<option>Selecione</option>
+		</select>
+		
+		<label>Ag&ecirc;ncia:</label>
+		<select name="agencia" id="agencia">
+			<option>Selecione</option>
+		</select>
+		<button type="button" id="bt_gerar" name="bt_gerar" disabled="disabled">Gerar</button>
+	</fieldset>
+	
+	<br>
+	<a href="U_WR004Excel.apw" class="export">
+		<img class='imgButton' src="portal_cliente_gt/Imagens/excel-icon.jpg" width="36" height="36" border="0"/>
+	</a>
+	
+	<div id="relatorio"></div>
+	
+	<br>
+	<a href="U_WR004Excel.apw" class="export">
+		<img class='imgButton' src="portal_cliente_gt/Imagens/excel-icon.jpg" width="36" height="36" border="0"/>
+	</a>
+</body>
+</html>

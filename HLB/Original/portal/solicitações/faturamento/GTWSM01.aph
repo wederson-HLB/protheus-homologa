@@ -1,0 +1,757 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWSM01   ºAutor  ³Eduardo C. Romanini º Data ³  17/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da manutenção da solicitação de faturamento.     º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Local cOper  := HttpGet->Oper
+Local cChave := HttpGet->chave
+
+Local nI := 0
+Local nY := 0
+
+Local aCpos   := {}
+Local aCabec  := {}
+Local aLinhas := {} 
+Local aReg    := {}
+
+//Retorna os campos que serão exibidos na tela
+aCabec := U_WS001CpItens("M")
+
+%>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta content="IE=8" http-equiv="X-UA-Compatible" />
+	
+	<link href='portal_cliente_gt/css/form.css' rel='stylesheet' type='text/css'> <% /*CSS de estilo para formularios do portal */ %>
+	<link href='portal_cliente_gt/css/jquery-ui.css' rel='stylesheet' type='text/css'>	<% /*CSS de estilo para as listas suspensas*/ %>
+	
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery-1.7.2.js">  </script> <% /*JavaScript padrão para utilizar JQuery */ %>
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery-ui.min.js"> </script> <% /*JavaScript para gerar a lista suspensa */ %>
+	<script type="text/javascript" src="portal_cliente_gt/js/sol_faturamento-1.0.js"> </script> <% /*JavaScript para validações e efeitos nessa pagina */ %>
+
+	<script type="text/javascript">
+		ntrava = 0;
+		ntotal = 1;
+
+		$(document).ready(function(){
+	
+			/* No caso de cópia, carrega a variavel nTotal */
+			if (getURLParameter('oper') == 'COP'){
+				ntotal = $('#itens tbody tr').length;
+			}
+			
+			$('#form1').submit(function() { 
+				
+				$(".modal").hide();	 	
+			});
+			 
+		});
+
+		//Declaração das variaveis globais em JavaScript
+		var aDeletados = new Array();
+		var ncont = 0;
+
+		/* Função para inclusão de linhas na tabela de itens */
+		function IncItem() {
+		
+			// Soma 1 no controle de quatidade de linhas incluidas
+			ntotal = ntotal + 1;
+			//Retorna o num. de linhas da tabela
+			numOfRows = $('#itens tr').length;
+			
+			cPage = 'U_WS001Itens.apw?cLin='+numOfRows+'&cOper=<%=cOper%>&cChave=<%=cChave%>';
+			//Requisição em ajax para retornar o valor da função em Advpl.
+			$.ajax({
+				url:cPage,
+				success:function(result){
+					//Adiciona a linha na tabela.
+					$("#itens").last().append(result);
+				}
+			})		
+		}
+		
+		/* Função para exclusão de linhas na tabela de itens */
+		function ExcItem(nLinha) {
+			aDeletados[ncont]=nLinha;
+		
+			var elem = document.getElementById('itens');
+			var rows = elem.rows;
+			rows.item(nLinha).style.visibility = 'hidden';
+			rows.item(nLinha).style.display = 'none'
+			ncont++;
+		}
+		
+		/* Função para validação e gravação da solicitação*/
+		function Valida() {
+
+			var nDel   = 0
+			var nTemC6 = 0
+            
+			<%
+			//Valida o preenchimento dos campos
+			SX3->(DbSetOrder(1))
+			If SX3->(DbSeek("ZF0"))
+				While SX3->(!EOF()) .and. SX3->X3_ARQUIVO == "ZF0"
+				
+					If  X3Usado(SX3->X3_CAMPO) .and. X3Obrigat(SX3->X3_CAMPO)
+			%>
+		
+			   			if(document.getElementById('<%= AllTrim(SX3->X3_CAMPO) %>').value == '')  {
+							alert('<%= u_WFTraduzir("Campos obrigatórios nao foram preenchidos!") %>');
+							return;          		
+						}
+			<%
+					EndIf	
+					SX3->(DbSkip())
+				EndDo
+			EndIf	
+			%> 
+
+			//Valida a infomação digitada no destinatario
+			if ($( "#ZF0_INCDES" ).val() != 'S'){ //Não é inclusão de destinatário
+				
+				var cRetDest = '';
+				
+				//Valida se o codigo do destinatario está preenchido.
+				if ($("#ZF0_CODDES").val().length == 0){
+					alert('<%= u_WFTraduzir("Inconsistencia no Destinatario. Por Favor selecione novamente.") %>');
+					return;                           	
+				}else{
+		            
+					//Define os parametros
+					if ($('#ZF0_TIPO').val() == 'S') { //Tipo Serviço
+						cData = { cTipo:'nome',cValor:$("#ZF0_NOMDES").val(),cCod: $("#ZF0_CODDES").val(), cCliFor:'cli'};
+			
+					}else{ //Tipo Mercantil
+				
+						if ( $('#ZF0_NFFORN').val() == 'N') {
+							cData = { cTipo:'nome',cValor:$("#ZF0_NOMDES").val(),cCod: $("#ZF0_CODDES").val(), cCliFor:'cli'};
+						}else{
+							cData = { cTipo:'nome',cValor:$("#ZF0_NOMDES").val(),cCod: $("#ZF0_CODDES").val(), cCliFor:'forn'};
+						}
+					}
+		
+					//Requisição em ajax para retornar o valor da função em Advpl.
+					$.ajax({
+						url:'U_WS001VlDest.apw',
+						async:false,
+						data:cData,
+						success:function(result){
+							cRetDest = result;
+						}
+					})
+					
+					if (cRetDest != 'S'){
+						alert('<%= u_WFTraduzir("Inconsistencia no Destinatario. Por Favor selecione novamente.") %>');
+						return;
+					}
+				}
+			}else{ //Inclusão de Destinatario
+					
+				if ( $("#ZF0_ENDDES").val() == '') {
+					alert("<%= u_WFTraduzir('O endereço do destinatário deve ser informado!') %>");
+					return;
+				}
+
+				if ( $("#ZF0_CIDDES").val() == '') {
+					alert("<%= u_WFTraduzir('A cidade do destinatário deve ser informada!') %>");
+					return;
+				}
+
+			}
+
+	        //Validação da Transportadora
+			if ($("#ZF0_TRANSP").val() == 'S' )	{
+          		
+          		if( $("#ZF0_INCTRA").val() != 'S'){
+          		
+	          		//Codigo da Transportador em branco
+	          		if($("#ZF0_CODTRA").val() =='' ){
+						alert('<%= u_WFTraduzir("Inconsistencia na Transportadora. Por Favor selecione novamente.") %>');
+						return;
+	          		}else{
+	
+						//Requisição em ajax para retornar o valor da função em Advpl.
+						$.ajax({
+							url:'U_WS001VlTrans.apw',
+							async:false,
+							data:{ cTipo:'nome',cValor:$("#ZF0_NOMTRA").val(),cCod: $("#ZF0_CODTRA").val()},
+							success:function(result){
+								cRetTra = result;
+							}
+						})
+							
+						if (cRetTra != 'S'){
+							alert('<%= u_WFTraduzir("Inconsistencia na Transportadora. Por Favor selecione novamente.") %>');
+							return;
+						}
+	          		}
+				
+				}else{			
+
+					if ( $("#ZF0_CNPJTA").val() == '') {
+						alert('<%= u_WFTraduzir("O CNPJ da transportadora deve ser informado!") %>');
+						return;
+					}
+					
+					if ( $("#ZF0_ENDTRA").val() == '') {
+						alert('<%= u_WFTraduzir("O endereço da transportadora deve ser informado!") %>');
+						return;
+					}
+
+					if ( $("#ZF0_CEPTRA").val() == '') {
+						alert('<%= u_WFTraduzir("O CEP da transportadora deve ser informado!") %>');
+						return;
+					}
+
+					if ( $("#ZF0_ESTTRA").val() == '') {
+						alert('<%= u_WFTraduzir("O estado da transportadora deve ser informado!") %>');
+						return;
+					}
+
+					if ( $("#ZF0_CIDTRA").val() == '') {
+						alert('<%= u_WFTraduzir("A cidade da transportadora deve ser informada") %>!');
+						return;
+					}
+
+					if ( $("#ZF0_BAITRA").val() == '') {
+						alert('<%= u_WFTraduzir("O bairro da transportadora deve ser informada!") %>');
+						return;
+					}
+
+					if ( $("#ZF0_IETRAN").val() == '') {
+						alert('<%= u_WFTraduzir("A Inscr. Estadual da transportadora deve ser informada!") %>');
+						return;
+					}
+			
+				}
+
+			}
+
+			if ($("#ZF0_TIPO").val() ==  'S') {
+	        	//Validação do Contrato
+				if ($("#ZF0_CONTRA").val() == 'S' )	{
+					if ( $("#ZF0_NUMCON").val() == '') {
+						alert('<%= u_WFTraduzir("O número do contrato deve ser informado!") %>');
+						return;
+					}
+				
+					if ( $("#ZF0_VIGCON").val() == '') {
+						alert('<%= u_WFTraduzir("A vigência do contrato deve ser informada!") %>');
+						return;
+					}
+				}
+			
+				//Validação do NIF
+				if ( $("#ZF0_CNPJDE").val() == '') {	
+				 	if ( $("#ZF0_NIF").val() == '') {
+						alert('<%= u_WFTraduzir("O NIF deve ser informado!") %>');
+						return;
+				 	}
+				}
+			}
+    
+			//Loop nos itens da solicitação
+			for(i=1;i<=ntotal;i++){
+				for(d=0;d<=aDeletados.length;d++){
+					if(aDeletados[d]==i){
+						nDel=1;
+					}
+				}
+			    
+				//Verifica se o item não está deletado.
+				if (nDel==0){
+					nTemC6=1; 
+			        
+					//Valida os campos obrigatorios
+					<%
+						SX3->(DbSetOrder(1))
+						If SX3->(DbSeek("ZF1"))
+							While SX3->(!EOF()) .and. SX3->X3_ARQUIVO == "ZF1"
+							
+								If  X3Usado(SX3->X3_CAMPO) .and. X3Obrigat(SX3->X3_CAMPO)
+					%>
+									if (document.getElementById('<%= AllTrim(SX3->X3_CAMPO) %>'+i.toString()).value == '') {
+										alert('<%= u_WFTraduzir("Campos obrigatórios nao foram preenchidos nos itens!") %>');
+										return;
+									}
+							
+					<%
+								EndIf	
+								SX3->(DbSkip())
+							EndDo
+						EndIf	
+					%> 
+				
+		            //Verifica se existe saldo para os produtos.	
+					if ($('#ZF0_TIPO').val() == 'M') { //Tipo da solicitação é Mercantil
+						
+						var lMsgSaldo = false;
+						var nSaldo;
+						
+						cData = { cCodigo:$("#ZF1_CODPRO"+i).val(),cLocal:$("#ZF1_LOCAL"+i).val()};						
+						
+						//Requisição em ajax para retornar o valor da função em Advpl.
+						$.ajax({
+							url:'U_WS001Saldo.apw',
+							async:false,
+							data:cData,
+							success:function(result){
+								nSaldo = parseFloat(result.replace(",","."));
+								var nQtdI = $("#ZF1_QTDE"+i).val();
+								nQtdI = parseFloat(nQtdI.replace(",","."));
+								
+								if ( result != '' && nSaldo < nQtdI ) {
+									lMsgSaldo = true;	
+									nSaldo    = result;
+								}
+							}
+						});
+						
+						//Verifica se será exibida a mensagem de saldo.
+						if (lMsgSaldo) {						
+							lOk = confirm('<%= u_WFTraduzir("O produto") %> '+$('#ZF1_CODPRO'+i).val()+' <%= u_WFTraduzir("não possui saldo disponivel em estoque.") %> \n'+
+							              '<%= u_WFTraduzir("Saldo Atual:") %> ' +nSaldo+ ' \n' +
+							              '<%= u_WFTraduzir("Confirma a inclusão da solicitação?") %>');
+
+							if (!lOk){
+								return;
+							}
+						}
+				    }
+				}
+				nDel=0;
+			}
+
+			//Verifica se ao menos um item foi incluido.
+			if(nTemC6==0){
+				alert('<%= u_WFTraduzir("Não foram informados itens!") %>');
+				return;
+			}
+
+            if(ntrava != 0)  {
+				alert('<%= u_WFTraduzir("Já existe solicitação em processamento, Aguarde!") %>');
+				return;          		
+			}else{        
+				ntrava = 1;
+			}
+		
+			//Grava as informações
+			$(".modal").show(); 
+			
+			document.form1.action = 'U_WS001Grv.apw?cOper=<%=cOper%>&totalit='+ntotal+'&aDel='+aDeletados;
+			document.form1.submit();
+		}   
+	</script>
+	
+	<style>
+		.modal {
+		 	display:none;
+		 	position: fixed;
+		 	z-index: 1000;
+		 	top: 0;
+		 	left: 0;
+		 	height: 100%;
+	 	 	width: 100%;
+		   	background: rgba( 255, 255, 255, .8 ) 
+                url("portal_cliente_gt/Imagens/loader.gif") 
+                50% 50% 
+                no-repeat;	 	
+		}
+	</style>
+	
+	<title><%= u_WFTraduzir("Solicitação de Faturamento") %></title>
+</head>
+
+<body> 
+
+<div class="modal">
+</div>
+
+<table width="100%" border="0">
+	<% //Título da janela
+	%>
+	<tr>
+		<th scope="col">
+			<div align="left" class="titulo"><%= u_WFTraduzir("Solicitação de Faturamento") %></div>
+		</th>
+	</tr>
+
+	<% //Linha horizontal
+	%>
+	<tr>
+		<td><hr /></td>
+	</tr>
+
+	<% //Botões
+	%>
+	<tr>
+    	<td>
+			<a href="javascript:Valida();" style="display:inline-block;" title="<%= u_WFTraduzir('Salvar') %>" >
+				<img src="portal_cliente_gt/Imagens/disk.png" width="16" height="16" border="0"/>
+			</a>
+			&nbsp;
+			<a href="U_GTWS001.apw" style="display:inline-block;" title="<%= u_WFTraduzir('Cancelar') %>" >
+				<img src="portal_cliente_gt/Imagens/Cancel.png" width="16" height="16" border="0"/>
+			</a>
+		</td>
+	</tr>
+
+	<% /*Campos do formulário */%>
+	<tr>
+		<td>
+			<form id="form1" name="form1" method="post" target="principal">
+
+				<% /*Tabela de identificação da solicitação */%>
+				<table id='painel_solic' class="painel">
+
+					<tr>
+						<th scope="col" class='th' width='16%' colspan='4'>
+							<%= u_WFTraduzir("Dados da Solicitação") %>
+						</th>
+                	</tr>
+                    
+					<%  
+					
+					    //Define os campos que serão exibidos no quadro 'Dados da Solicitação'
+						         //Campo         ,Conteudo Padrao, Label                                ,Habilitado?,Editavel? 
+						aCpos := {	{"ZF0_TIPO"  ,"M"            ,u_WFTraduzir("Tipo:")                 , .T.       ,.T.      },;
+		  							{"ZF0_PEDIDO",""             ,u_WFTraduzir("Pedido:")               , .T.       ,.T.      },;
+		  							{"ZF0_NOSSOP",""             ,u_WFTraduzir("Nosso Pedido:")         , .T.       ,.T.      },;
+		  							{"ZF0_NATOPE",""             ,u_WFTraduzir("Natureza da Operação:") , .T.       ,.T.      },;
+		  							{"ZF0_CONPGT",""             ,u_WFTraduzir("Condição Pgto:")        , .T.       ,.T.      },;
+		  							{"ZF0_DESTME",""             ,u_WFTraduzir("Mercadoria Destinada:") , .T.       ,.T.      },;
+		  							{"ZF0_CLIEST",""             ,u_WFTraduzir("Pgto.Cli.Estrangeiro:") , .T.       ,.T.      },;
+		  							{"ZF0_NFFORN","N"            ,u_WFTraduzir("NF Emitida p/Fornec?:") , .T.       ,.T.      },;
+									{"ZF0_CONTRA","N"            ,u_WFTraduzir("Contrato?:")            , .T.       ,.T.      },;	  							
+									{"ZF0_NUMCON",""             ,u_WFTraduzir("Numero Contrato:")      , .F.       ,.T.      },;
+									{"ZF0_VIGCON",""             ,u_WFTraduzir("Vigencia:")             , .F.       ,.T.      }}
+									
+									
+					//Gera a tabela em html
+					%>
+					<%= U_WFForm("ZF0",cOper,cChave,aCpos) %>
+
+				</table>
+                
+                <br>
+
+				<% /*Tabela de destinatário */
+
+				//Botão de inclusão
+				If cOper<>"VIS" %>
+					<a id='bt_inc_dest' style="display:inline-block;" title="<%= u_WFTraduzir('Incluir') %>" >
+						<img src="portal_cliente_gt/imagens/add.png" width="16" height="16" border="0"/>
+					</a>
+				<% EndIf %>
+				
+				<% /*Campos do Destinatário*/ %>
+				<table id='painel_dest' class="painel">
+
+					<tr>
+						<th scope='col' class='th' width='16%' colspan='4'>
+							<%= u_WFTraduzir("Dados do Destinatário:") %>
+							
+							<% /*Indicação de novo destinatário */ %>
+							<span id='aviso_dest' class='aviso' style="display:none;"> &nbsp<%= u_WFTraduzir("(Novo)") %> </span>							 
+	
+		                    <% /*Inclui um campo invisivel para controle de inclusao */%>
+							<input type='text' id='ZF0_INCDES' name='ZF0_INCDES' 
+							<% If cOper == "VIS" %>
+								value= <%=U_WFVlCpo("ZF0","ZF0_INCDES",cChave)%>
+							<% Else %>
+								value='N' 
+							<% Endif %>
+							size='5px' style="display:none;">
+						</th>
+                	</tr>
+					<%  
+
+					    //Define os campos que serão exibidos no quadro 'Destinatário'
+						         //Campo         ,Conteudo Padrao, Label                  ,Habilitado?,Editavel? 
+						aCpos := {	{"ZF0_NOMDES",""             ,u_WFTraduzir("Destinatário:")         , .T.       ,.T.      },;
+		  							{"ZF0_CNPJDE",""             ,u_WFTraduzir("CNPJ:")                 , .T.       ,.T.      },;
+		  							{"ZF0_ENDDES",""             ,u_WFTraduzir("Endereço:")             , .F.       ,.T.      },;
+		  							{"ZF0_CEPDES",""             ,u_WFTraduzir("CEP:")                  , .F.       ,.T.      },;
+		  							{"ZF0_ESTDES",""             ,u_WFTraduzir("Estado:")               , .F.       ,.T.      },;
+		  							{"ZF0_CIDDES",""             ,u_WFTraduzir("Cidade:")               , .F.       ,.T.      },;
+		  							{"ZF0_BAIDES",""             ,u_WFTraduzir("Bairro:")               , .F.       ,.T.      },;
+		  							{"ZF0_IEDEST",""             ,u_WFTraduzir("Insc. Estadual:")       , .F.       ,.T.      },;
+		  							{"ZF0_CODDES",""             ,u_WFTraduzir("Codigo")                , .T.       ,.F.      },;
+		  							{"ZF0_MAILDE",""             ,u_WFTraduzir("E-mail:")               , .T.       ,.T.      },;
+		  							{"ZF0_NIF"   ,""             ,u_WFTraduzir("NIF:")                  , .T.       ,.T.      }}
+
+					//Gera a tabela em html
+					%>
+					<%= U_WFForm("ZF0",cOper,cChave,aCpos) %>
+
+				</table>
+                
+                <br>
+                
+				<% /* Tabela de local de cobrança*/ %>
+				<table id='painel_cobr' class="painel">
+
+					<tr>
+						<th scope="col" class='th' width='16%' colspan='4'>
+							<%= u_WFTraduzir("Local de Cobrança:") %>
+						</th>
+                	</tr>
+
+					<%  
+
+					    //Define os campos que serão exibidos no quadro 'Local de Cobrança'
+						         //Campo         ,Conteudo Padrao, Label                  ,Habilitado?,Editavel? 
+						aCpos := {	{"ZF0_CPCOBR",""             ,u_WFTraduzir("Copiar Destinatário:")  , .T.       ,.T.      },;
+		  							{"ZF0_NOMCOB",""             ,u_WFTraduzir("Cobrança:")             , .T.       ,.T.      },;
+		  							{"ZF0_ENDCOB",""             ,u_WFTraduzir("Endereço:")             , .T.       ,.T.      },;
+		  							{"ZF0_CEPCOB",""             ,u_WFTraduzir("CEP:")                  , .T.       ,.T.      },;
+		  							{"ZF0_ESTCOB",""             ,u_WFTraduzir("Estado:")               , .T.       ,.T.      },;
+		  							{"ZF0_CIDCOB",""             ,u_WFTraduzir("Cidade:")               , .T.       ,.T.      },;
+		  							{"ZF0_BAICOB",""             ,u_WFTraduzir("Bairro:")               , .T.       ,.T.      }}
+
+					//Gera a tabela em html
+					%>
+					<%= U_WFForm("ZF0",cOper,cChave,aCpos) %>
+
+				</table>                    
+
+				<% /*Tabela de local de entrega.  */%>				
+				<div id='div_entr'>
+					<br>
+
+					<table id='painel_entr' class="painel">
+					    
+						<tr>
+							<th scope="col" class='th' width='16%' colspan='4'>
+								<div id='tit_painel_entr'><%= u_WFTraduzir("Local de Entrega da Mercadoria") %></div>
+							</th>
+	                	</tr>
+	
+	                    <%
+						    //Define os campos que serão exibidos no quadro 'Local de Entrega'
+							         //Campo         ,Conteudo Padrao, Label                  ,Habilitado?,Editavel? 
+							aCpos := {	{"ZF0_CPENTR",""             ,u_WFTraduzir("Copiar Destinatário:")  , .T.       ,.T.      },;
+			  							{"ZF0_NOMENT",""             ,u_WFTraduzir("Entrega:")              , .T.       ,.T.      },;
+			  							{"ZF0_CNPJEN",""             ,u_WFTraduzir("CNPJ:")                 , .T.       ,.T.      },;
+			  							{"ZF0_ENDENT",""             ,u_WFTraduzir("Endereço:")             , .T.       ,.T.      },;
+			  							{"ZF0_CEPENT",""             ,u_WFTraduzir("CEP:")                  , .T.       ,.T.      },;
+			  							{"ZF0_ESTENT",""             ,u_WFTraduzir("Estado:")               , .T.       ,.T.      },;
+			  							{"ZF0_CIDENT",""             ,u_WFTraduzir("Cidade:")               , .T.       ,.T.      },;
+			  							{"ZF0_BAIENT",""             ,u_WFTraduzir("Bairro:")               , .T.       ,.T.      },;
+			  							{"ZF0_IEENTR",""             ,u_WFTraduzir("Insc. Estadual:")       , .T.       ,.T.      }}
+						//Gera a tabela em html
+						%>
+						<%= U_WFForm("ZF0",cOper,cChave,aCpos) %>
+	
+					</table>		
+	 			</div>
+
+				<% /*Tabela de local de saída.  */%>				
+				<div id='div_saida'>
+					<br>
+
+					<table id='painel_saida' class="painel">
+					    
+						<tr>
+							<th scope="col" class='th' width='16%' colspan='4'>
+								<div id='tit_painel_saida'><%= u_WFTraduzir("Local de Saída da Mercadoria") %></div>
+							</th>
+	                	</tr>
+	
+	                    <%
+						    //Define os campos que serão exibidos no quadro 'Local de Saída'
+							         //Campo         ,Conteudo Padrao, Label                  ,Habilitado?,Editavel? 
+							aCpos := {	{"ZF0_NOMSAI",""             ,u_WFTraduzir("Local de Saída:")       , .T.       ,.T.      },;
+			  							{"ZF0_CNPJSA",""             ,u_WFTraduzir("CNPJ:")                 , .T.       ,.T.      }}
+	
+						//Gera a tabela em html
+						%>
+						<%= U_WFForm("ZF0",cOper,cChave,aCpos) %>
+	
+					</table>		
+	 			</div>
+
+
+				<% /*Tabela de Transportadora  */%>            	
+				<div id='div_trans'>	 			               
+					<br>
+
+					<% /*Botão de inclusão*/ %>
+					If cOper<>"VIS" %>
+						<a id='bt_inc_trans' style="display:inline-block;" title="<%= u_WFTraduzir('Incluir') %>" >
+							<img src="portal_cliente_gt/imagens/add.png" width="16" height="16" border="0"/>
+						</a>
+					<% EndIf %>
+
+					<table id='painel_trans' class="painel">
+					    
+						<tr>
+							<th scope="col" class='th' width='16%' colspan='4'>
+								<%= u_WFTraduzir("Dados da Transportadora") %>
+
+								<% /*Indicação de novo destinatário */ %>
+								<span id='aviso_trans' class='aviso' style="display:none;"> &nbsp<%= u_WFTraduzir("(Novo)") %> </span>							 
+
+			                    <% /*Inclui um campo invisivel para controle de inclusao */%>
+								<input type='text' id='ZF0_INCTRA' name='ZF0_INCTRA' 
+								<% If cOper == "VIS" %>
+									value= <%=U_WFVlCpo("ZF0","ZF0_INCTRA",cChave)%>
+								<% Else %>
+									value='N' 
+								<% Endif %>
+								size='5px' style="display:none;">
+
+							</th>
+	                	</tr>
+									
+	                    <%
+						    //Define os campos que serão exibidos no quadro 'Dados da Transportadora'
+							         //Campo         ,Conteudo Padrao, Label                  ,Habilitado?,Editavel? 
+							aCpos := {	{"ZF0_TRANSP",""             ,u_WFTraduzir("Utiliza?:")             , .T.       ,.T.      },;
+										{"ZF0_NOMTRA",""             ,u_WFTraduzir("Transportadora:")       , .F.       ,.T.      },;
+			  							{"ZF0_CNPJTA",""             ,u_WFTraduzir("CNPJ:")                 , .F.       ,.T.      },;
+			  							{"ZF0_ENDTRA",""             ,u_WFTraduzir("Endereço:")             , .F.       ,.T.      },;
+			  							{"ZF0_CEPTRA",""             ,u_WFTraduzir("CEP:")                  , .F.       ,.T.      },;
+			  							{"ZF0_ESTTRA",""             ,u_WFTraduzir("Estado:")               , .F.       ,.T.      },;
+			  							{"ZF0_CIDTRA",""             ,u_WFTraduzir("Cidade:")               , .F.       ,.T.      },;
+			  							{"ZF0_BAITRA",""             ,u_WFTraduzir("Bairro:")               , .F.       ,.T.      },;
+			  							{"ZF0_IETRAN",""             ,u_WFTraduzir("Insc. Estadual:")       , .F.       ,.T.      },;
+			  							{"ZF0_CODTRA",""             ,u_WFTraduzir("Codigo")                , .T.       ,.F.      },;
+			  							{"ZF0_COLETA",""             ,u_WFTraduzir("Nº da Coleta:")         , .F.       ,.T.      },;
+			  							{"ZF0_FRETE" ,""             ,u_WFTraduzir("Frete:")                , .F.       ,.T.      },;
+			  							{"ZF0_ESPECI",""             ,u_WFTraduzir("Especie")               , .F.       ,.T.      },;
+										{"ZF0_QTDESP",""             ,u_WFTraduzir("Quantidade")            , .F.       ,.T.      },;
+			  							{"ZF0_PESLIQ",""             ,u_WFTraduzir("Peso Liquido:")         , .F.       ,.T.      },;
+			  							{"ZF0_PESBRU",""             ,u_WFTraduzir("Peso Bruto:")           , .F.       ,.T.      }}
+	
+						//Gera a tabela em html
+						%>
+						<%= U_WFForm("ZF0",cOper,cChave,aCpos) %>
+	
+					</table>		
+				</div>
+					
+                <br>
+                
+				
+				<% 
+				//Botão de inclusão de itens
+				If cOper=="VIS" %>
+					<a style="display:inline-block;" title="<%= u_WFTraduzir('Incluir') %>" >
+				<% Else %>
+					<a href="javascript:IncItem();" style="display:inline-block;" title="<%= u_WFTraduzir('Incluir') %>" >				
+				<% EndIf %>
+				
+					<img src="portal_cliente_gt/imagens/add.png" width="16" height="16" border="0"/>
+				</a>
+
+				<% /*Tabela de itens da solicitação */%>
+				<table id='painel_itens' class="painel">
+					    
+					<tr>
+						<td>
+							<table id='itens' width='100%' style='padding:1px'>
+								                            
+	                            <thead>
+									<tr>
+										<% For nI:=1 To Len(aCabec) %>
+											<th scope="col" class='th'>
+												<%= aCabec[nI][2] %>
+												
+												<%  //Exibe o asterisco para os campos obrigatórios.
+													If Alltrim(aCabec[nI][1]) $ "ZF1_CODPRO|ZF1_QTDE|ZF1_PRECO"
+														<span id=<%="'obg_"+aCabec[nI][1]+Alltrim(Str(nI))+"'"%> style='color:Red;'>*</span>
+													EndIf
+												%>
+												
+											</th>  
+										<% Next %>
+									</tr>
+								</thead>
+								     
+							    <tbody>
+									<% If cOper=="INC" %>
+										<%= U_WS001Itens(cOper,"","1") %>
+									<% Else %>
+										<%= U_WS001LoadIt(cOper,cChave) %>
+									<% EndIf %>												
+								</tbody>
+							</table>
+
+						</td>
+					</tr>	
+     			</table>
+
+				<br>
+
+				<% /*Tabela de itens da solicitação */%>
+				<table id='painel_adic' class="painel">
+					    
+					<tr>
+						<th scope="col" class='th' width='100%'>
+							<%= u_WFTraduzir("Dados Adicionais") %>
+						</th>
+                	</tr>
+								
+					<tr>
+						<td width='100%' >
+							<center>
+								<textarea id='ZF0_INFADI' name='ZF0_INFADI' class='inputarea' rows="5" cols="100" wrap="hard" maxlength='600' <%= If(cOper=="VIS", 'disabled="yes"',) %> >
+									<%
+									If cOper <> "INC"
+                                    	ZF0->(DbSetOrder(1))
+                                    	If ZF0->(DbSeek(xFilial("ZF0")+cChave))
+         							%>
+                                    		<%= AllTrim(ZF0->ZF0_INFADI) %>
+									<% 
+										EndIf
+									EndIf %>
+								</textarea>
+							</center>
+						</td>
+					</tr>
+
+ 					<tr>
+						<td colspan="4">
+							&nbsp;        
+						</td>
+					</tr>
+				</table>                 
+			</form>
+		</td>
+	</tr>
+	
+	<% //Botões
+	%>
+	<tr>
+    	<td>
+			<a href="javascript:Valida();" style="display:inline-block;" title="<%= u_WFTraduzir('Salvar') %>" >
+				<img src="portal_cliente_gt/Imagens/disk.png" width="16" height="16" border="0"/>
+			</a>
+			&nbsp;
+			<a href="U_GTWS001.apw" style="display:inline-block;" title="<%= u_WFTraduzir('Cancelar') %>" >
+				<img src="portal_cliente_gt/Imagens/Cancel.png" width="16" height="16" border="0"/>
+			</a>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

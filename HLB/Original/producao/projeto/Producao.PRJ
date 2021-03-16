@@ -1,0 +1,4696 @@
+Group Producao
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=16
+   Project Faturamento
+      FoldersCount=6
+      Folder Nfe
+         VSSPath=Fontes
+         FilesCount=15
+         File \Producao\Faturamento\NFe\nfesefaz.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\PE01NFESEFAZ.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\PE02NFESEFAZ.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\PE03NFESEFAZ.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\DANFEII.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\DANFEIII.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\FISTRFNFE.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\GTFAT001.prw
+             Type=T
+         End
+         File \Producao\Faturamento\NFe\IBGEMUN.prw
+             Type=T
+         End
+         File \producao\faturamento\nfe\PE04NFESEFAZ.prw
+             Type=T
+         End
+         File \producao\faturamento\nfe\PE01DANFE.prw
+             Type=T
+         End
+         File \producao\faturamento\nfe\PE05NFESEFAZ.prw
+             Type=T
+         End
+         File \producao\faturamento\nfe\PE06NFESEFAZ.prw
+             Type=T
+         End
+         File \producao\faturamento\nfe\PE02DANFE.prw
+             Type=T
+         End
+         File \producao\faturamento\nfe\PE07NFESEFAZ.prw
+             Type=T
+         End
+      End
+      Folder Miscelania
+         VSSPath=Nova Pasta5
+         FilesCount=9
+         File \Producao\Faturamento\Miscelania\GTFAT003.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Miscelania\GTFAT004.prw
+             Type=T
+         End
+         File \producao\faturamento\miscelania\GTFAT007.prw
+             Type=T
+         End
+         File \producao\faturamento\miscelania\GTFAT008.prw
+             Type=T
+         End
+         File \producao\faturamento\miscelania\GTFAT010.prw
+             Type=T
+         End
+         File \producao\faturamento\miscelania\GTFAT012.prw
+             Type=T
+         End
+         File \producao\faturamento\miscelania\GTFAT015.PRW
+             Type=T
+         End
+         File \producao\faturamento\miscelania\GTFAT014.PRW
+             Type=T
+         End
+         File \producao\faturamento\miscelania\GTFAT022.prw
+             Type=T
+         End
+      End
+      Folder WorkFlow
+         VSSPath=Nova Pasta6
+         FilesCount=2
+         File \Producao\Faturamento\WorkFlow\GTFAT002.prw
+             Type=T
+         End
+         File \producao\faturamento\workflow\WF_P_ESTNEG.PRW
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta4
+         FilesCount=42
+         File \Producao\Faturamento\Ponto de Entrada\M440STTS.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\M460FIM.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\MT410ALT.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\OS010GRV.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\MTA410.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\MT410TOK.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\MA415END.PRW
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\MT410INC.PRW
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\MTA416PV.prw
+             Type=T
+         End
+         File \Producao\Faturamento\Ponto de Entrada\M460IPI.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MT410CPY.PRW
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M460MARK.PRW
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MALTCLI.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MA030TOK.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M410LIOK.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MA410MNU.PRW
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MATUCOMP.PRW
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MT416FIM.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M410ALOK.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MT140CPO.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MT460EST.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MTA140MNU.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M410PVNF.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M460QRY.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M521DNFS.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MA440GRLT.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M460FIL.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MA415MNU.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MA415LEG.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MT410ACE.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M030EXC.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M030INC.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M410STTS.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M460NUM.PRW
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MS520VLD.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\M460NOTA.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\FTVD010SF3.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\CHGX5FIL.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\FIRSTNFSE.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MA030ROT.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MTSLDLOT.prw
+             Type=T
+         End
+         File \producao\faturamento\ponto de entrada\MA410DEL.PRW
+             Type=T
+         End
+      End
+      Folder Nfse
+         VSSPath=Nova Pasta5
+         FilesCount=7
+         File \producao\faturamento\nfse\NFSEXml002.prw
+             Type=T
+         End
+         File \producao\faturamento\nfse\NFSEXml001.prw
+             Type=T
+         End
+         File \producao\faturamento\nfse\nfsexmlenv.prw
+             Type=T
+         End
+         File \producao\faturamento\nfse\NFSEXml102.PRW
+             Type=T
+         End
+         File \producao\faturamento\nfse\NFSEXml003.PRW
+             Type=T
+         End
+         File \producao\faturamento\nfse\PE01NFSEXML.prw
+             Type=T
+         End
+         File \producao\faturamento\nfse\GTFAT021.PRW
+             Type=T
+         End
+      End
+      Folder relatorios
+         VSSPath=Nova Pasta6
+         FilesCount=4
+         File \producao\faturamento\relatorios\umatr777.prx
+             Type=T
+         End
+         File \producao\faturamento\relatorios\GTFAT011.prw
+             Type=T
+         End
+         File \producao\faturamento\relatorios\GTFAT017.PRW
+             Type=T
+         End
+         File \producao\faturamento\relatorios\GTFAT020.prw
+             Type=T
+         End
+      End
+   End
+   Project Livros Fiscais
+      FoldersCount=5
+      Folder Atualizações
+         VSSPath=Nova Pasta1
+         FilesCount=6
+         File \Producao\Livros Fiscais\Atualização\CYYFAT01.PRW
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Atualização\CYYFAT02.PRW
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Atualização\CYYFAT03.PRW
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Atualização\CYYFAT04.PRW
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Atualização\EYYFAT01.PRW
+             Type=T
+         End
+         File \producao\livros fiscais\atualização\AYYSF3.PRW
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta3
+         FilesCount=0
+      End
+      Folder Miscelania
+         VSSPath=Nova Pasta4
+         FilesCount=13
+         File \Producao\Livros Fiscais\Miscelania\ATUNCM.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Miscelania\GTFATTES.PRW
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Miscelania\GTTESPESQ.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Miscelania\GTFIS001.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Miscelania\ALTMVDCTF.PRW
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Miscelania\TYY001.prw
+             Type=T
+         End
+         File \producao\livros fiscais\miscelania\MUDAFIS_AP5.prw
+             Type=T
+         End
+         File \producao\livros fiscais\miscelania\GTFIS002.prw
+             Type=T
+         End
+         File \producao\livros fiscais\miscelania\GTFIS003.PRW
+             Type=T
+         End
+         File \producao\livros fiscais\miscelania\GTFIS004.PRW
+             Type=T
+         End
+         File \producao\livros fiscais\miscelania\GTFIS005.prw
+             Type=T
+         End
+         File \producao\livros fiscais\miscelania\GTFIS008.prw
+             Type=T
+         End
+         File \producao\livros fiscais\miscelania\HLBGEN02.prw
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta5
+         FilesCount=15
+         File \Producao\Livros Fiscais\Ponto de Entrada\MA080VLD.PRW
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Ponto de Entrada\MT080GRV.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Ponto de Entrada\MT080EXC.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Ponto de Entrada\X19GRAVA.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Ponto de Entrada\MTDESCRNFE.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Ponto de Entrada\SPDPIS09.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Ponto de Entrada\MTMODNOT.prw
+             Type=T
+         End
+         File \Producao\Livros Fiscais\Ponto de Entrada\MA900TOK.PRW
+             Type=T
+         End
+         File \producao\livros fiscais\ponto de entrada\SPDFIS10.prw
+             Type=T
+         End
+         File \producao\livros fiscais\ponto de entrada\TITICMST.prw
+             Type=T
+         End
+         File \producao\livros fiscais\ponto de entrada\MSD2460.prw
+             Type=T
+         End
+         File \producao\livros fiscais\ponto de entrada\MSD2520.prw
+             Type=T
+         End
+         File \producao\livros fiscais\ponto de entrada\FisAtEnd.prw
+             Type=T
+         End
+         File \producao\livros fiscais\ponto de entrada\CV115MUN.prw
+             Type=T
+         End
+         File \producao\livros fiscais\ponto de entrada\MA080BUT.prw
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta5
+         FilesCount=0
+      End
+   End
+   Project Genericos
+      FoldersCount=7
+      Folder Integracao
+         VSSPath=Nova Pasta1
+         FilesCount=19
+         File \Producao\Genericos\Integração\INTPRYOR.prw
+             Type=T
+         End
+         File \Producao\Genericos\Integração\GTHDAPSS.prw
+             Type=T
+         End
+         File \Producao\Genericos\Integração\GTHDAEMP.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Integração\WSBACEN.prw
+             Type=T
+         End
+         File \Producao\Genericos\Integração\BACENCLASS.prw
+             Type=T
+         End
+         File \Producao\Genericos\Integração\GTGEN001.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Integração\GTGEN002.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Integração\GTGEN003.prw
+             Type=T
+         End
+         File \producao\genericos\integração\SQL2DBF.PRW
+             Type=T
+         End
+         File \producao\genericos\integração\GTGEN013.prw
+             Type=T
+         End
+         File \producao\genericos\integração\GTGEN012.PRW
+             Type=T
+         End
+         File \producao\genericos\integração\GTGEN015.prw
+             Type=T
+         End
+         File \producao\genericos\integração\GTGEN014.PRW
+             Type=T
+         End
+         File \producao\genericos\integração\KPIMPORTXML.PRW
+             Type=T
+         End
+         File \producao\genericos\integração\KPXMLIMP.PRW
+             Type=T
+         End
+         File \producao\genericos\integração\KPIMPXML.PRW
+             Type=T
+         End
+         File \producao\genericos\integração\KPMEsDSai.prw
+             Type=T
+         End
+         File \producao\genericos\integração\GTGEN047.prw
+             Type=T
+         End
+         File \producao\genericos\integração\PEGTGEN47.prw
+             Type=T
+         End
+      End
+      Folder Updates
+         VSSPath=Nova Pasta2
+         FilesCount=138
+         File \Producao\Genericos\Updates\USIX003.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3007.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3008.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USIG001.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Updates\UZ95001.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX1001.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3010.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX1002.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6005.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3003.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3015.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6006.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3016.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6007.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Updates\UCTB001.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USB1001.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\UCVD001.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3017.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3018.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6008.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX3019.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX1003.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6009.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6010.prw
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6011.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Updates\USX6012.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX2002.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX1004.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\UGTMIG11.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UATUSIX.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6014.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UGTGEN001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3023.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UATUEIC.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3024.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6015.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX5001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USIX004.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX3027.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3028.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3029.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX2003.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX5002.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\UGEN001.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\UZ59001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UPATUAMB.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6016.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UCDN001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6017.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\UZ60001.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\GTUPDFIS.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3031.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UZ34001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UZX0001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UCD1001.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX3035.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UZX1001.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USRV001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USXV001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3036.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6018.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UZ31001.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX6020.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6019.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3039.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3041.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6021.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX3043.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3044.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UTP001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3046.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3047.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3048.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3049.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3051.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3053.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UGTPMIG.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX1005.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3054.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3056.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX1006.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3055.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3057.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6024.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USXB001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6026.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UTAF001.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX3058.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3059.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3060.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3061.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6027.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3062.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UZ23001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USIX005.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3064.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UZX0U60.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\UZ21001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3065.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3066.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3067.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3068.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UZ19001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3069.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USXB002.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6029.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6030.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6031.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3072.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3073.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6032.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6033.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6034.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6035.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6036.prw
+             Type=T
+         End
+         File \producao\genericos\updates\GTMIG12.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3075.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6037.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UTAF002.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX3076.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX5004.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3077.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3078.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3080.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USIX006.prw
+             Type=T
+         End
+         File \producao\genericos\updates\upd_fab_rdm.prw
+             Type=T
+         End
+         File \producao\genericos\updates\updgeral_rdm.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3081.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3082.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3083.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6039.PRW
+             Type=T
+         End
+         File \producao\genericos\updates\USX3085.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3086.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX2006.prw
+             Type=T
+         End
+         File \producao\genericos\updates\UFG1001.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX3087.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6040.prw
+             Type=T
+         End
+         File \producao\genericos\updates\USX6041.prw
+             Type=T
+         End
+      End
+      Folder Objetos
+         VSSPath=Nova Pasta3
+         FilesCount=6
+         File \Producao\Genericos\objetos\GTOBJ001.prw
+             Type=T
+         End
+         File \producao\genericos\objetos\DEMAIL.PRW
+             Type=T
+         End
+         File \producao\genericos\objetos\GTOBJ002.PRW
+             Type=T
+         End
+         File \producao\genericos\objetos\GTOBJ003.prw
+             Type=T
+         End
+         File \producao\genericos\objetos\GTOBJ004.PRW
+             Type=T
+         End
+         File \Producao\Genericos\Integração\INTPRYOR.prw
+             Type=T
+         End
+      End
+      Folder Ponto de entrada
+         VSSPath=Nova Pasta4
+         FilesCount=5
+         File \Producao\Genericos\Ponto de entrada\AFTERLOGIN.prw
+             Type=T
+         End
+         File \producao\genericos\ponto de entrada\sf2460i.prw
+             Type=T
+         End
+         File \producao\genericos\ponto de entrada\MDIOK.prw
+             Type=T
+         End
+         File \producao\genericos\ponto de entrada\VldMoeda.prw
+             Type=T
+         End
+         File \producao\genericos\ponto de entrada\MT103DRF.prw
+             Type=T
+         End
+      End
+      Folder Miscelania
+         VSSPath=Nova Pasta5
+         FilesCount=25
+         File \Producao\Genericos\Miscelania\GTCFG001.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\P_ARQSVD.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTGEN009.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\PADTES.PRW
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTGEN010.PRW
+             Type=T
+         End
+         File \producao\genericos\miscelania\VLDCPO_RDM.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\RYYSZ2.PRW
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTCORP31.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTGEN016.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTGEN025.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTGEN027.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTGEN028.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\u_ftdb.prg
+             Type=T
+         End
+         File \producao\genericos\miscelania\TRYEXCEPTION.CH
+             Type=T
+         End
+         File \producao\genericos\miscelania\SM0VIEWER.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTBAUD03.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTBAUD01.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTBUPD02.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTBAUD02.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\N_SQL2DBF.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\GTGEN040.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\CHKEXEC.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\PutHelp.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\PutSx1.prw
+             Type=T
+         End
+         File \producao\genericos\miscelania\Rep5787.prw
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta6
+         FilesCount=24
+         File \producao\genericos\especificos\versm0.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN020.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN034.PRW
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN037.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN038.PRW
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN039.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN041.PRW
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN042.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN043.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN045.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GMCOMR01.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GMCOMR02.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GMCOMR03.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GMCOMR04.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GMCOMR05.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GMGETXML.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\myemail.PRW
+             Type=T
+         End
+         File \producao\genericos\especificos\XMLBLQCD.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\XMLCNVCF.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\XmlDcondor.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\XMLMT103.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\XMLCTE09.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\GTGEN046.prw
+             Type=T
+         End
+         File \producao\genericos\especificos\HLBGEN01.prw
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta7
+         FilesCount=4
+         File \producao\genericos\relatorios\GTGEN017.PRW
+             Type=T
+         End
+         File \producao\genericos\relatorios\GTGEN019.prw
+             Type=T
+         End
+         File \producao\genericos\relatorios\GTGEN035.prw
+             Type=T
+         End
+         File \producao\genericos\relatorios\GTGEN044.prw
+             Type=T
+         End
+      End
+   End
+   Project Importação
+      FoldersCount=3
+      Folder Miscelania
+         VSSPath=Nova Pasta1
+         FilesCount=2
+         File \Producao\Importação\Miscelania\GTEIC003.prw
+             Type=T
+         End
+         File \Producao\Importação\Miscelania\GTEICQ01.prw
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta2
+         FilesCount=4
+         File \Producao\Importação\Ponto de Entrada\EICDI500_RDM.prw
+             Type=T
+         End
+         File \Producao\Importação\Ponto de Entrada\EICSI400_RDM.prw
+             Type=T
+         End
+         File \Producao\Importação\Ponto de Entrada\EICPO400_RDM.prw
+             Type=T
+         End
+         File \producao\importação\ponto de entrada\EICDI154_RDM.prw
+             Type=T
+         End
+      End
+      Folder Relatorio
+         VSSPath=Nova Pasta3
+         FilesCount=1
+         File \producao\importação\relatorios\Eicpo150_RDM.prw
+             Type=T
+         End
+      End
+   End
+   Project Clientes
+      FoldersCount=118
+      Folder Trading
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \Producao\Clientes\Trading\1DREL001.prw
+             Type=T
+         End
+      End
+      Folder Shiseido
+         VSSPath=Nova Pasta2
+         FilesCount=69
+         File \Producao\Clientes\Shiseido\Integracao Armazem\R7GEN001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Loja\R7LOJ001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\GSXMTSZ4.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\GSXMTSZ5.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\GSXMTSZ6.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\GSXMTSZ7.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\GSXMTSZ8.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\R7BEST01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX0040.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX0050.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX0060.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX0100.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX1010.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX1050.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX1070.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX1080.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\GSX1090.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\XMLExamp.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Ginga\XMLExampMask.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\Visibilit\R7FATV001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\New Ginga\R7FAT001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\CNAB\KR73413.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\CNAB\KR74091.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\CNAB\KR74092.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\CNAB\KR74093.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\CNAB\KR74094.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\CNAB\R7RFIN01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\CNAB\R7RFIN02.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\AR7FAT01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\ATUESTOQ.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\F13MED.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\MATR650x.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\P_SHIRESS.prw
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\PR7FAT01.prx
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\R7BFAT01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\R7BFAT02.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\R7BFAT03.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Shiseido\R7XFAT01.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\Loja\R7LOJ003.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\R7EST001.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\VALPROPV.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\NR7FAT01.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\NR7FAT02.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\R7FAT002.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\matr46bx.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\FISCAT17X.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\matr900x.prx
+             Type=T
+         End
+         File \producao\clientes\shiseido\R7FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_CC.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_Clientes.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_CondPag.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_Grupos.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_ItemConta.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_ItensTab.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_Pedidos.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_Produtos.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_ProdutosPorCodigo.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_SaldoProduto.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_SaldosPorLote.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_StatusPed.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_Tabela.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_TotalDeProdutos.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_Transp.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_Vendedores.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\R7FAT003.PRW
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_RegrasDesconto.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\R7CTB001.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_RelFaturamento.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\Mobile_PedNaoAtend.prw
+             Type=T
+         End
+      End
+      Folder Okuma
+         VSSPath=Nova Pasta3
+         FilesCount=9
+         File \Producao\Clientes\Okuma\EDEST002.prw
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\EDEST001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\EDFAT001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\PEDEST01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\REDEST01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\REDEST04.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\REDEST08.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\REDFAT01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Okuma\REDFAT02.PRW
+             Type=T
+         End
+      End
+      Folder Discovery
+         VSSPath=Nova Pasta4
+         FilesCount=35
+         File \Producao\Clientes\Discovery\49FAT001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\48RFIN01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\ATUCT2_48.prw
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\48BRAND.prw
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\I49FAT01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\48NFAT01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\48BFAT01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487451.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487452.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487453.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487454.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487455.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487456.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487457.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Discovery\Cnab\K487458.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\49FAT002.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\49FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\49CTB001.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\49CTB002.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\49CTB003.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\49CTB004.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\49CTB005.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\49COM001.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\49CTB006.prw
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_Produtos_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_ProdForn_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_PedNaoAtend_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_Pedidos_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_ItensContabeis_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_Fornecedores_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_ContasContabeis_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_CondPag_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_ClasseValor_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\portal\Mobile_CC_PD.PRW
+             Type=T
+         End
+         File \producao\clientes\discovery\B48FAT01.prw
+             Type=T
+         End
+      End
+      Folder Harris
+         VSSPath=Nova Pasta5
+         FilesCount=2
+         File \Producao\Clientes\Harris\K2FAT001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Harris\K2FAT002.prw
+             Type=T
+         End
+      End
+      Folder Sirona
+         VSSPath=Nova Pasta6
+         FilesCount=6
+         File \Producao\Clientes\Sirona\BOLBRAD.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sirona\P_SINUMT.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sirona\RELSF2SI.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sirona\SIFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\sirona\SICTB001.prw
+             Type=T
+         End
+         File \producao\clientes\sirona\SIEST001.prw
+             Type=T
+         End
+      End
+      Folder MindLab
+         VSSPath=Nova Pasta7
+         FilesCount=2
+         File \Producao\Clientes\MindLab\BOL237MN.prw
+             Type=T
+         End
+         File \Producao\Clientes\MindLab\P_MV_P_MT120.prw
+             Type=T
+         End
+      End
+      Folder Promega
+         VSSPath=Nova Pasta8
+         FilesCount=2
+         File \Producao\Clientes\Promega\ISFAT001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Promega\ISEICINT.prw
+             Type=T
+         End
+      End
+      Folder Takeda
+         VSSPath=Nova Pasta9
+         FilesCount=11
+         File \Producao\Clientes\Takeda\P_PAGBAN.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGANO.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGAGEN.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGACTA.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGDOC.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_CONTINV.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGVAL.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGNOS.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGMOD.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGIDE.prw
+             Type=T
+         End
+         File \Producao\Clientes\Takeda\P_PAGCAR.prw
+             Type=T
+         End
+      End
+      Folder Ordem Suprema
+         VSSPath=Nova Pasta10
+         FilesCount=3
+         File \Producao\Clientes\Ordem Suprema\AZRFIN01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Ordem Suprema\AZBOLSANT.prw
+             Type=T
+         End
+         File \Producao\Clientes\Ordem Suprema\P_NNAZ033.prw
+             Type=T
+         End
+      End
+      Folder Eurosilicone
+         VSSPath=Nova Pasta11
+         FilesCount=4
+         File \Producao\Clientes\Eurosilicone\3URFIN01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Eurosilicone\3UFATRASTRO.prw
+             Type=T
+         End
+         File \Producao\Clientes\Eurosilicone\3UFATBAR.prw
+             Type=T
+         End
+         File \Producao\Clientes\Eurosilicone\3UFATSVINC.prw
+             Type=T
+         End
+      End
+      Folder Highwinds
+         VSSPath=Nova Pasta12
+         FilesCount=4
+         File \Producao\Clientes\Highwinds\KIFAT001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Highwinds\KIFAT002.PRW
+             Type=T
+         End
+         File \producao\clientes\highwinds\KIFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\highwinds\KIFIN002.prw
+             Type=T
+         End
+      End
+      Folder Neogen
+         VSSPath=Nova Pasta13
+         FilesCount=10
+         File \Producao\Clientes\Neogen\LNBOLSANT.prw
+             Type=T
+         End
+         File \Producao\Clientes\Neogen\KZ4356_J.prw
+             Type=T
+         End
+         File \Producao\Clientes\Neogen\LNRFIN01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Neogen\LNVENDINT.prw
+             Type=T
+         End
+         File \Producao\Clientes\Neogen\LNCOMISS.prw
+             Type=T
+         End
+         File \Producao\Clientes\Neogen\IMPLNORC.prw
+             Type=T
+         End
+         File \Producao\Clientes\Neogen\IMPETIQUETA.prw
+             Type=T
+         End
+         File \producao\clientes\neogen\LNmatr780.prw
+             Type=T
+         End
+         File \producao\clientes\neogen\LNmatr605.prw
+             Type=T
+         End
+         File \producao\clientes\neogen\LNFAT001.PRW
+             Type=T
+         End
+      End
+      Folder Chemtool
+         VSSPath=Nova Pasta14
+         FilesCount=2
+         File \Producao\Clientes\chemtool\G6FAT001.prw
+             Type=T
+         End
+         File \Producao\Clientes\chemtool\G6FAT002.PRW
+             Type=T
+         End
+      End
+      Folder Engecorps
+         VSSPath=Nova Pasta15
+         FilesCount=8
+         File \Producao\Clientes\Engecorps\UFINR865.prw
+             Type=T
+         End
+         File \Producao\Clientes\Engecorps\P_RQTDLOTE.prw
+             Type=T
+         End
+         File \Producao\Clientes\Engecorps\P_ECCODBAR.prw
+             Type=T
+         End
+         File \Producao\Clientes\Engecorps\P_CBARCON.prw
+             Type=T
+         End
+         File \Producao\Clientes\Engecorps\FUNCNABFOL.prw
+             Type=T
+         End
+         File \Producao\Clientes\Engecorps\CONTTED.prw
+             Type=T
+         End
+         File \Producao\Clientes\Engecorps\CONTFIM07.prw
+             Type=T
+         End
+         File \Producao\Clientes\Engecorps\CODBAR07.prw
+             Type=T
+         End
+      End
+      Folder Tellabs
+         VSSPath=Nova Pasta16
+         FilesCount=10
+         File \Producao\Clientes\Tellabs\RELD1CT2.prw
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\brwD1001prw.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1FAT001.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1RCOM01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1RCOM02.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1RPEDCO.PRX
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1RRODES.PRX
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1RRSOCO.PRX
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1RSOLCO.PRX
+             Type=T
+         End
+         File \Producao\Clientes\Tellabs\D1IFAT01.PRW
+             Type=T
+         End
+      End
+      Folder GTIS
+         VSSPath=Nova Pasta17
+         FilesCount=2
+         File \Producao\Clientes\Gtis\RGTIS001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Gtis\contabilidade\GTIS001.PRW
+             Type=T
+         End
+      End
+      Folder VSB
+         VSSPath=Nova Pasta18
+         FilesCount=1
+         File \Producao\Clientes\VSB\NGYFAT01.prw
+             Type=T
+         End
+      End
+      Folder Satamatics
+         VSSPath=Nova Pasta19
+         FilesCount=1
+         File \Producao\Clientes\Satamatics\NRGFAT01.prw
+             Type=T
+         End
+      End
+      Folder Kofax
+         VSSPath=Nova Pasta20
+         FilesCount=1
+         File \Producao\Clientes\Kofax\NKFFAT01.prw
+             Type=T
+         End
+      End
+      Folder Packing
+         VSSPath=Nova Pasta21
+         FilesCount=1
+         File \Producao\Clientes\Packing\NPAFAT01.prw
+             Type=T
+         End
+      End
+      Folder Brocade
+         VSSPath=Nova Pasta22
+         FilesCount=1
+         File \Producao\Clientes\Brocade\NNHFAT01.prw
+             Type=T
+         End
+      End
+      Folder Nautilus
+         VSSPath=Nova Pasta23
+         FilesCount=1
+         File \Producao\Clientes\Nautilus\NJIFAT01.prw
+             Type=T
+         End
+      End
+      Folder Medstar
+         VSSPath=Nova Pasta24
+         FilesCount=1
+         File \Producao\Clientes\Medstar\NKJFAT01.prw
+             Type=T
+         End
+      End
+      Folder NXP
+         VSSPath=Nova Pasta25
+         FilesCount=3
+         File \Producao\Clientes\NXP\NHVFAT01.prw
+             Type=T
+         End
+         File \Producao\Clientes\NXP\GERATXT_NXP.prw
+             Type=T
+         End
+         File \Producao\Clientes\NXP\GERATXT1_NXP.prw
+             Type=T
+         End
+      End
+      Folder Vestas
+         VSSPath=Nova Pasta26
+         FilesCount=2
+         File \Producao\Clientes\Vestas\NVEFAT01.prw
+             Type=T
+         End
+         File \producao\clientes\vestas\VEGPE001.prw
+             Type=T
+         End
+      End
+      Folder Bisazza
+         VSSPath=Nova Pasta27
+         FilesCount=1
+         File \Producao\Clientes\Bisazza\NHFFAT01.prw
+             Type=T
+         End
+      End
+      Folder Instrumentation
+         VSSPath=Nova Pasta28
+         FilesCount=1
+         File \Producao\Clientes\Instrumentation\NIEFAT01.prw
+             Type=T
+         End
+      End
+      Folder Alpunto
+         VSSPath=Nova Pasta29
+         FilesCount=1
+         File \Producao\Clientes\Alpunto\NHOFAT01.prw
+             Type=T
+         End
+      End
+      Folder Uniduto
+         VSSPath=Nova Pasta30
+         FilesCount=1
+         File \Producao\Clientes\Uniduto\SGPEDCOM.prw
+             Type=T
+         End
+      End
+      Folder ADInstruments
+         VSSPath=Nova Pasta31
+         FilesCount=1
+         File \Producao\Clientes\ADInstruments\NDWFAT01.prw
+             Type=T
+         End
+      End
+      Folder Ringling
+         VSSPath=Nova Pasta32
+         FilesCount=1
+         File \Producao\Clientes\Ringling\NF47FAT01.prw
+             Type=T
+         End
+      End
+      Folder Kapci
+         VSSPath=Nova Pasta33
+         FilesCount=1
+         File \Producao\Clientes\Kapci\NFKDFAT01.PRW
+             Type=T
+         End
+      End
+      Folder Veraz
+         VSSPath=Nova Pasta34
+         FilesCount=3
+         File \Producao\Clientes\Veraz\XCNFAT01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Veraz\INTVERAZ.prw
+             Type=T
+         End
+         File \producao\clientes\veraz\XCFAT001.prw
+             Type=T
+         End
+      End
+      Folder ThermoFisher
+         VSSPath=Nova Pasta35
+         FilesCount=1
+         File \Producao\Clientes\ThermoFisher\NFKFAT01.prw
+             Type=T
+         End
+      End
+      Folder Werfen
+         VSSPath=Nova Pasta36
+         FilesCount=1
+         File \Producao\Clientes\Werfen\N88FAT01.prw
+             Type=T
+         End
+      End
+      Folder Hazera
+         VSSPath=Nova Pasta37
+         FilesCount=3
+         File \Producao\Clientes\Hazera\NHBFAT01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Hazera\HBEST001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Hazera\HBEST002.prw
+             Type=T
+         End
+      End
+      Folder PetroTechnik
+         VSSPath=Nova Pasta38
+         FilesCount=1
+         File \Producao\Clientes\PetroTechnik\PRNFAT01.prw
+             Type=T
+         End
+      End
+      Folder Val Zanten
+         VSSPath=Nova Pasta39
+         FilesCount=2
+         File \Producao\Clientes\Val Zanten\EGAGPE01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Val Zanten\GARCTB01.prw
+             Type=T
+         End
+      End
+      Folder WDF
+         VSSPath=Nova Pasta40
+         FilesCount=6
+         File \Producao\Clientes\WDF\INVS901.prw
+             Type=T
+         End
+         File \Producao\Clientes\WDF\CADS9ZZ1.prw
+             Type=T
+         End
+         File \Producao\Clientes\WDF\CADS9ZZ2.prw
+             Type=T
+         End
+         File \Producao\Clientes\WDF\CADS9ZZ3.prw
+             Type=T
+         End
+         File \Producao\Clientes\WDF\S8NFAT01.prw
+             Type=T
+         End
+         File \Producao\Clientes\WDF\NS8FAT02.prw
+             Type=T
+         End
+      End
+      Folder JDA
+         VSSPath=Nova Pasta41
+         FilesCount=1
+         File \Producao\Clientes\JDA\NCXFAT01.prw
+             Type=T
+         End
+      End
+      Folder Boston
+         VSSPath=Nova Pasta42
+         FilesCount=5
+         File \Producao\Clientes\Boston\KZl4791.prw
+             Type=T
+         End
+         File \Producao\Clientes\Boston\KZl479.prw
+             Type=T
+         End
+         File \Producao\Clientes\Boston\ZLNFAT01.prw
+             Type=T
+         End
+         File \producao\clientes\boston\53FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\boston\exp5301.PRW
+             Type=T
+         End
+      End
+      Folder ADL
+         VSSPath=Nova Pasta43
+         FilesCount=1
+         File \Producao\Clientes\ADL\96NFAT01.prw
+             Type=T
+         End
+      End
+      Folder Freescale
+         VSSPath=Nova Pasta44
+         FilesCount=1
+         File \Producao\Clientes\Freescale\XXNFAT01.prw
+             Type=T
+         End
+      End
+      Folder Dr.Reddys
+         VSSPath=Nova Pasta45
+         FilesCount=11
+         File \Producao\Clientes\Dr Reddys\KU24093.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\KU24092.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\KU24091.prw
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\GERAREDS.prw
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\BUSCA_PCM.prw
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\AXZZ0.prw
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\U2RFIN01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\U2RASTRE.prw
+             Type=T
+         End
+         File \Producao\Clientes\Dr Reddys\U2NFAT01.prw
+             Type=T
+         End
+         File \producao\clientes\dr reddys\U2FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\dr reddys\U2SX001.prw
+             Type=T
+         End
+      End
+      Folder Graphocolor
+         VSSPath=Nova Pasta46
+         FilesCount=8
+         File \Producao\Clientes\Graphocolor\FINFAT01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Graphocolor\FINFAT02.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Graphocolor\FINFAT03.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Graphocolor\FIRFIN01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Graphocolor\FIRGPE01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Graphocolor\FIRGPE02.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Graphocolor\KFI341.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Graphocolor\KFI3412.PRW
+             Type=T
+         End
+      End
+      Folder Intralox
+         VSSPath=Nova Pasta47
+         FilesCount=5
+         File \Producao\Clientes\Intralox\BU6FAT03.prw
+             Type=T
+         End
+         File \Producao\Clientes\Intralox\IU6FAT02.prw
+             Type=T
+         End
+         File \producao\clientes\intralox\intralo_AP5.PRW
+             Type=T
+         End
+         File \producao\clientes\intralox\YYSMTP1.PRW
+             Type=T
+         End
+         File \producao\clientes\intralox\U6GEN001.PRW
+             Type=T
+         End
+      End
+      Folder Sumitomo
+         VSSPath=Nova Pasta48
+         FilesCount=15
+         File \Producao\Clientes\Sumitomo\RELFATFF01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\CADFFSZ1.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\EXFF001.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\FFBFAT01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\FFFIN001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\FFICON01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\FFNFAT01.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\FFV001.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\NFFFAT02.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\NFFFAT03.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\RELFINFF01.prw
+             Type=T
+         End
+         File \Producao\Clientes\Sumitomo\RELLOGFF01.prw
+             Type=T
+         End
+         File \producao\clientes\sumitomo\FFFIN002.prw
+             Type=T
+         End
+         File \producao\clientes\sumitomo\P_FF001.prw
+             Type=T
+         End
+         File \producao\clientes\a100row\RWATF001.PRW
+             Type=T
+         End
+      End
+      Folder A100row
+         VSSPath=Nova Pasta49
+         FilesCount=2
+         File \Producao\Clientes\a100row\RWCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\a100row\RWATF001.PRW
+             Type=T
+         End
+      End
+      Folder Polaris
+         VSSPath=Nova Pasta50
+         FilesCount=2
+         File \Producao\Clientes\polaris\PLCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\polaris\PLGPE001.prw
+             Type=T
+         End
+      End
+      Folder Grace
+         VSSPath=Nova Pasta51
+         FilesCount=5
+         File \Producao\Clientes\grace\33GPE002.prw
+             Type=T
+         End
+         File \Producao\Clientes\grace\33GPE004.prw
+             Type=T
+         End
+         File \Producao\Clientes\grace\33GPE001.PRW
+             Type=T
+         End
+         File \Producao\Clientes\grace\33GPE005.prw
+             Type=T
+         End
+         File \producao\clientes\grace\33GPE003.prw
+             Type=T
+         End
+      End
+      Folder Linkedin
+         VSSPath=Nova Pasta52
+         FilesCount=8
+         File \Producao\Clientes\Linkedin\ZJFAT001.PRW
+             Type=T
+         End
+         File \Producao\Clientes\Linkedin\ZJFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\linkedin\BOL755Z.prw
+             Type=T
+         End
+         File \producao\clientes\linkedin\ZJGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\linkedin\ZJCOM001.prw
+             Type=T
+         End
+         File \producao\clientes\linkedin\ZJFIN004.prw
+             Type=T
+         End
+         File \producao\clientes\linkedin\ZJFIN003.PRW
+             Type=T
+         End
+         File \producao\clientes\linkedin\ZJFAT002.prw
+             Type=T
+         End
+      End
+      Folder SNF
+         VSSPath=Nova Pasta53
+         FilesCount=8
+         File \Producao\Clientes\SNF\SNF022.PRW
+             Type=T
+         End
+         File \Producao\Clientes\SNF\SNF023.PRW
+             Type=T
+         End
+         File \Producao\Clientes\SNF\SNF024.PRW
+             Type=T
+         End
+         File \Producao\Clientes\SNF\SNF025.PRW
+             Type=T
+         End
+         File \producao\clientes\snf\BHFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\snf\BHFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\snf\BHFAT002.prw
+             Type=T
+         End
+         File \producao\clientes\snf\BHFAT003.prw
+             Type=T
+         End
+      End
+      Folder FSI
+         VSSPath=Nova Pasta54
+         FilesCount=3
+         File \Producao\Clientes\FSI\FSI023.PRW
+             Type=T
+         End
+         File \Producao\Clientes\FSI\umatr730.prw
+             Type=T
+         End
+         File \producao\clientes\fsi\FSINFS_ap.PRX
+             Type=T
+         End
+      End
+      Folder Illumina
+         VSSPath=Nova Pasta55
+         FilesCount=1
+         File \Producao\Clientes\Illumina\R2CGEN01.prw
+             Type=T
+         End
+      End
+      Folder Paypal
+         VSSPath=Nova Pasta56
+         FilesCount=6
+         File \producao\clientes\Paypal\PBCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\Paypal\PBCTB002.prw
+             Type=T
+         End
+         File \producao\clientes\paypal\PBGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\Paypal\7WCTB001.PRW
+             Type=T
+         End
+         File \producao\clientes\Paypal\7WFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\Paypal\7WCTB002.prw
+             Type=T
+         End
+      End
+      Folder Godigital
+         VSSPath=Nova Pasta57
+         FilesCount=1
+         File \producao\clientes\Godigital\4YFAT01.prw
+             Type=T
+         End
+      End
+      Folder H&S
+         VSSPath=Nova Pasta58
+         FilesCount=1
+         File \producao\clientes\H&S\22GPE001.PRW
+             Type=T
+         End
+      End
+      Folder Dun
+         VSSPath=Nova Pasta59
+         FilesCount=2
+         File \producao\clientes\dun\DTGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\dun\DTGPE002.prw
+             Type=T
+         End
+      End
+      Folder IS Informatica
+         VSSPath=Nova Pasta60
+         FilesCount=3
+         File \producao\clientes\IS Informatica\4ZFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\IS Informatica\4ZGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\IS Informatica\4ZFIN002.prw
+             Type=T
+         End
+      End
+      Folder SteelCase
+         VSSPath=Nova Pasta61
+         FilesCount=3
+         File \producao\clientes\SteelCase\9NGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\SteelCase\9NFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\steelcase\9NGEN001.prw
+             Type=T
+         End
+      End
+      Folder Victaulic
+         VSSPath=Nova Pasta62
+         FilesCount=9
+         File \producao\clientes\victaulic\TMFAT001.PRW
+             Type=T
+         End
+         File \producao\clientes\victaulic\TMFAT002.PRW
+             Type=T
+         End
+         File \producao\clientes\victaulic\TMFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\victaulic\TMFAT004.prw
+             Type=T
+         End
+         File \producao\clientes\victaulic\TMFAT005.prw
+             Type=T
+         End
+         File \producao\clientes\victaulic\TMFAT006.prw
+             Type=T
+         End
+         File \producao\clientes\victaulic\Tmfat007.prw
+             Type=T
+         End
+         File \producao\clientes\victaulic\TMEST001.prw
+             Type=T
+         End
+         File \producao\clientes\victaulic\TMFIN001.prw
+             Type=T
+         End
+      End
+      Folder Gartner
+         VSSPath=Nova Pasta63
+         FilesCount=4
+         File \producao\clientes\gartner\40FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\gartner\40FIN002.PRW
+             Type=T
+         End
+         File \producao\clientes\gartner\40FIN003.prw
+             Type=T
+         End
+         File \producao\clientes\gartner\40CTB001.prw
+             Type=T
+         End
+      End
+      Folder Turn
+         VSSPath=Nova Pasta64
+         FilesCount=1
+         File \producao\clientes\turn\DPFAT001.PRW
+             Type=T
+         End
+      End
+      Folder Ducati
+         VSSPath=Nova Pasta65
+         FilesCount=3
+         File \producao\clientes\ducati\PFFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\ducati\PFFIN002.PRW
+             Type=T
+         End
+         File \producao\clientes\ducati\PFFIN003.prw
+             Type=T
+         End
+      End
+      Folder MedaPharma
+         VSSPath=Nova Pasta66
+         FilesCount=1
+         File \producao\clientes\meda pharma\3RFIN001.prw
+             Type=T
+         End
+      End
+      Folder Western
+         VSSPath=Nova Pasta67
+         FilesCount=1
+         File \producao\clientes\western\UZFIN001.prw
+             Type=T
+         End
+      End
+      Folder Consorcio Tegram
+         VSSPath=Nova Pasta68
+         FilesCount=1
+         File \producao\clientes\consorcio tegram\XYGPE001.prw
+             Type=T
+         End
+      End
+      Folder Mabra
+         VSSPath=Nova Pasta69
+         FilesCount=6
+         File \producao\clientes\mabra\JKFAT005.prw
+             Type=T
+         End
+         File \producao\clientes\mabra\JKFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\mabra\JKFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\mabra\JKFAT009.prw
+             Type=T
+         End
+         File \producao\clientes\mabra\JKFAT012.prw
+             Type=T
+         End
+         File \producao\clientes\mabra\JKFAT010.prw
+             Type=T
+         End
+      End
+      Folder Equant
+         VSSPath=Nova Pasta70
+         FilesCount=21
+         File \producao\clientes\equant\ORRFAT20.prw
+             Type=T
+         End
+         File \producao\clientes\equant\AKORA01.prw
+             Type=T
+         End
+         File \producao\clientes\equant\ORRFAT40.prw
+             Type=T
+         End
+         File \producao\clientes\equant\RelVen.prw
+             Type=T
+         End
+         File \producao\clientes\equant\ORRFAT10.prw
+             Type=T
+         End
+         File \producao\clientes\equant\NFSERV.prw
+             Type=T
+         End
+         File \producao\clientes\equant\ORRFAT30.prw
+             Type=T
+         End
+         File \producao\clientes\equant\AKORA20.PRW
+             Type=T
+         End
+         File \producao\clientes\equant\LWFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\equant\LXFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\equant\LWFAT002.prw
+             Type=T
+         End
+         File \producao\clientes\equant\GTEST001.prw
+             Type=T
+         End
+         File \producao\clientes\equant\GTEST002.PRW
+             Type=T
+         End
+         File \producao\clientes\equant\RETEND.prw
+             Type=T
+         End
+         File \producao\clientes\equant\LWCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\equant\LWCTB002.prw
+             Type=T
+         End
+         File \producao\clientes\equant\LWEST001.prw
+             Type=T
+         End
+         File \producao\clientes\equant\LWFIS001.PRW
+             Type=T
+         End
+         File \producao\clientes\equant\LWFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\equant\LWFIN002.prw
+             Type=T
+         End
+         File \producao\clientes\equant\USX3050.prw
+             Type=T
+         End
+      End
+      Folder Globenet
+         VSSPath=Nova Pasta71
+         FilesCount=5
+         File \producao\clientes\globenet\O9FAT001.prw
+             Type=T
+         End
+         File \producao\clientes\globenet\O9CTB001.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\globenet\GTCTB004.prw
+             Type=T
+         End
+         File \producao\clientes\globenet\GTCTB005.PRW
+             Type=T
+         End
+      End
+      Folder Gamesa
+         VSSPath=Nova Pasta73
+         FilesCount=1
+         File \producao\clientes\Gamesa\INC_RGLT.prw
+             Type=T
+         End
+      End
+      Folder Rokonet
+         VSSPath=Nova Pasta74
+         FilesCount=1
+         File \producao\clientes\rokonet\FBFIN001.prw
+             Type=T
+         End
+      End
+      Folder Twitter
+         VSSPath=Nova Pasta75
+         FilesCount=22
+         File \producao\clientes\twitter\TPCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPGEN001.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFIN001.PRW
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFIN002.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFIN003.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFIN004.PRW
+             Type=T
+         End
+         File \producao\clientes\twitter\P_NNTP237.PRW
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT002.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPCTB002.PRW
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFIN005.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFIN006.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPGEN002.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFin007.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT004.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT005.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT007.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT006.prw
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFIN008.PRW
+             Type=T
+         End
+         File \producao\clientes\twitter\TPFAT008.prw
+             Type=T
+         End
+      End
+      Folder Mfs
+         VSSPath=Nova Pasta76
+         FilesCount=2
+         File \producao\clientes\mfs\4JGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\mfs\4JGEN001.prw
+             Type=T
+         End
+      End
+      Folder Merril
+         VSSPath=Nova Pasta77
+         FilesCount=3
+         File \producao\clientes\Merril\MRFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\Merril\MRFIN002.PRW
+             Type=T
+         End
+         File \producao\clientes\Merril\MRFIN003.prw
+             Type=T
+         End
+      End
+      Folder Exeltis
+         VSSPath=Nova Pasta78
+         FilesCount=35
+         File \producao\clientes\exeltis\SUEST003.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUEST002.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUEST001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUEST004.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUGEN003.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUGEN001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUGEN002.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUFIN01.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUEST005.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUEST006.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUEST007.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUFAT002.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUFIN003.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUFIN002.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\SUFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGGEN002.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGGEN001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT002.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGEST001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGEST004.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFIN002.PRW
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGSX001.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT005.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFIN003.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT004.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT006.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT007.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT009.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT008.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT010.prw
+             Type=T
+         End
+         File \producao\clientes\exeltis\LGFAT011.prw
+             Type=T
+         End
+      End
+      Folder channel
+         VSSPath=Nova Pasta79
+         FilesCount=2
+         File \producao\clientes\channeladvisor\i0FIN002.prw
+             Type=T
+         End
+         File \producao\clientes\channeladvisor\I0FIN001.prw
+             Type=T
+         End
+      End
+      Folder Merit
+         VSSPath=Nova Pasta80
+         FilesCount=1
+         File \producao\clientes\merit\GXFIN001.prw
+             Type=T
+         End
+      End
+      Folder Lego
+         VSSPath=Nova Pasta81
+         FilesCount=1
+         File \producao\clientes\Lego\M5GPE001.prw
+             Type=T
+         End
+      End
+      Folder Bioderma
+         VSSPath=Nova Pasta82
+         FilesCount=3
+         File \producao\clientes\bioderma\L5EST001.prw
+             Type=T
+         End
+         File \producao\clientes\Bioderma\L5FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\bioderma\L5GEN001.prw
+             Type=T
+         End
+      End
+      Folder Bluecielo
+         VSSPath=Nova Pasta83
+         FilesCount=2
+         File \producao\clientes\bluecielo\U1CTB001.prw
+             Type=T
+         End
+         File \producao\clientes\bluecielo\U1CTB002.prw
+             Type=T
+         End
+      End
+      Folder Cotton
+         VSSPath=Nova Pasta84
+         FilesCount=2
+         File \producao\clientes\cotton\LVGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\cotton\LVGPE002.prw
+             Type=T
+         End
+      End
+      Folder NTT
+         VSSPath=Nova Pasta85
+         FilesCount=3
+         File \producao\clientes\NTT\0FFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\ntt\0FFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\ntt\0FFIN002.prw
+             Type=T
+         End
+      End
+      Folder PLANTRONICS
+         VSSPath=Nova Pasta86
+         FilesCount=1
+         File \producao\clientes\plantronics\DVCNABITAU.PRW
+             Type=T
+         End
+      End
+      Folder yahoo
+         VSSPath=Nova Pasta87
+         FilesCount=1
+         File \producao\clientes\yahoo\6WEST001.PRW
+             Type=T
+         End
+      End
+      Folder Gilead
+         VSSPath=Nova Pasta88
+         FilesCount=1
+         File \producao\clientes\Gilead\9XFIN001.prw
+             Type=T
+         End
+      End
+      Folder Philips
+         VSSPath=Nova Pasta89
+         FilesCount=1
+         File \producao\clientes\Philips\8AFIN001.prw
+             Type=T
+         End
+      End
+      Folder Monkey
+         VSSPath=Nova Pasta90
+         FilesCount=1
+         File \producao\clientes\monkey\8VCTB001.prw
+             Type=T
+         End
+      End
+      Folder zoom
+         VSSPath=Nova Pasta91
+         FilesCount=4
+         File \producao\clientes\zoom\B1FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\zoom\B1FAT001.prw
+             Type=T
+         End
+         File \producao\clientes\zoom\B1INV001.prw
+             Type=T
+         End
+         File \producao\clientes\zoom\B1CTB001.PRW
+             Type=T
+         End
+      End
+      Folder Tibco
+         VSSPath=Nova Pasta92
+         FilesCount=1
+         File \producao\clientes\tibco\7MFIN001.prw
+             Type=T
+         End
+      End
+      Folder Aol
+         VSSPath=Nova Pasta93
+         FilesCount=4
+         File \producao\clientes\aol\73FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\aol\73Fat001.prw
+             Type=T
+         End
+         File \producao\clientes\aol\73Fat002.PRW
+             Type=T
+         End
+         File \producao\clientes\aol\73FIN002.prw
+             Type=T
+         End
+      End
+      Folder ADP
+         VSSPath=Nova Pasta94
+         FilesCount=14
+         File \producao\clientes\adp\GTADP_00.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_01.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_02.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_03.prw
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_04.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_05.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_06.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_07.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_08.prw
+             Type=T
+         End
+         File \producao\clientes\adp\GTRHA001.PRW
+             Type=T
+         End
+         File \producao\clientes\adp\MENU_ADP.prw
+             Type=T
+         End
+         File \producao\clientes\adp\USZA001.prw
+             Type=T
+         End
+         File \producao\clientes\adp\USZZ001.prw
+             Type=T
+         End
+         File \producao\clientes\adp\GTADP_09.PRW
+             Type=T
+         End
+      End
+      Folder landesk
+         VSSPath=Nova Pasta95
+         FilesCount=1
+         File \producao\clientes\landesk\QIFIN001.prw
+             Type=T
+         End
+      End
+      Folder Ascencia
+         VSSPath=Nova Pasta96
+         FilesCount=2
+         File \producao\clientes\ascencia\68CTB001.PRW
+             Type=T
+         End
+         File \producao\clientes\ascencia\68CTB002.prw
+             Type=T
+         End
+      End
+      Folder Akamai
+         VSSPath=Nova Pasta97
+         FilesCount=1
+         File \producao\clientes\akamai\50CTB001.PRW
+             Type=T
+         End
+      End
+      Folder Uber
+         VSSPath=Nova Pasta98
+         FilesCount=7
+         File \producao\clientes\uber\TTCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\uber\TTGPE001.prw
+             Type=T
+         End
+         File \producao\clientes\uber\TTFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\uber\GYFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\uber\GYFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\uber\GYFAT005.prw
+             Type=T
+         End
+         File \producao\clientes\uber\GYFAT002.prw
+             Type=T
+         End
+      End
+      Folder Ararinha
+         VSSPath=Nova Pasta99
+         FilesCount=3
+         File \producao\clientes\ararinha\8ZCTB001.PRW
+             Type=T
+         End
+         File \producao\clientes\ararinha\8ZCTB002.PRW
+             Type=T
+         End
+         File \producao\clientes\ararinha\8ZCTB003.prw
+             Type=T
+         End
+      End
+      Folder Tisi do brasil
+         VSSPath=Nova Pasta100
+         FilesCount=1
+         File \producao\clientes\Tisi do brasil\6TFIN001.prw
+             Type=T
+         End
+      End
+      Folder Instructure
+         VSSPath=Nova Pasta101
+         FilesCount=1
+         File \producao\clientes\Instructure\INFIN001.prw
+             Type=T
+         End
+      End
+      Folder Bbva
+         VSSPath=Nova Pasta102
+         FilesCount=1
+         File \producao\clientes\bbva\28CTB001.prw
+             Type=T
+         End
+      End
+      Folder Nbcu
+         VSSPath=Nova Pasta103
+         FilesCount=4
+         File \producao\clientes\nbcu\DSCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\nbcu\F1CTB001.prw
+             Type=T
+         End
+         File \producao\clientes\nbcu\52CTB001.prw
+             Type=T
+         End
+         File \producao\clientes\nbcu\DSCTB002.prw
+             Type=T
+         End
+      End
+      Folder Nelson
+         VSSPath=Nova Pasta104
+         FilesCount=1
+         File \producao\clientes\nelson\BEFAT001.prw
+             Type=T
+         End
+      End
+      Folder vogel
+         VSSPath=Nova Pasta105
+         FilesCount=25
+         File \producao\clientes\vogel\V5FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Fat002.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Fat001.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Fat003.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5UPD001.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5GEN001.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Fat007.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FAT006.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FAT005.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Fat008.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FAT004.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FAT009.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FIN002.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FAT010.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Est002.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Est001.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Est003.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Est004.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5Est005.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5GEN002.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5GEN003.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5GEN004.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FAT011.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FIN003.prw
+             Type=T
+         End
+         File \producao\clientes\vogel\V5FIN004.prw
+             Type=T
+         End
+      End
+      Folder Monster
+         VSSPath=Nova Pasta106
+         FilesCount=3
+         File \producao\clientes\monster\JOFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\monster\UJO001.prw
+             Type=T
+         End
+         File \producao\clientes\monster\JOFIN001.prw
+             Type=T
+         End
+      End
+      Folder agrinos
+         VSSPath=Nova Pasta107
+         FilesCount=1
+         File \producao\clientes\agrinos\EXCTB001.prw
+             Type=T
+         End
+      End
+      Folder Solaris
+         VSSPath=Nova Pasta108
+         FilesCount=20
+         File \producao\clientes\Solaris\HHWS001.prw
+             Type=T
+         End
+         File \producao\clientes\Solaris\HHGEN001.prw
+             Type=T
+         End
+         File \producao\clientes\Solaris\HHFAT001.prw
+             Type=T
+         End
+         File \producao\clientes\Solaris\HHFAT002.prw
+             Type=T
+         End
+         File \producao\clientes\Solaris\HHEST001.prw
+             Type=T
+         End
+         File \producao\clientes\Solaris\HHEST002.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\Solaris\HHFIN002.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFIN003.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFIN004.prw
+             Type=T
+         End
+         File \producao\clientes\Solaris\HHEST003.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFIN005.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHWS002.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHGEN002.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHWS003.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFIN006.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFIN007.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHWS004.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFAT003.prw
+             Type=T
+         End
+         File \producao\clientes\solaris\HHFAT004.prw
+             Type=T
+         End
+      End
+      Folder Jdsu
+         VSSPath=Nova Pasta108
+         FilesCount=1
+         File \producao\clientes\Jdsu\41FIN001.prw
+             Type=T
+         End
+      End
+      Folder Intuitive
+         VSSPath=Nova Pasta109
+         FilesCount=2
+         File \producao\clientes\intuitive\JNCTB001.prw
+             Type=T
+         End
+         File \producao\clientes\intuitive\JNCTB002.prw
+             Type=T
+         End
+      End
+      Folder Tech do Brasil
+         VSSPath=Nova Pasta110
+         FilesCount=1
+         File \producao\clientes\Tech do Brasil\JFFIN001.prw
+             Type=T
+         End
+      End
+      Folder Perdue
+         VSSPath=Nova Pasta111
+         FilesCount=1
+         File \producao\clientes\perdue\JBEST001.prw
+             Type=T
+         End
+      End
+      Folder globalenglish
+         VSSPath=Nova Pasta112
+         FilesCount=1
+         File \producao\clientes\globalenglish\N7FIN001.prw
+             Type=T
+         End
+      End
+      Folder rogama
+         VSSPath=Nova Pasta113
+         FilesCount=1
+         File \producao\clientes\rogama\J2FIN001.prw
+             Type=T
+         End
+      End
+      Folder Media
+         VSSPath=Nova Pasta114
+         FilesCount=1
+         File \producao\clientes\media\UYFIN001.prw
+             Type=T
+         End
+      End
+      Folder china telecom
+         VSSPath=Nova Pasta115
+         FilesCount=3
+         File \producao\clientes\china telecom\O5FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\china telecom\O5FAT001.prw
+             Type=T
+         End
+         File \producao\clientes\china telecom\O5GEN001.prw
+             Type=T
+         End
+      End
+      Folder doterra
+         VSSPath=Nova Pasta116
+         FilesCount=28
+         File \producao\clientes\doterra\N6FAT004.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FAT003.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FAT002.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FAT001.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS010.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS009.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS007.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS006.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS005.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS004.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS003.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS002.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6WS001.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6SX001.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6JOB002.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6JOB001.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6GEN005.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6GEN004.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6GEN003.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6GEN002.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6GEN001.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FAT006.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FAT005.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FAT007.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FAT009.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FIN003.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FIN002.prw
+             Type=T
+         End
+         File \producao\clientes\doterra\N6FIN001.prw
+             Type=T
+         End
+      End
+      Folder les mills
+         VSSPath=Nova Pasta117
+         FilesCount=4
+         File \producao\clientes\les mills\QNFIN001.prw
+             Type=T
+         End
+         File \producao\clientes\les mills\QNFIN002.PRW
+             Type=T
+         End
+         File \producao\clientes\les mills\QNGEN001.prw
+             Type=T
+         End
+         File \producao\clientes\les mills\QNFIN003.prw
+             Type=T
+         End
+      End
+      Folder Cognizant
+         VSSPath=Nova Pasta118
+         FilesCount=3
+         File \producao\clientes\Cognizant\S2FIN001.prw
+             Type=T
+         End
+         File \producao\clientes\cognizant\S2FAT001.prw
+             Type=T
+         End
+         File \producao\clientes\cognizant\USX3079.PRW
+             Type=T
+         End
+      End
+   End
+   Project PCP
+      FoldersCount=1
+      Folder Updates
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \Producao\PCP\updates\USX3009.prw
+             Type=T
+         End
+      End
+   End
+   Project Estoque
+      FoldersCount=3
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta1
+         FilesCount=37
+         File \Producao\Estoque\Ponto de Entrada\MT103FIM.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\A010TOK.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\A100DEL.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\A261TOK.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\MA010FIL.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\MT100TOK.PRW
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\MA330OK.PRW
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\MT103CWH.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\MT010ALT.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\MA020TDOK.prw
+             Type=T
+         End
+         File \Producao\Estoque\Ponto de Entrada\MTA103MNU.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\UMATA456.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\SD1100I.PRW
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT20FOPOS.PRW
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MA103OPC.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MTA103OK.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT103SE2.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT100GE2.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\FT080DSC.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\SF1100E.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MTA260MNU.PRW
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MTA261MNU.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT103FIN.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MTPROCP3.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT116OK.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT116GRV.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT116AGR.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT103DNF.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MT100GRV.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MA140BUT.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MA116BUT.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MA103BUT.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\A103CND2.prx
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MA261IN.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\GQREENTR.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MA103F4I.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\MA103F4H.prw
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta2
+         FilesCount=6
+         File \producao\estoque\especificos\callsldini.prw
+             Type=T
+         End
+         File \producao\estoque\especificos\AYYEST01.PRW
+             Type=T
+         End
+         File \producao\estoque\especificos\GTGEN018.prw
+             Type=T
+         End
+         File \producao\estoque\especificos\GTEST003.prw
+             Type=T
+         End
+         File \producao\estoque\especificos\GTEST004.prw
+             Type=T
+         End
+         File \producao\estoque\especificos\GTEST005.PRW
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta3
+         FilesCount=2
+         File \producao\estoque\relatorios\GTJ001.PRW
+             Type=T
+         End
+         File \producao\estoque\relatorios\PRYRVENO.prw
+             Type=T
+         End
+      End
+   End
+   Project Financeiro
+      FoldersCount=5
+      Folder CNAB
+         VSSPath=Nova Pasta1
+         FilesCount=32
+         File \Producao\Financeiro\CNAB\P_GTISCC.prw
+             Type=T
+         End
+         File \Producao\Financeiro\CNAB\P_GTISCB.prw
+             Type=T
+         End
+         File \Producao\Financeiro\CNAB\P_NN237.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\KZ43562.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\P_NNZF033.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\P_VALPAD.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN003.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN004.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN005.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN006.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN007.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN008.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN009.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN011.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN016.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN017.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN018.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN019.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN020.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN021.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN023.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN032.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN033.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN034.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN035.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN036.prw
+             Type=T
+         End
+         File \producao\financeiro\cnab\UFINA435.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN040.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN039.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN038.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN041.PRW
+             Type=T
+         End
+         File \producao\financeiro\cnab\GTFIN042.PRW
+             Type=T
+         End
+      End
+      Folder relatorio
+         VSSPath=Nova Pasta2
+         FilesCount=3
+         File \Producao\Financeiro\relatorio\GTFIN001.PRW
+             Type=T
+         End
+         File \producao\financeiro\relatorio\Check Report.prw
+             Type=T
+         End
+         File \producao\financeiro\relatorio\UFINA130.PRW
+             Type=T
+         End
+      End
+      Folder Ponto de entrada
+         VSSPath=Nova Pasta3
+         FilesCount=56
+         File \Producao\Financeiro\Ponto de entrada\F240CAN.PRW
+             Type=T
+         End
+         File \Producao\Financeiro\Ponto de entrada\F590CAN.PRW
+             Type=T
+         End
+         File \Producao\Financeiro\Ponto de entrada\F90SE5GRV.PRW
+             Type=T
+         End
+         File \Producao\Financeiro\Ponto de entrada\F200ABAT.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FINR460_RDM.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\DarfAdObs.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\MAT070OK.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F650DESCR.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F650VAR.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\200GEMBX.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA050UPD.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA050GRV.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F050ROT.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F080FIL.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA070CA3.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F200TIT.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F050MDVC.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F090TOK.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA080TIT.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F300FLT.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA430PA.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F590COK.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F060VLOK.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F240FIL.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\f050ins.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\f050irf.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\f376grv.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\f378grv.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\f430var.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA630APV.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F200PORT.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA060QRY.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F241IND.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F241MARK.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA60CAN2.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F430BXA.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA470CTA.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F300SE5.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA200RE2.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F060SEA.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F040URET.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F040ADLE.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA60TRAN.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F200VAR.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FR150FLT.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F420SOMA.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA050ALT.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F150ARQ.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FIN420_1.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA430OCO.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA420NAR.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA050INC.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\FA60CAN1.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F060SEA2.prw
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F430COMP.PRW
+             Type=T
+         End
+         File \producao\financeiro\ponto de entrada\F150GRV.prw
+             Type=T
+         End
+      End
+      Folder Miscelanea
+         VSSPath=Nova Pasta4
+         FilesCount=6
+         File \Producao\Financeiro\Miscelanea\FATITAUGT.PRW
+             Type=T
+         End
+         File \Producao\Financeiro\Miscelanea\FATNDITAU.prw
+             Type=T
+         End
+         File \Producao\Financeiro\Miscelanea\SISPAGFUN.PRW
+             Type=T
+         End
+         File \Producao\Financeiro\Miscelanea\TRAILLER.PRW
+             Type=T
+         End
+         File \producao\financeiro\miscelanea\Adv014_AP5.prx
+             Type=T
+         End
+         File \producao\financeiro\miscelanea\GTFIN002.prw
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta5
+         FilesCount=5
+         File \producao\financeiro\especificos\DataPry.PRW
+             Type=T
+         End
+         File \producao\financeiro\especificos\HoraPry.PRW
+             Type=T
+         End
+         File \producao\financeiro\especificos\axsE5_AP5.PRW
+             Type=T
+         End
+         File \producao\financeiro\especificos\GTFIN010.PRW
+             Type=T
+         End
+         File \producao\financeiro\especificos\GTFIN015.prw
+             Type=T
+         End
+      End
+   End
+   Project GPE
+      FoldersCount=6
+      Folder DIRF
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \Producao\GPE\DIRF\IMPIRPJ.prx
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta2
+         FilesCount=5
+         File \Producao\GPE\especificos\GTGPE002.prw
+             Type=T
+         End
+         File \producao\gpe\especificos\YYPGPE04.PRW
+             Type=T
+         End
+         File \producao\gpe\especificos\P_VPROLL.prw
+             Type=T
+         End
+         File \producao\gpe\especificos\ZZZF3.prw
+             Type=T
+         End
+         File \producao\gpe\especificos\gerespp.PRW
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta3
+         FilesCount=26
+         File \Producao\GPE\relatorios\GTGRSRD.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\WGPP051.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\PGPER040.PRX
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTRELFOL.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTRELSRD.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGRFOL.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\FOLR003.prw
+             Type=T
+         End
+         File \producao\gpe\relatorios\GRACER02.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\SEGDES.PRX
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE004.prw
+             Type=T
+         End
+         File \producao\gpe\relatorios\IMPRESH.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\WGPP052.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE014.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE016.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE015.prw
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE013.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE018.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE020.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE019.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE021.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE022.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE023.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE024.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE029.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE026.PRW
+             Type=T
+         End
+         File \producao\gpe\relatorios\GTGPE025.PRW
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta4
+         FilesCount=5
+         File \producao\gpe\ponto de entrada\GP410DES.prw
+             Type=T
+         End
+         File \producao\gpe\ponto de entrada\GP410CRP.prw
+             Type=T
+         End
+         File \producao\gpe\ponto de entrada\GTGPE007.prw
+             Type=T
+         End
+         File \producao\gpe\ponto de entrada\GP450DES.PRW
+             Type=T
+         End
+         File \producao\gpe\ponto de entrada\gtgpe027.PRW
+             Type=T
+         End
+      End
+      Folder Integrações
+         VSSPath=Nova Pasta5
+         FilesCount=7
+         File \producao\gpe\integração\GTGEN004.prw
+             Type=T
+         End
+         File \producao\gpe\integração\GTGEN006.prw
+             Type=T
+         End
+         File \producao\gpe\integração\GTGEN011.prw
+             Type=T
+         End
+         File \producao\gpe\integração\KPMAAF01.prw
+             Type=T
+         End
+         File \producao\gpe\integração\GTGEN026.prw
+             Type=T
+         End
+         File \producao\gpe\integração\SRFM001.PRW
+             Type=T
+         End
+         File \producao\gpe\integração\GTGPE017.PRW
+             Type=T
+         End
+      End
+      Folder Rdmake Padrão
+         VSSPath=Nova Pasta6
+         FilesCount=2
+         File \producao\gpe\rdmake padrão\RECIBO.PRX
+             Type=T
+         End
+         File \producao\gpe\rdmake padrão\GPEWORD.PRW
+             Type=T
+         End
+      End
+   End
+   Project Compras
+      FoldersCount=2
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta1
+         FilesCount=9
+         File \Producao\Compras\Ponto de Entrada\MA020TOK.prw
+             Type=T
+         End
+         File \Producao\Compras\Ponto de Entrada\MT100AGR.PRW
+             Type=T
+         End
+         File \Producao\Compras\Ponto de Entrada\MT100LOK.PRW
+             Type=T
+         End
+         File \Producao\Compras\Ponto de Entrada\SF1100I.PRW
+             Type=T
+         End
+         File \Producao\Compras\Ponto de Entrada\MTA130C8.PRW
+             Type=T
+         End
+         File \producao\compras\ponto de entrada\MT120F.PRW
+             Type=T
+         End
+         File \producao\compras\ponto de entrada\MT097END.prw
+             Type=T
+         End
+         File \producao\compras\ponto de entrada\MTA097.prw
+             Type=T
+         End
+         File \producao\compras\ponto de entrada\MTA097MNU.prw
+             Type=T
+         End
+      End
+      Folder Relatorio
+         VSSPath=Nova Pasta2
+         FilesCount=1
+         File \producao\compras\Relatorio\GTCOM001.prw
+             Type=T
+         End
+      End
+   End
+   Project Contabilidade
+      FoldersCount=5
+      Folder Lançamento Padrão
+         VSSPath=Nova Pasta1
+         FilesCount=9
+         File \Producao\Contabilidade\Lancamento Padrao\LP610ENTD.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\Lancamento Padrao\Lp530Val.prw
+             Type=T
+         End
+         File \Producao\contabilidade\lancamento padrao\LP6102ICM.prw
+             Type=T
+         End
+         File \producao\contabilidade\lancamento padrao\6502VCFO.prw
+             Type=T
+         End
+         File \producao\contabilidade\lancamento padrao\LP59601.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lancamento padrao\LP610.prw
+             Type=T
+         End
+         File \producao\contabilidade\lancamento padrao\LP9501VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lancamento padrao\lp508.prw
+             Type=T
+         End
+         File \producao\contabilidade\lancamento padrao\LP610001.prw
+             Type=T
+         End
+      End
+      Folder LP Pryor
+         VSSPath=Nova Pasta2
+         FilesCount=146
+         File \Producao\Contabilidade\LP Pryor\LP5101D.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP5131DB.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP5301DEB.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP6202CRE.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP6505CRE.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP56201C.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP56201D.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP61016.prw
+             Type=T
+         End
+         File \Producao\Contabilidade\LP Pryor\LP65013CRE.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP61015CF.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6102IPI.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6503deb.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP5131CR.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6501deb.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lphistorico.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6501VAL_AP5.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6502val_AP5.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6511VL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6507VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6506VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6505val_AP5.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6504VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6503VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6401val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6403val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6402val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lm56201u_AP5.prx
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp5907val.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp5906val.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp531Val.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp5908val.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp591val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53002CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65012CRE.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6505cfopC.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65014CRE.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6501VCFO.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53005CCC.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6101CFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6503VCFO.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP9507VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP9506VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP9505VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP9504VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65005CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6109vl.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6108vlCF.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6107vl2.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP61013VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp61013I.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610_16.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610_15.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610_13.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610_04.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610_02.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP59103CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP59102CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP59004CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP562_01.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp5327val.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp5326val.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp5325val.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53204CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53202CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53104CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53102CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP520CC.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp5203val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP510GT.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6507VCFO.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6505VCFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6505CTAcfop.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6403IPICFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6402ICMCFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6401VLVFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP510_01.PRX
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\6504VCFO.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53105CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6508IR.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP520VAL1.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52002CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52004CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52102CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52104CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52302CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52304CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52702CCC.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP52704CCD.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP95010VAL.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP95011VAL.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP95012VAL.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP95013VAL.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP9508VAL.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP9509VAL.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP513_DB.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\65011VCFO.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610CENTC.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP61016CRE.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610CLASS.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp64001deb.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP64002CRE.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP64003CRE.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP64004CRE.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP650_02VAL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\65523ICMCFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\65524IPICFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp61019.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP51001_D.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LPARM_D.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LPARM_C1.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LPARMCC2.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LPARM_C2.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65111V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65107V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LPARMCC1.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65101V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65102V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65103V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65104V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65105V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP65106V.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp5108val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp5107val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6101cre_AP5.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6109val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6108val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6107val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6106val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6105val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6104val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6104DEB_AP5.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6103val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6102val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6102CRE_AP5.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\A09CLVLR.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP610CLVL.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LpHis537.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\Lp537Val.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP9506B.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp61013CFOP.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\lp6101val_AP5.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP6502CRED.PRW
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53004D.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP53005.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP590ClVl.prw
+             Type=T
+         End
+         File \producao\contabilidade\lp pryor\LP590ITEM.prw
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta3
+         FilesCount=11
+         File \producao\contabilidade\especificos\VldTplcto.prw
+             Type=T
+         End
+         File \producao\contabilidade\especificos\CFGPAR-C_AP5.PRX
+             Type=T
+         End
+         File \producao\contabilidade\especificos\P_CT2TXT.prw
+             Type=T
+         End
+         File \producao\contabilidade\especificos\ATUCT1.PRW
+             Type=T
+         End
+         File \producao\contabilidade\especificos\YYBCON01.prw
+             Type=T
+         End
+         File \producao\contabilidade\especificos\GTCTB007.PRW
+             Type=T
+         End
+         File \producao\contabilidade\especificos\GTCTB006.PRW
+             Type=T
+         End
+         File \producao\contabilidade\especificos\GTCTB008.prw
+             Type=T
+         End
+         File \producao\contabilidade\especificos\DPZZKTXT.prw
+             Type=T
+         End
+         File \producao\contabilidade\especificos\AxCadZZK.prw
+             Type=T
+         End
+         File \producao\contabilidade\especificos\GTCTB009.prw
+             Type=T
+         End
+      End
+      Folder Ponto de entrada
+         VSSPath=Nova Pasta4
+         FilesCount=10
+         File \producao\contabilidade\ponto de entrada\CTB101EXC.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\CTB102EXC.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\CT101TOK.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\VLCPLOTE.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\ANTCTBGRV.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\ECDCHVMOV.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\CT020TOK.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\VDCTB101GR.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\ANCTB102GR.prw
+             Type=T
+         End
+         File \producao\contabilidade\ponto de entrada\DPCTB102GR.prw
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta5
+         FilesCount=3
+         File \producao\contabilidade\relatórios\GTCTB001.prw
+             Type=T
+         End
+         File \producao\contabilidade\relatórios\GTCTB002.PRW
+             Type=T
+         End
+         File \producao\contabilidade\relatórios\GTCTB003.prw
+             Type=T
+         End
+      End
+   End
+   Project Ativo
+      FoldersCount=1
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \producao\ativo\ponto de entrada\AT010SN1.prw
+             Type=T
+         End
+      End
+   End
+   Project Automação Fiscal
+      FoldersCount=1
+      Folder Específicos
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \producao\automação fiscal\específicos\GTTAF001.prw
+             Type=T
+         End
+      End
+   End
+   Project Fluig
+      FoldersCount=2
+      Folder Webservice
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \producao\Fluig\WebService\_NKNZZPM.prw
+             Type=T
+         End
+      End
+      Folder Integração
+         VSSPath=Nova Pasta2
+         FilesCount=1
+         File \producao\Fluig\Integração\GTFLG001.prw
+             Type=T
+         End
+      End
+   End
+   Project Loja
+      FoldersCount=1
+      Folder Integração
+         VSSPath=Nova Pasta1
+         FilesCount=5
+         File \producao\Loja\Integração\GTLOJ002.prw
+             Type=T
+         End
+         File \producao\Loja\Integração\UGTLOJ001.prw
+             Type=T
+         End
+         File \producao\Loja\Integração\GTLOJ004.prw
+             Type=T
+         End
+         File \producao\Loja\Integração\GTLOJ003.prw
+             Type=T
+         End
+         File \producao\loja\integração\GTLOJ001.prw
+             Type=T
+         End
+      End
+   End
+   Project WebService
+      FoldersCount=3
+      Folder Generico
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \producao\webservice\generico\YYWS001.prw
+             Type=T
+         End
+      End
+      Folder Faturamento
+         VSSPath=Nova Pasta2
+         FilesCount=1
+         File \producao\webservice\faturamento\YYFAT001.prw
+             Type=T
+         End
+      End
+      Folder Estoque
+         VSSPath=Nova Pasta3
+         FilesCount=1
+         File \producao\webservice\estoque\YYEST001.prw
+             Type=T
+         End
+      End
+   End
+End

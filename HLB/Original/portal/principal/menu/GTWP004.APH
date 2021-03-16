@@ -1,0 +1,96 @@
+<% 
+#include 'totvs.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWP004   ºAutor  ³Eduardo C. Romanini º Data ³  02/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html do menu da pagina principal do portal Gt.        º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+aRot := HttpSession->aMenu
+
+If Type("aRot")<>"A"
+	nTamI:=0
+Else
+	nTamI:=len(aRot)	
+EndIf                 
+
+%>          
+
+<html>
+<head>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<link href="portal_cliente_gt/CSS/menu.css" rel="stylesheet" type="text/css">
+	<script language="JavaScript">
+		function DinMenu( x )
+		{
+			if ( document.getElementById( x ).style.display == "none" )
+				document.getElementById( x ).style.display = '';
+			else
+				document.getElementById( x ).style.display = "none";
+		} 
+	</script>
+
+</head>
+
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="background:url(portal_cliente_gt/Imagens/menu_fundo.jpg) left repeat-y">
+
+	<table width="207" border="0" cellspacing="0" cellpadding="0">
+		<% If nTamI > 0 %> 
+			<% For nI := 1 To nTamI %>
+				<tr>
+					<td width="8">
+						<img src="portal_cliente_gt/Imagens/transparente.gif" width="8" height="10">
+					</td>
+					<td width="199">
+						<a href="javascript:DinMenu('S<%=aRot[nI][1]%>');" class="FonteMenu">
+							<img src="portal_cliente_gt/Imagens/menu-flechinha.gif" hspace="6" border="0" align="absmiddle">
+							<%= u_WFTraduzir(aRot[nI][2]) %>
+						</a>
+					</td>
+				</tr>
+				<tr> 
+					<td width="8"></td>
+					<td width="199">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0" style="display:none" id="S<%=aRot[nI][1]%>">
+							<% nTamY := Len( aRot[nI][3] ) %>
+							<% For nY := 1 To nTamY %>
+								<tr>
+									<td>
+										<a href="<%=aRot[nI][3][nY][2]%>" class="FonteSubMenu" target="principal">
+											<img src="portal_cliente_gt/Imagens/transparente.gif" width="8" height="19" hspace="6" border="0" align="absmiddle">
+											<%= u_WFTraduzir(aRot[nI][3][nY][1]) %>
+										</a>
+									</td>
+							    </tr>
+							<% Next nY %>
+						</table>
+					</td>
+				</tr>
+			<% Next nI %>
+		<% Else %>
+			<tr>
+				<td width="8">
+					<img src="portal_cliente_gt/Imagens/transparente.gif" width="8" height="10">
+				</td>
+				<td width="199">
+					<a href="javascript:DinMenu('S001');" class="FonteMenu">
+						<img src="portal_cliente_gt/Imagens/menu-flechinha.gif" hspace="6" border="0" align="absmiddle">
+						Grant Thornton
+					</a>
+				</td>
+			</tr>
+		<% EndIf %>
+	</table>
+
+</body>
+</html>

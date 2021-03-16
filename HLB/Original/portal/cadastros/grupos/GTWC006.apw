@@ -1,0 +1,212 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWC006 ºAutor  ³Eduardo C. Romanini  º  Data ³  28/05/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Cadastro de grupos do portal.                               º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWC006()
+*---------------------*
+Local cHtml	:= "" 
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cHtml := ExecInPage("GTWC006")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : GTWCM06
+Objetivo: Manutenção do cadastro de grupos
+Autor   : Eduardo C. Romanini
+Data    : 28/05/2012
+*/
+*---------------------*
+User Function GTWCM06()
+*---------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cHtml := ExecInPage("GTWCM06")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : WC006Grv()
+Objetivo: Gravação dos dados
+Autor   : Eduardo C. Romanini
+Data    : 28/05/2012
+*/
+*----------------------*
+User Function WC006Grv()
+*----------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+Local aPost := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Parametro recebido na chamada da função.
+cOper := HttpGet->cOper
+
+If Valtype(cOper) <> "U" .and. cOper <> "VIS"
+
+	//Inclusão
+	If cOper == "INC"
+	    ZW6->(RecLock("ZW6",.T.))
+		    
+		ZW6->ZW6_CODIGO := GeraCodigo()	
+		
+	//Alteração
+	ElseIf cOper == "ALT"
+		ZW6->(RecLock("ZW6",.F.))
+	EndIf
+		
+	SX3->(DbSetOrder(1))
+	If SX3->(DbSeek("ZW6"))
+		While SX3->(!EOF())
+			If  X3Usado(SX3->X3_CAMPO)
+				ZW6->&(SX3->X3_CAMPO) := &("HttpPost->"+AllTrim(SX3->X3_CAMPO))
+			EndIf
+			SX3->(DbSkip())
+		EndDo
+	EndIf
+			
+	ZW6->(MsUnlock())
+
+    //Grava as rotinas vinculadas
+	ZW4->(DbGoTop())
+	While ZW4->(!EOF())
+			
+		//Verifica se a rotina já está vinculada
+		ZW7->(DbSetOrder(1))
+		If ZW7->(DbSeek(xFilial("ZW7")+AvKey(ZW6->ZW6_CODIGO,"ZW7_CODGRP")+ZW4->ZW4_CODIGO))
+
+			//Verfica se foi desmarcada            
+			If Type("HttpPost->R"+AllTrim(ZW4->ZW4_CODIGO)) == "U"
+
+				ZW7->(RecLock("ZW7",.F.))
+				ZW7->(DbDelete())
+				ZW7->(MsUnlock())
+
+			EndIf
+
+		//Rotinas não vinculadas
+		Else
+			//Verifica se foi marcada
+			If Type("HttpPost->R"+AllTrim(ZW4->ZW4_CODIGO)) <> "U"
+				ZW7->(RecLock("ZW7",.T.))
+				
+				ZW7->ZW7_CODGRP	:= ZW6->ZW6_CODIGO
+				ZW7->ZW7_CODROT	:= ZW4->ZW4_CODIGO
+
+				ZW7->(MsUnlock())
+			EndIf
+
+		EndIf
+		ZW4->(DbSkip())		
+	EndDo
+
+EndIf
+
+cHtml := ExecInPage("GTWC006")
+
+WEB EXTENDED END
+	 
+Return cHtml  
+
+/*
+Função  : GeraCodigo
+Objetivo: Gera um novo código para o cadastro de menu 
+Autor   : Eduardo C. Romanini
+Data    : 28/05/2012
+*/
+*--------------------------*
+Static Function GeraCodigo()
+*--------------------------*
+Local cRet := ""
+
+Local nCod := 0
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+BeginSql Alias 'QRY'
+	SELECT MAX(ZW6_CODIGO) as 'ULTCOD'
+	FROM %table:ZW6%
+	WHERE %notDel%
+EndSql
+
+QRY->(DbGoTop())
+If QRY->(!BOF()) .and. QRY->(!EOF())
+    
+	//Verifica o ultimo codigo utilizado pela empresa
+	nCod := Val(Right(QRY->ULTCOD,5))
+	//Soma 1 ao codigo
+	nCod++
+
+	//Tranforma o numero para gravação
+	cRet := "G"+StrZero(nCod,5)
+Else
+	//Primeiro numero de solicitação
+	nCod := "G00001"
+EndIf
+
+QRY->(DbCloseArea())
+
+Return cRet
+
+/*
+Função  : WC006RotVinc()
+Objetivo: Verifica se a rotina está vinculada ao usuário
+Autor   : Eduardo C. Romanini
+Data    : 29/05/2012
+*/
+*-----------------------------------------*
+User Function WC006RotVinc(cCodGrp,cCodRot)
+*-----------------------------------------*
+Local lRet := .F.
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+ZW7->(DbSetOrder(1))
+If ZW7->(DbSeek(xFilial("ZW7")+AllTrim(cCodGrp)+AllTrim(cCodRot)))
+	lRet := .T.
+EndIf
+
+Return lRet
+

@@ -1,0 +1,1690 @@
+//#include "spednfe.ch"
+#include "protheus.ch"
+#include "topconn.ch"
+#define STR0035  "Ambiente"
+#define STR0039  "O primeiro passo é configurar a conexão do Protheus com o serviço."
+#define STR0050  "Protocolo"
+#define STR0056  "Produção"
+#define STR0057  "Homologação"
+#define STR0068  "Cod.Ret.NFe"
+#define STR0069  "Msg.Ret.NFe"
+#define STR0114  "Ok"
+#define STR0107  "Consulta NF"
+#define STR0129  "Versão da mensagem"
+
+
+/*/{Protheus.doc} MT103DNF
+(long_description)
+
+@author Marcelo Lauschner
+@since 06/12/2013
+@version 1.0
+
+@return logico, Permite ou não o lançamento da Nota fiscal
+
+@example
+(examples)
+
+@see (links_or_references)
+/*/
+User Function MT103DNF()
+
+//INICIO - CENTRAL XML	
+Local	aInParamIxb		:= aClone(ParamIxb)
+Local 	aDanfe			:= ParamIxb[1]
+Local	lRet			:= .T.
+Local	aAreaOld		:= GetArea()
+Local	cQry			:= ""
+Local	nTmF1Serie,nTmF1Doc,nPxIniVlrTot,nPxFimVlrTot
+Local	cF1Serie		:= ""
+Local	cF1Doc			:= ""
+Local	cF1CGC			:= ""
+Local	cCgcEmit		:= ""
+Local	cF1Emissao		:= ""
+Local	cEmissaoXml		:= ""
+Local	aImpNfe			:= {}
+Local	aImpXml			:= {}
+// Lista de impostos retirada da função MaFisInsereImp do fonte MATXFIS.PRX para facilitar consultas
+Local 	aImpostos		:= { 'IRRF Imposto de Renda','ISS Imp. Serviço','I.C.M.S','IPI','ICMS Retido','INSS','PIS - Via Apuração','COFINS - Via Apuração','PIS - Via Retençao','COFINS - Via Retençao','CSLL - Via Retençao','ICMS Complementar','PIS - Subst. Tributaria','COFINS - Subst. Tributaria','SEST/SENAT','FETHAB','FABOV','FACS'}
+Local 	aImpCod			:= { 'IRR','ISS','ICM','IPI','SOL','INS','PS2','CF2','PIS','COF','CSL','CMP','PS3','CF3','SES','FET','FAB','FAC'}
+Local	lSendAlert		:= .F.
+Local	iR				:= 0
+Local	iW				:= 0
+Local   iB 				:= 0
+Local	lFirstExec		:= .T.
+Local	lRecusou		:= .F.
+Local	lExistTblXml	:= .F.	// Verifica se a tabela CONDORXML existe para validar totais da nota depois da validação de ajustes de impostos
+Local	aSF4Area		:= SF4->(GetArea())
+//Chave SD1 - D1_FILIAL+D1_DOC+D1_SERIE+D1_FORNECE+D1_LOJA+D1_COD+D1_ITEM
+// Preciso ler o tamanho do campo XIT_KEYSD1 para para ler o D1_ITEM correto
+Local	nTamKeySD1 		:= Len(xFilial("SD1"))+TamSX3("D1_DOC")[1]+TamSX3("D1_SERIE")[1]+TamSX3("D1_FORNECE")[1]+TamSX3("D1_LOJA")[1]+TamSX3("D1_COD")[1]
+Local	lIsA2SIMPNAC	:= MaFisRet(,'NF_SIMPNAC') == "1"  // Verifica se o fornecedor é Optante do Simples Nacional
+Local	lAddIcmRet		:= .F.
+Local	nVlrTotalNf		:= MaFisRet(,'NF_TOTAL')
+Local	nXmlValNf		:= 0
+Local	nRounAcept		:= 0
+Local	cConvOrigem		:= ""
+							//0 – Nacional, exceto as indicadas nos códigos 3 a 5;
+							//1 – Estrangeira – importação direta, exceto a indicada no código 6;
+							//2 – Estrangeira – adquirida no mercado interno, exceto a indicada no código 7;
+							//3 – Nacional, mercadoria ou bem com conteúdo de importação superior a 40% (quarenta por cento);
+							//4 – Nacional, cuja produção tenha sido feita em conformidade com os processos produtivos básicos de que tratam o Decreto-Lei nº 288, de 28 de fevereiro de 1967, a Lei federal        nº 8.248, de 23 de outubro de 1991, a Lei federal nº 8.387, de 30 de dezembro de 1991, a Lei federal nº 10.176, de 11 de janeiro de 2001 e a Lei federal nº 11.484, de 31 de maio de 2007;
+							//5 – Nacional, mercadoria ou bem com conteúdo de importação inferior ou igual a 40% (quarenta por cento);
+							//6 – Estrangeira – importação direta, sem similar nacional, constante em lista de resolução do Conselho de Ministros da Câmara de Comércio Exterior (CAMEX);
+							//7 – Estrangeira – adquirida no mercado interno, sem similar nacional, constante em lista de resolução do CAMEX.
+Local	cMsgAtuXmlOk	:= ""
+Local	cF1ChvNfe		:= aDanfe[13]
+Local	lGeraDupl		:= .F. 
+Local	cVldNrSer		:= ""
+Local	nPxD1Tes	   	:= aScan(aHeader,{|x| Alltrim(x[2]) == "D1_TES"})
+Private nSumDupl		:= 0
+Private	cRetBlq			:= ""
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	lSendAlert 	:= GetNewPar("XM_MT103ML",.F.)
+	nRounAcept 	:= GetNewPar("XM_ARRDIMP",0.02 ) // Valor do imposto que pode ser arredondado para cima ou para baixa - Tolerancia
+	cConvOrigem := GetNewPar("XM_CB1ORIG","0=0;1=2;2=2;3=3;4=4;5=5;6=7;7=7;8=0")
+	cVldNrSer	:= GetNewPar("XM_VLNRSER","S#D#C#E#N#F") // 	S - Série D - Documento C - Cnpj E - Emissão N - Tipo Sped Mod.55 F - Tipo CTE Mod.57
+	
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MT103DNF",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	If Type("lAutoExec") == "U"
+		Private	lAutoExec	:= IsBlind()
+	Endif
+	
+	
+	// IAGO 04/03/2015 - Chamado da rotina MT119TOK está null
+	If Type("l103Auto") == "U"
+		Private	l103Auto	:= IsBlind()
+	Endif
+	
+	If UPPER(Alltrim(FunName())) == "MATA310" // Nâo verifica na rotina de transferência entre filiais
+		lRet	:= .T. 	
+	// 25/10/2017 - Verifica se o parâmetro de exceção de rotina que não valida o PE está na Pilha de chamadas
+	ElseIf Alltrim(GetNewPar("XM_NPEM103","MATA310")) <> "MATA103"  .And. IsInCallStack(Alltrim(GetNewPar("XM_NPEM103","MATA310"))) // Se for acionada por um Ponto de Entrada no Faturamento de Notas 
+		lRet	:= .T. 	
+	// 21/06/2016 - Verifica se a Espécie de nota está em branco mas se trata de uma NFe/CTe
+	ElseIf Empty(cEspecie) .And. Len(Alltrim(cF1ChvNfe)) == 44
+		lRet	:= .F.
+		cRetBlq += "Informada Chave Eletrônica porém não preenchido o campo ESPECIE"
+	// Forço a verificação da Chave Eletronica
+	ElseIf Alltrim(cEspecie) $ "SPED#CTE" .And. cFormul # "S"
+		If cEspecie $ Padr("CTE",Len(cEspecie)) .And. Len(aDanfe) >= 23 //.And. Empty(aDanfe[23])
+			If Type("cTpCte") == "C"  .And. Type("cModFrete") == "C" .And. Type("cModalCte") == "C"
+				// Atualizo variavel private do Mata103
+				If Empty(aNFEDanfe[14])
+					aNFEDanfe[14]	:= RetTipoFrete(cModFrete) //cModFrete
+					aDanfe[14]		:= RetTipoFrete(cModFrete) //cModFrete
+				Endif
+				If Empty(aNFEDanfe[18])
+					aNFEDanfe[18]	:= RetTipoCTE(cTpCte)
+					aDanQfe[18]		:= RetTipoCTE(cTpCte)
+				Endif
+	
+				If Empty(aNFEDanfe[23])
+					aNFEDanfe[23]	:= RetModCTE(cModalCte) //cModalCte
+					aDanfe[23]		:= RetModCTE(cModalCte)	//cModalCte
+				Endif
+				// Chamado 161 - Gertec - Identificou que a Modalidade do CTe não é preenchida depois de gravar o Cte mesmo que o array já estivesse populado	
+				If Empty(MaFisRet(,"NF_MODAL"))
+					MaFisAlt("NF_MODAL",cModalCte)
+				Endif
+				
+			Else
+				/*If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"O tipo de Nota exige que seja informado o campo 'Tipo de CTe' do Conhecimento de Transporte Eletrônico!")
+					cRetBlq += "O tipo de Nota exige que seja informado o campo 'Modalidade CTe' do Conhecimento de Transporte Eletrônico!"
+					lRet	:= .F.
+				Else
+					lRet	:= MsgYesNo("O tipo de Nota exige que seja informado o campo 'Modalidade CTe' do Conhecimento de Transporte Eletrônico! Continua lançamento?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Tipo de CTe não informado")
+				Endif*/
+			Endif
+		ElseIf cEspecie $ Padr("CTE",Len(cEspecie)) .And. Len(aDanfe) >= 18 //.And. Empty(aDanfe[18])
+			If Type("cTpCte") == "C"  .And. Type("cModFrete") == "C" //.And. Type("cModalCte") == "C"
+				// Atualizo variavel private do Mata103
+				If Empty(aNFEDanfe[14])
+					aNFEDanfe[14]	:= RetTipoFrete(cModFrete) //cModFrete
+					aDanfe[14]		:= RetTipoFrete(cModFrete) //cModFrete
+				Endif
+				If Empty(aNFEDanfe[18])
+					aNFEDanfe[18]	:= RetTipoCTE(cTpCte)
+					aDanfe[18]		:= RetTipoCTE(cTpCte)
+				Endif
+			Else
+				/*If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"O tipo de Nota exige que seja informado o campo 'Tipo de CTe' do Conhecimento de Transporte Eletrônico!")
+					cRetBlq += "O tipo de Nota exige que seja informado o campo 'Tipo de CTe' do Conhecimento de Transporte Eletrônico!"
+					lRet	:= .F.
+				Else
+					lRet	:= MsgYesNo("O tipo de Nota exige que seja informado o campo 'Tipo de CTe' do Conhecimento de Transporte Eletrônico! Continua lançamento?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Tipo de CTe não informado")
+				Endif*/
+			Endif
+		ElseIf cEspecie $ Padr("CTE",Len(cEspecie)) .And. Len(aDanfe) >= 14 //.And. Empty(aDanfe[14])
+			If Type("cModFrete") == "C" .And. Type("cTpCte") == "C"
+				// Atualizo variavel private do Mata103
+				If Empty(aNFEDanfe[14])
+					aNFEDanfe[14]	:= RetTipoFrete(cModFrete) //cModFrete
+					aDanfe[14]		:= RetTipoFrete(cModFrete) //cModFrete
+				Endif
+			Else
+				/*If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"O tipo de Nota exige que seja informado o campo 'Tipo de Frete' do Conhecimento de Transporte Eletrônico!")
+					cRetBlq += "O tipo de Nota exige que seja informado o campo 'Tipo de Frete' do Conhecimento de Transporte Eletrônico!"
+					lRet	:= .F.
+				Else
+					lRet	:= MsgYesNo("O tipo de Nota exige que seja informado o campo 'Tipo de Frete' do Conhecimento de Transporte Eletrônico! Continua lançamento?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Tipo de Frete não informado")
+				Endif*/
+				
+			Endif
+		ElseIf Len(Alltrim(cF1ChvNfe)) <> 44
+			If l103Auto
+				StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"O tipo de Nota exige que seja informado a Chave da Nota Fiscal Eletônica ou do Conhecimento de Transporte Eletrônico!")
+				cRetBlq += "O tipo de Nota exige que seja informado a Chave da Nota Fiscal Eletônica ou do Conhecimento de Transporte Eletrônico!"
+				lRet	:= .F.
+			Else
+				lRet	:= MsgYesNo("O tipo de Nota exige que seja informado a Chave da Nota Fiscal Eletônica ou do Conhecimento de Transporte Eletrônico! Continua lançamento?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Chave NFe/CTe não informado")
+			Endif
+		Endif
+		
+		// 24/10/2016 - Validação correta do CNPJ do emitente da nota 
+		If cFormul # "S" .And. Alltrim(cEspecie) $ "SPED#CTE" .And. lRet
+			If cTipo$"DB"
+				DbSelectArea("SA1")
+				DbSetOrder(1)
+				MsSeek(xFilial("SA1")+cA100For+cLoja)
+				cCgcEmit	:=	SA1->A1_CGC
+			Else
+				DbSelectArea("SA2")
+				DbSetOrder(1)
+				MsSeek(xFilial("SA2")+cA100For+cLoja)
+				cCgcEmit	:= 	SA2->A2_CGC
+			EndIf
+					
+			nTmF1Serie	:= TamSX3("F1_SERIE")[1]
+			nTmF1Doc	:= TamSX3("F1_DOC")[1]
+			cF1Serie	:= Substr(cF1ChvNfe,23,3)
+			cF1Doc		:= Substr(cF1ChvNfe,26,9)
+			cF1CGC		:= Substr(cF1ChvNfe,7,14)
+			cEmissaoXml	:= Substr(cF1ChvNfe,3,4)
+			cF1Emissao	:= Substr(DTOS(dDEmissao),3,2) + Substr(DTOS(dDEmissao),5,2) // 1610 20161024
+			
+			// Verifica se a série digitada está correta
+			If "S" $ cVldNrSer .And. StrZero(Val(cSerie),nTmF1Serie) <> cF1Serie
+				If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"Lançamento interrompido. Digitado série de nota '" + cSerie + "' quando o esperado era '"+ cF1Serie +"' ")
+					cRetBlq += "Lançamento interrompido. Digitado série de nota '" + cSerie + "' quando o esperado era '"+ cF1Serie +"' "
+					lRet	:= .F.
+				Else
+					lRet	:= MsgYesNo("Digitado série de nota '" + cSerie + "' quando o esperado era '"+ cF1Serie +"' Deseja continuar assim mesmo?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Numeração errada de Série")
+				Endif
+				
+			ElseIf "D" $ cVldNrSer .And. StrZero(Val(cNFiscal),nTmF1Doc) <> StrZero(Val(cF1Doc),nTmF1Doc) //cF1Doc
+				If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"Lançamento interrompido. Digitado número de nota '"+ cNFiscal +"' quando o esperado era '"+ cF1Doc +"' ")
+					cRetBlq += "Lançamento interrompido. Digitado número de nota '"+ cNFiscal +"' quando o esperado era '"+ cF1Doc +"' "
+				Else
+					MsgStop("Lançamento interrompido. Digitado número de nota '"+ cNFiscal +"' quando o esperado era '"+ cF1Doc +"' ",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Numeração errada de Nota")
+				Endif
+				lRet	:= .F.
+			ElseIf "C" $ cVldNrSer .And. cF1CGC <> cCgcEmit
+				If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"Lançamento interrompido. Digitado para CNPJ   '"+ Transform(cCgcEmit,"@R 99.999.999/9999-99")+"' quando o esperado era '" + Transform(cF1CGC,"@R 99.999.999/9999-99")+"' ")
+					cRetBlq += "Lançamento interrompido. Digitado para CNPJ   '"+ Transform(cCgcEmit,"@R 99.999.999/9999-99")+"' quando o esperado era '" + Transform(cF1CGC,"@R 99.999.999/9999-99")+"' "
+					lRet	:= .F.
+				Else
+					lRet	:= MsgYesNo("Digitado para CNPJ   '"+ Transform(cCgcEmit,"@R 99.999.999/9999-99")+"' quando o esperado era '" + Transform(cF1CGC,"@R 99.999.999/9999-99")+"' ",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - CNPJ não confere!")
+				Endif				
+			ElseIf "E" $ cVldNrSer .And. cEmissaoXml <> cF1Emissao
+				If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"Lançamento interrompido. Digitado Ano/Mês '"+cF1Emissao+"' quando o esperado era '"+cEmissaoXml+"' ")
+					cRetBlq += "Lançamento interrompido. Digitado Ano/Mês '"+cF1Emissao+"' quando o esperado era '"+cEmissaoXml+"' "
+				Else
+					MsgStop("Lançamento interrompido. Digitado Ano/Mês '"+cF1Emissao+"' quando o esperado era '"+cEmissaoXml+"' ",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Ano/Mês Emissão errados!")
+				Endif
+				lRet	:= .F.
+			ElseIf "N" $ cVldNrSer .And. Substr(cF1ChvNfe,21,2) == "55" .And. Alltrim(cEspecie) <> "SPED"
+				If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"Lançamento interrompido. Digitado Espécie '" + cEspecie + "' quando o esperado era 'SPED' por que a chave eletrônica informa Modelo 55!")
+					cRetBlq += "Lançamento interrompido. Digitado Espécie '" + cEspecie + "' quando o esperado era 'SPED' por que a chave eletrônica informa Modelo 55!
+				Else
+					MsgStop("Lançamento interrompido. Digitado Espécie '" + cEspecie + "' quando o esperado era 'SPED' por que a chave eletrônica informa Modelo 55!",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Espécie Errada!")
+				Endif
+				lRet	:= .F.
+			ElseIf "F" $ cVldNrSer .And. Substr(cF1ChvNfe,21,2) == "57" .And. Alltrim(cEspecie) <> "CTE"
+				If l103Auto
+					StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"Lançamento interrompido. Digitado Espécie '" + cEspecie + "' quando o esperado era 'CTE' por que a chave eletrônica informa Modelo 57!")
+					cRetBlq += "Lançamento interrompido. Digitado Espécie '" + cEspecie + "' quando o esperado era 'CTE' por que a chave eletrônica informa Modelo 57!"
+				Else
+					MsgStop("Lançamento interrompido. Digitado Espécie '" + cEspecie + "' quando o esperado era 'CTE' por que a chave eletrônica informa Modelo 57!",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Espécie Errada!")
+				Endif
+				lRet	:= .F.
+			Endif
+		Endif
+						
+		If lRet
+			// Melhoria feita em 28/08/2012 a pedido da Urbano, para conciliar com o parametro padrão da Totvs que verifica se está ativa
+			// a consulta da chave eletronica durante o lançamento da nota ou não.
+			If GetNewPar("MV_CHVNFE",.F.)
+				lRet := sfAutSefaz(cF1ChvNfe)
+			Else
+				lRet := .T.
+			Endif
+			
+			If lRet
+				
+				cQry := "SELECT COUNT(*) EXISTXML "
+				cQry += "  FROM TOP_FIELD "
+				cQry += " WHERE FIELD_TABLE LIKE '%CONDORXML%' "
+				
+				TCQUERY cQry NEW ALIAS "QSXML"
+				// Existir a tabela CONDORXML,irá validar a existencia da Chave na Base de dados
+				If QSXML->EXISTXML > 0
+					lExistTblXml	:= .T. // Atribui valor Verdadeiro para permitir validação de Total da Nota após ajustes forçados de impostos
+					
+					cQry := ""
+					cQry += "SELECT XML_NOMEDT,XML_NUMNF "
+					cQry += "  FROM CONDORXML "
+					cQry += " WHERE XML_DEST = '"+SM0->M0_CGC+"' "
+					cQry += "   AND XML_REJEIT = ' ' "
+					cQry += "   AND XML_CHAVE = '"+cF1ChvNfe+"' "
+					
+					TCQUERY cQry NEW ALIAS "QSPED"
+					
+					If !Eof()
+						lRet	:= .T.
+						
+					Else
+						
+						// Alterado default se parametro não existir para .T. permitindo lançar sem ter XML, pois o Wizard não foi executado na empresa. 
+						lRet	:= GetNewPar("XM_LIBSXML",.T.)
+						If !lRet
+							If l103Auto
+								StaticCall(XMLDCONDOR,stSendMail,GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,"Lançamento interrompido pois não há registro de XML desta Chave informada!","Sem arquivo XML na Central XML!")
+							Else
+								MsgStop("Lançamento interrompido pois não há registro de XML desta Chave informada!","'MT103DNF.PRW' - Sem arquivo XML na Central XML!")
+							Endif
+						Else
+							If GetNewPar("XM_MSGNXML",.F.)
+								lRet 	:= MsgYesNo("Não há registro de arquivo na Central XML desta Chave informada! Tem certeza de lançar a nota assim mesmo?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Sem arquivo XML na Central XML!")
+							Else
+								lRet	:= .T. 
+							Endif
+						Endif
+					Endif
+					QSPED->(DbCloseArea())
+				Endif
+				QSXML->(DbCloseArea())
+				
+				// Melhoria adicionada em 22/08/2014 para contemplar validação de duplicatas
+				If lRet .And. Type("aDupAxSE2") == "A"
+					If GetNewPar("XM_CPVLDNF",.F.)
+						lRet	:= sfVldCond(aDupAxSE2,aDupSE2,cF1ChvNfe)
+					Endif
+				Endif
+				
+				
+				// Se houve retorno positivo para as validações anteriores
+				// Verifica se está ativa a validação dos impostos
+				If lRet .And. GetNewPar("XM_VLDIMPX",.F.)
+					// Obtém a lista dos impostos contidos na nota em lançamento
+					aImpNfe	:= Iif(Type("oFisRod:aArray") =="A",oFisRod:aArray,MaFisRet(,'NF_IMPOSTOS'))
+					//"Cod."###"Descricao"###"Base Imposto"###"Aliquota"###"Vlr. Imposto"
+					//"Cod."###"Descricao"###"Base Imposto"###"Vlr. Imposto"
+					
+					//aImpXml
+					// 29/01/2014 - Adiciona pergunte para forçar posicionamento da pergunta do mata103
+					Pergunte("MTA103",.F.)
+					// Validação com aliquota
+					If mv_par09 == 1 // Quebra por aliquota
+						If Type("oMulti") <> "U"
+							For iR := 1 To Len(oMulti:aCols)
+								If !oMulti:aCols[iR,Len(oMulti:aHeader)+1]
+									// Busca informação do ICMS
+									If oMulti:aCols[iR,nPxBasIcm] > 0 .And. !lIsA2SIMPNAC
+										If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "ICM"+Alltrim(Str(oMulti:aCols[iR,nPxPicm])) })) == 0
+											Aadd(aImpXml,{"ICM","I.C.M.S",oMulti:aCols[iR,nPxBasIcm],oMulti:aCols[iR,nPxPicm],oMulti:aCols[iR,nPxValIcm],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasIcm]
+											aImpXml[nPxScan,5] += oMulti:aCols[iR,nPxValIcm]
+										Endif
+									Endif
+									
+									// Busca informação do ICMS do Simples Nacional
+									If oMulti:aCols[iR,nPxCrdIcmSN] > 0 .And. lIsA2SIMPNAC
+										If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "ICM"+Alltrim(Str(oMulti:aCols[iR,nPxPIcmSN])) })) == 0
+											Aadd(aImpXml,{"ICM","I.C.M.S",(oMulti:aCols[iR,nPxTotNfe]-oMulti:aCols[iR,nPxValDesc]),oMulti:aCols[iR,nPxPIcmSN],oMulti:aCols[iR,nPxCrdIcmSN],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += (oMulti:aCols[iR,nPxTotNfe] - oMulti:aCols[iR,nPxValDesc])
+											aImpXml[nPxScan,5] += oMulti:aCols[iR,nPxCrdIcmSN]
+										Endif
+									Endif
+									
+									// Busca informação do PIS
+									If oMulti:aCols[iR,nPxBasPis] > 0 .And. oMulti:aCols[iR,nPxValPis] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "PS2"+Alltrim(Str(oMulti:aCols[iR,nPxPPis])) })) == 0
+											Aadd(aImpXml,{"PS2","PIS - Via Apuração",oMulti:aCols[iR,nPxBasPis],oMulti:aCols[iR,nPxPPis],oMulti:aCols[iR,nPxValPis],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasPis]
+											aImpXml[nPxScan,5] += oMulti:aCols[iR,nPxValPis]
+										Endif
+									Endif
+									
+									// Busca informação do Cofins
+									If oMulti:aCols[iR,nPxBasCof] > 0 .And. oMulti:aCols[iR,nPxValCof] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "CF2"+Alltrim(Str(oMulti:aCols[iR,nPxPCof])) })) == 0
+											Aadd(aImpXml,{"CF2","COFINS - Via Apuração",oMulti:aCols[iR,nPxBasCof],oMulti:aCols[iR,nPxPCof],oMulti:aCols[iR,nPxValCof],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasCof]
+											aImpXml[nPxScan,5] += oMulti:aCols[iR,nPxValCof]
+										Endif
+									Endif
+									
+									// Busca informação da ST
+									If oMulti:aCols[iR,nPxBasRet] > 0 .And. oMulti:aCols[iR,nPxPICMSST] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "ICR"+Alltrim(Str(oMulti:aCols[iR,nPxPICMSST])) })) == 0
+											//If (nPxScan := aScan(aImpXml,{|x| x[1] == "ICR" })) == 0
+											Aadd(aImpXml,{"ICR","ICMS Retido",oMulti:aCols[iR,nPxBasRet],oMulti:aCols[iR,nPxPICMSST],oMulti:aCols[iR,nPxIcmRet],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasRet]
+											aImpXml[nPxScan,5] += oMulti:aCols[iR,nPxIcmRet]
+										Endif
+										lAddIcmRet	:= .T.	// Define que já encontrou dados para adicionar ST
+									Endif
+									
+									// Busca informação do IPI
+									If oMulti:aCols[iR,nPxBasIpi] > 0 .And. oMulti:aCols[iR,nPxValIpi] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "IPI"+Alltrim(Str(oMulti:aCols[iR,nPxPIpi])) })) == 0
+											Aadd(aImpXml,{"IPI","IPI",oMulti:aCols[iR,nPxBasIpi],oMulti:aCols[iR,nPxPIpi],oMulti:aCols[iR,nPxValIpi],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasIpi]
+											aImpXml[nPxScan,5] += oMulti:aCols[iR,nPxValIpi]
+										Endif
+									Endif
+									
+									// Monta confronto de CST  - Adicionado em 22/06/2013 a pedido de MadeiraMadeira
+									cOriB1 		:= Substr(oMulti:aCols[iR,nPxXITCST],1,1)
+									// Altera o enfoque do campo Origem
+									// 1=2 Importado direto para Importado adquirido mercado interno
+									// 6=7
+									// 3=3
+									// 5=5
+									//cOriB1		:= Iif(cOriB1 =="1","2",Iif(cOriB1=="6","7",IIf(cOriB1 == "8","0",cOriB1)))
+									cOriB1		:= Substr(cConvOrigem,AT(cOriB1+"=",cConvOrigem)+2,1) //"0=0;1=2;2=2;3=3;4=4;5=5;6=7;7=7;8=0"
+									
+									nPD1ClasFis := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_CLASFIS"})
+									nPD1Item    := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_ITEM"})
+									nPD1BaseIcm := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_BASEICM"})
+									nPD1ValIcm  := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_VALICM"})
+									nPD1Total   := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_TOTAL"})
+									nPD1Valdesc := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_VALDESC"})
+									nPD1AliqSol := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_ALIQSOL"})
+									For iW := 1 To Len(aCols)
+										If !aCols[iW,Len(aHeader)+1]
+											If aCols[iW,nPD1Item] == Substr(oMulti:aCols[iR,nPxKeySD1],nTamKeySD1+1,Len(aCols[iW,nPD1Item]))
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "CSTCST DO ICMS " + Substr(oMulti:aCols[iR,nPxXITCST],2,2) })) == 0
+													Aadd(aImpXml,{	"CST",;
+														"CST DO ICMS "+Substr(oMulti:aCols[iR,nPxXITCST],2,2),;
+														oMulti:aCols[iR,nPxBasIcm],;
+														0,;
+														oMulti:aCols[iR,nPxValIcm],;
+														0,;
+														0,;
+														0,;
+														0})
+												Else
+													aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasIcm]
+													aImpXml[nPxScan,5] += oMulti:aCols[iR,nPxValIcm]
+												Endif
+												
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "CSTCST DO ICMS " + Substr(aCols[iW,nPD1ClasFis],2,2) })) == 0
+													Aadd(aImpXml,{	"CST",;
+														"CST DO ICMS "+Substr(aCols[iW,nPD1ClasFis],2,2),;
+														0,;
+														0,;
+														0,;
+														MaFisRet(iW,"IT_BASEICM"),;
+														0,;
+														MaFisRet(iW,"IT_VALICM"),;
+														0})
+												Else
+													aImpXml[nPxScan,6] += MaFisRet(iW,"IT_BASEICM")//aCols[iW,nPD1BaseIcm]
+													aImpXml[nPxScan,8] += MaFisRet(iW,"IT_VALICM")//aCols[iW,nPD1ValIcm]
+												Endif
+												
+												// Confronta origem
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "ORIORIGEM PRODUTO "+cOriB1 })) == 0
+													Aadd(aImpXml,{	"ORI",;
+														"ORIGEM PRODUTO "+cOriB1,;
+														(oMulti:aCols[iR,nPxTotNfe]-oMulti:aCols[iR,nPxValDesc]),;
+														0,;
+														0,;
+														0,;
+														0,;
+														0,;
+														0})
+												Else
+													aImpXml[nPxScan,3] += (oMulti:aCols[iR,nPxTotNfe]-oMulti:aCols[iR,nPxValDesc])
+												Endif
+												
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "ORIORIGEM PRODUTO "+Substr(aCols[iW,nPD1ClasFis],1,1) })) == 0
+													Aadd(aImpXml,{	"ORI",;
+														"ORIGEM PRODUTO "+Substr(aCols[iW,nPD1ClasFis],1,1),;
+														0,;
+														0,;
+														0,;
+														aCols[iW,nPD1Total]-aCols[iW,nPD1Valdesc],;
+														0,;
+														0,;
+														0})
+												Else
+													aImpXml[nPxScan,6] += aCols[iW,nPD1Total]-aCols[iW,nPD1Valdesc]
+												Endif
+												
+												
+												// Adicionada a validação em 26/04/2014
+												// Busca informação de ST antecipado, para validar confronto de impostos
+												// F4_INCSOL=N, F4_MKPCMP=2, F4_MKPSOL=2
+												DbSelectArea("SF4")
+												DbSetOrder(1)
+												If DbSeek(xFilial("SF4")+MaFisRet(iW,"IT_TES"))
+													// Agrega Solidário N=Não; Markup Icms Complementar 2=Não; Margem Solidário 2=Configuração
+													If SF4->F4_INCSOL == "N" .And. SF4->F4_MKPCMP=="2" .And. SF4->F4_MKPSOL == "2"
+														If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "ICR"+Alltrim(Str(MaFisRet(iW,"IT_ALIQSOL")))})) == 0
+															Aadd(aImpXml,{	"ICR",;
+																"ICMS Retido",;
+																MaFisRet(iW,"IT_BASESOL"),;
+																MaFisRet(iW,"IT_ALIQSOL"),;
+																MaFisRet(iW,"IT_VALSOL"),;
+																0,;
+																0,;
+																0,;
+																0})
+														Else
+															aImpXml[nPxScan,3] += MaFisRet(iW,"IT_BASESOL")//aCols[iW,nPD1BaseIcm]
+															aImpXml[nPxScan,5] += MaFisRet(iW,"IT_VALSOL")//aCols[iW,nPD1ValIcm]
+														Endif
+														lAddIcmRet	:= .T.	// Define que já encontrou dados para adicionar ST
+													Endif
+												Endif
+												
+												// Busca informação da aliquota do ST para montar o Array somente por causa da aliquota do ST que não veio do XML
+												If nPD1AliqSol > 0
+													If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == "ICR"+Alltrim(Str(aCols[iW,nPD1AliqSol])) })) == 0
+														//If (nPxScan := aScan(aImpXml,{|x| x[1] == "ICR" })) == 0
+														Aadd(aImpXml,{"ICR","ICMS Retido",oMulti:aCols[iR,nPxBasRet],aCols[iW,nPD1AliqSol],oMulti:aCols[iR,nPxIcmRet],0,0,0,0})
+													ElseIf !lAddIcmRet		// Se não encontrou dados para adicionar ST anteriormente soma
+														aImpXml[nPxScan,3]	+= oMulti:aCols[iR,nPxBasRet]
+														aImpXml[nPxScan,5]	+= oMulti:aCols[iR,nPxIcmRet]
+													Endif
+												Endif
+											Endif
+										Endif
+									Next
+								Endif
+							Next
+							// Verifica os TES se gera Duplicata ou não
+							For iW := 1 To Len(aCols)
+								If !aCols[iW,Len(aHeader)+1]
+									DbSelectArea("SF4")
+									DbSetOrder(1)
+									If DbSeek(xFilial("SF4")+aCols[iW,nPxD1Tes])
+										If SF4->F4_DUPLIC == "S"
+											lGeraDupl	:= .T.
+										Endif
+									Endif
+								Endif
+							Next iW 
+							
+							// Restauro a area da SF4
+							RestArea(aSF4Area)
+							
+							For iR := 1 To Len(aImpNfe)
+								If !Empty(aImpNfe[iR,3])
+									If (nPxScan := aScan(aImpXml,{|x| x[1]+Alltrim(Str(x[4])) == aImpNfe[iR,1]+Alltrim(Str(aImpNfe[iR,4])) })) == 0
+										Aadd(aImpXml,{aImpNfe[iR,1],aImpNfe[iR,2],0,0,0,aImpNfe[iR,3],aImpNfe[iR,4],aImpNfe[iR,5],iR})
+									Else
+										aImpXml[nPxScan,6] += aImpNfe[iR,3]
+										aImpXml[nPxScan,7] := aImpNfe[iR,4]
+										aImpXml[nPxScan,8] += aImpNfe[iR,5]
+										aImpXml[nPxScan,9] := iR	// Posição original do imposto no MATXFIS
+									Endif
+								Endif
+							Next
+							If Type("aInfIcmsCte") <> "U"
+								//aInfIcmsCte	:= {"ICM","I.C.M.S.",nBaseIcms,nAliqIcms,nValIcms}
+								//Aadd(aInfIcmsCte,{"ICR","ICMS Retido",nBaseRet,nAliqIcms,nIcmsSt})
+								For iR := 1 To Len(aInfIcmsCte)
+									If !Empty(aInfIcmsCte[iR,3])
+										If (nPxScan := aScan(aImpXml,{|x| x[1]+Transform(x[7],"@E 999.99") == aInfIcmsCte[iR,1]+Transform(aInfIcmsCte[iR,4],"@E 999.99")})) == 0
+											Aadd(aImpXml,{aInfIcmsCte[iR,1],aInfIcmsCte[iR,2],aInfIcmsCte[iR,3],aInfIcmsCte[iR,4],aInfIcmsCte[iR,5],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += aInfIcmsCte[iR,3]
+											aImpXml[nPxScan,4] := aInfIcmsCte[iR,4]
+											aImpXml[nPxScan,5] += aInfIcmsCte[iR,5]
+										Endif
+									Endif
+								Next
+								
+							Endif
+							
+							// 25/01/2018 - Melhoria que valida se há consistência em gerar duplicatas mesmo não havendo TES que gere ou o contrário
+							If !lAutoExec .And. nSumDupl > 0 .And. !lGeraDupl
+							//	lRet	:= MsgYesNo("Foram encontradas parcelas que gerarão títulos conforme a aba 'Duplicatas', porém nenhuma TES dos itens está configurada para gerar Duplicata! Deseja continuar assim mesmo?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Duplicatas")
+							Endif 
+							
+							If !lAutoExec .And. nSumDupl == 0 .And. lGeraDupl
+							//	lRet	:= MsgYesNo("Não foram encontradas parcelas que gerarão títulos conforme a aba 'Duplicatas', porém há TES nos itens que está configurada para gerar Duplicata! Deseja continuar assim mesmo?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Duplicatas")
+							Endif 
+							
+							
+							aSort(aImpXml,,,{|x,y| x[1] < y[1]}) // Ordena por impostos
+							If Len(aImpXml) > 0 .And. lRet 
+								If !lAutoExec .And. !l103Auto
+									lRet	:= .F.
+									DEFINE MSDIALOG oDlgImp Title OemToAnsi(ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Confronto de impostos") FROM 001,001 TO 320,810 PIXEL
+									
+									oPanelImp := TPanel():New(0,0,'',oDlgImp, oDlgImp:oFont, .T., .T.,, ,200,40,.T.,.T. )
+									oPanelImp:Align := CONTROL_ALIGN_ALLCLIENT
+						
+									oLisImp := TWBrowse():New( 005,005,395,140,,{"Cod.","Descricao","Base Imposto XML","Aliquota XML","Vlr. Imposto XML","Base Imposto","Aliquota","Vlr Imposto","PosOri"},;
+										{30,90,50,30,50,50,30,50,10},oPanelImp,,,,,,,,,,,,.F.,,.T.,,.F.,,, ) //"Cod."###"Descricao"###"Base Imposto"###"Aliquota"###"Vlr. Imposto"
+									oLisImp:SetArray(aImpXml)
+									oLisImp:bLine:= {|| {	aImpXml[oLisImp:nAt,1],;
+										aImpXml[oLisImp:nAt,2],;
+										Transform(aImpXml[oLisImp:nAt,3],"@E 99,999,999.99"),;
+										Transform(aImpXml[oLisImp:nAt,4],"@E 999.99"),;
+										Transform(aImpXml[oLisImp:nAt,5],"@E 999,999.99"),;
+										Transform(aImpXml[oLisImp:nAt,6],"@E 99,999,999.99"),;
+										Transform(aImpXml[oLisImp:nAt,7],"@E 999.99"),;
+										Transform(aImpXml[oLisImp:nAt,8],"@E 999,999.99"),;
+										aImpXml[oLisImp:nAt,9]}}
+									ACTIVATE MsDialog oDlgImp Centered On Init EnchoiceBar(oDlgImp,{||lRet := .T.,oDlgImp:End() },{|| lRet := .F. , oDlgImp:End()})
+								Else
+									For iR := 1 To Len(aImpXml)
+										If aImpXml[iR,1] $ "ICR#ICM#IPI"
+											nDifBase	:= Round(aImpXml[iR,3],2) - Round(aImpXml[iR,6],2)
+											nDifVlr		:= Round(aImpXml[iR,5],2) - Round(aImpXml[iR,8],2)
+											
+											// Se estiver numa tolerância de até 2 centavos
+											// Força ajuste dos impostos pela função fiscal
+											If 	aImpXml[iR,9] > 0 .And. ((nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0 ) .Or.;
+													(ndifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0 ))
+												// Verifica se existe o objeto da Central XML
+												If Type("oArqXml") <> "U"
+													
+													If aImpXml[iR,1] $ "ICM" .And. (nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0)
+														MaFisAlt("IMP_BASEICM",Round(aImpXml[iR,3],2),aImpXml[iR,9])
+														cMsgBlqAut		:= ""
+														
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste da Base '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' para "+cValToChar(aImpXml[iR,3]) +" de "+cValToChar(aImpXml[iR,6]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "ICM" .And. (nDifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0)
+														MaFisAlt("IMP_VALICM",Round(aImpXml[iR,5],2),aImpXml[iR,9])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste do valor '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' para "+cValToChar(aImpXml[iR,5]) +" de "+cValToChar(aImpXml[iR,8]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "IPI" .And. (nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0)
+														MaFisAlt("IMP_BASEIPI",Round(aImpXml[iR,3],2),aImpXml[iR,9])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste da Base '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' para "+cValToChar(aImpXml[iR,3]) +" de "+cValToChar(aImpXml[iR,6]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "IPI" .And. (nDifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0)
+														MaFisAlt("IMP_VALIPI",Round(aImpXml[iR,5],2),aImpXml[iR,9])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste do valor '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' para "+cValToChar(aImpXml[iR,5]) +" de "+cValToChar(aImpXml[iR,8]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "ICR" .And. (nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0)
+														MaFisAlt("IMP_BASESOL",Round(aImpXml[iR,3],2),aImpXml[iR,9])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste da Base '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' para "+cValToChar(aImpXml[iR,3]) +" de "+cValToChar(aImpXml[iR,6]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "ICR" .And. (nDifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0)
+														MaFisAlt("IMP_VALSOL",Round(aImpXml[iR,5],2),aImpXml[iR,9])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste do valor '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' para "+cValToChar(aImpXml[iR,5]) +" de "+cValToChar(aImpXml[iR,8]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													
+													
+												Endif
+											ElseIf (nDifVlr <> 0 .Or. nDifBase <> 0 )
+												If Type("oArqXml") <> "U"
+													// Quando For ICMS Próprio e o Fornecedor for do Simples não valida
+													// Demais situações são validadas
+													If (aImpXml[iR,1] $ "ICM" .And. !lIsA2SIMPNAC) .Or. aImpXml[iR,1] $ "IPI#ICR"
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Validou rejeição imposto '"+aImpXml[iR,1]+"' "+;
+																" Base XML:"+cValToChar(aImpXml[iR,3])+;
+																" Valor XML:"+cValToChar(aImpXml[iR,5])+;
+																" Base NF:"+cValToChar(aImpXml[iR,6])+;
+																" Valor NF:"+cValToChar(aImpXml[iR,8]))
+														Endif
+														// Seta variavel para recusa ocorrida
+														lRecusou	:= .T.
+														aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+														Pergunte("XMLDCONDOR",.F.)
+														// Reposiciona o registro da chave eletronica
+														U_DbSelArea("CONDORXML",.F.,1)
+														Set Filter To
+														If DbSeek(cF1ChvNfe)
+															// Grava divergencia, forçando o lançamento semi-automático
+															//	cOkMot,lAtuItens,cItem,cMsgAux,nLinXml,cInChave
+															cMsgAtuXmlOk	:= "MT103DNF- NF:"+cSerie+"/"+cNFiscal+Chr(13)+Chr(10) +;
+																"Validou rejeição imposto '"+aImpXml[iR,1]+"' "+Chr(13)+Chr(10)+;
+																"Base XML:"+cValToChar(aImpXml[iR,3])+Chr(13)+Chr(10)+;
+																"Valor XML:"+cValToChar(aImpXml[iR,5])+Chr(13)+Chr(10)+;
+																"Base NF:"+cValToChar(aImpXml[iR,6])+Chr(13)+Chr(10)+;
+																"Valor NF:"+cValToChar(aImpXml[iR,8])
+															
+															StaticCall(XMLDCONDOR,sfAtuXmlOk,"DI",,,cMsgAtuXmlOk/*cMsgAux*/,/*nLinXml*/,cF1ChvNfe/*cInChave*/)
+														Endif
+														lRet	:= .F.
+														StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+													Endif
+												Endif
+											Endif
+										Endif
+									Next
+									
+									// Chamada recursiva do ponto de entrada
+									// Após acertos dos valores de impostos com tolerância de 2 centavo
+									If lRet .And. !lFirstExec .And. !(ExecBlock("MT103DNF",.F.,.F.,{aDanfe}))
+										
+										If lSendAlert
+											StaticCall(	XMLDCONDOR,;
+												stSendMail,;
+												GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+												"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+												"Validou rejeição recursiva")
+										Endif
+										
+										aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+										Pergunte("XMLDCONDOR",.F.)
+										// Reposiciona o registro da chave eletronica
+										U_DbSelArea("CONDORXML",.F.,1)
+										Set Filter To
+										If DbSeek(cF1ChvNfe)
+											// Grava divergencia, forçando o lançamento semi-automático
+											cMsgAtuXmlOk	:=	"MT103DNF- NF:"+cSerie+"/"+cNFiscal+Chr(13)+Chr(10)+"Validou rejeição recursiva"
+											StaticCall(XMLDCONDOR,sfAtuXmlOk,"DI",,,cMsgAtuXmlOk)
+										Endif
+										lRet	:= .F.
+										StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+										// Executa o segunto Loop só para validar CST e ORI
+									ElseIf 	lRet .And. lFirstExec
+										For iR := 1 To Len(aImpXml)
+											If aImpXml[iR,1] $ "CST#ORI"
+												If Round(aImpXml[iR,3],2) <> Round(aImpXml[iR,6],2) .Or. Round(aImpXml[iR,5],2) <> Round(aImpXml[iR,8],2)
+													
+													// Verifica se existe o objeto da Central XML
+													
+													If Type("oArqXml") <> "U" .And. ( aImpXml[iR,1] $ "ORI" .Or. (aImpXml[iR,1] $ "CST" .And. !lIsA2SIMPNAC))
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Validou rejeição imposto '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' "+;
+																"Base XML:"+cValToChar(aImpXml[iR,3])+;
+																"Valor XML:"+cValToChar(aImpXml[iR,5])+;
+																"Base NF:"+cValToChar(aImpXml[iR,6])+;
+																"Valor NF:"+cValToChar(aImpXml[iR,8]))
+														Endif
+														aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+														Pergunte("XMLDCONDOR",.F.)
+														
+														U_DbSelArea("CONDORXML",.F.,1)
+														Set Filter To
+														If DbSeek(cF1ChvNfe)
+															cMsgAtuXmlOk	:= "MT103DNF- NF:"+cSerie+"/"+cNFiscal+Chr(13)+Chr(10)+;
+																"Validou rejeição imposto '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' "+Chr(13)+Chr(10)+;
+																"Base XML:"+cValToChar(aImpXml[iR,3])+Chr(13)+Chr(10)+;
+																"Valor XML:"+cValToChar(aImpXml[iR,5])+Chr(13)+Chr(10)+;
+																"Base NF:"+cValToChar(aImpXml[iR,6])+Chr(13)+Chr(10)+;
+																"Valor NF:"+cValToChar(aImpXml[iR,8])
+															
+															StaticCall(XMLDCONDOR,sfAtuXmlOk,"OR",,,cMsgAtuXmlOk/*cMsgAux*/,/*nLinXml*/,cF1ChvNfe/*cInChave*/)
+														Endif
+														lRet	:= .F.
+														StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+													Endif
+												Endif
+											Endif
+										Next
+									Endif
+								Endif
+							Else
+								lRet	:= .T.
+							Endif
+						Endif
+						
+					Else
+						If Type("oMulti") <> "U"
+							For iR := 1 To Len(oMulti:aCols)
+								If !oMulti:aCols[iR,Len(oMulti:aHeader)+1]
+									// Busca informação do ICMS
+									If oMulti:aCols[iR,nPxBasIcm] > 0 .And. !lIsA2SIMPNAC
+										If (nPxScan := aScan(aImpXml,{|x| x[1] == "ICM" })) == 0
+											Aadd(aImpXml,{"ICM","I.C.M.S",oMulti:aCols[iR,nPxBasIcm],oMulti:aCols[iR,nPxValIcm],0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasIcm]
+											aImpXml[nPxScan,4] += oMulti:aCols[iR,nPxValIcm]
+										Endif
+									Endif
+									
+									// Busca informação do ICMS do Simples Nacional
+									If oMulti:aCols[iR,nPxCrdIcmSN] > 0 .And. lIsA2SIMPNAC
+										If (nPxScan := aScan(aImpXml,{|x| x[1] == "ICM" })) == 0
+											Aadd(aImpXml,{"ICM","I.C.M.S",(oMulti:aCols[iR,nPxTotNfe]-oMulti:aCols[iR,nPxValDesc]),oMulti:aCols[iR,nPxCrdIcmSN],0,0,0,0})
+										Else
+											aImpXml[nPxScan,3] += (oMulti:aCols[iR,nPxTotNfe]-oMulti:aCols[iR,nPxValDesc])
+											aImpXml[nPxScan,4] += oMulti:aCols[iR,nPxCrdIcmSN]
+										Endif
+									Endif
+									
+									// Busca informação do PIS
+									If oMulti:aCols[iR,nPxBasPis] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1] == "PS2" })) == 0
+											Aadd(aImpXml,{"PS2","PIS - Via Apuração",oMulti:aCols[iR,nPxBasPis],oMulti:aCols[iR,nPxValPis],0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasPis]
+											aImpXml[nPxScan,4] += oMulti:aCols[iR,nPxValPis]
+										Endif
+									Endif
+									// Busca informação do Cofins
+									If oMulti:aCols[iR,nPxBasCof] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1] == "CF2" })) == 0
+											Aadd(aImpXml,{"CF2","COFINS - Via Apuração",oMulti:aCols[iR,nPxBasCof],oMulti:aCols[iR,nPxValCof],0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasCof]
+											aImpXml[nPxScan,4] += oMulti:aCols[iR,nPxValCof]
+										Endif
+									Endif
+									// Busca informação da ST
+									If oMulti:aCols[iR,nPxBasRet] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1] == "ICR" })) == 0
+											Aadd(aImpXml,{"ICR","ICMS Retido",oMulti:aCols[iR,nPxBasRet],oMulti:aCols[iR,nPxIcmRet],0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasRet]
+											aImpXml[nPxScan,4] += oMulti:aCols[iR,nPxIcmRet]
+										Endif
+									Endif
+									// Busca informação do IPI
+									If oMulti:aCols[iR,nPxBasIpi] > 0
+										If (nPxScan := aScan(aImpXml,{|x| x[1] == "IPI" })) == 0
+											Aadd(aImpXml,{"IPI","IPI",oMulti:aCols[iR,nPxBasIpi],oMulti:aCols[iR,nPxValIpi],0,0,0})
+										Else
+											aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasIpi]
+											aImpXml[nPxScan,4] += oMulti:aCols[iR,nPxValIpi]
+										Endif
+									Endif
+									
+									// Monta confronto de CST  - Adicionado em 22/06/2013 a pedido de MadeiraMadeira
+									cOriB1 		:= Substr(oMulti:aCols[iR,nPxXITCST],1,1)
+									// Altera o enfoque do campo Origem
+									// 1=2 Importado direto para Importado adquirido mercado interno
+									// 6=7
+									// 3=3
+									// 5=5
+									//cOriB1		:= Iif(cOriB1 =="1","2",Iif(cOriB1=="6","7",IIf(cOriB1 == "8","0",cOriB1)))
+									cOriB1		:= Substr(cConvOrigem,AT(cOriB1+"=",cConvOrigem)+2,1) //"0=0;1=2;2=2;3=3;4=4;5=5;6=7;7=7;8=0"
+									
+									nPD1ClasFis := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_CLASFIS"})
+									nPD1Item    := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_ITEM"})
+									nPD1BaseIcm := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_BASEICM"})
+									nPD1ValIcm  := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_VALICM"})
+									nPD1Total   := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_TOTAL"})
+									nPD1Valdesc := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_VALDESC"})
+									For iW := 1 To Len(aCols)
+										If !aCols[iW,Len(aHeader)+1]
+											If  aCols[iW,nPD1Item] == Substr(oMulti:aCols[iR,nPxKeySD1],nTamKeySD1+1,Len(aCols[iW,nPD1Item]))
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "CSTCST DO ICMS "+Substr(oMulti:aCols[iR,nPxXITCST],2,2) })) == 0
+													Aadd(aImpXml,{	"CST",;
+														"CST DO ICMS "+Substr(oMulti:aCols[iR,nPxXITCST],2,2),;
+														oMulti:aCols[iR,nPxBasIcm],;
+														oMulti:aCols[iR,nPxValIcm],;
+														0,;
+														0,;
+														0})
+												Else
+													aImpXml[nPxScan,3] += oMulti:aCols[iR,nPxBasIcm]
+													aImpXml[nPxScan,4] += oMulti:aCols[iR,nPxValIcm]
+												Endif
+												
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "CSTCST DO ICMS "+Substr(aCols[iW,nPD1ClasFis],2,2) })) == 0
+													Aadd(aImpXml,{	"CST",;
+														"CST DO ICMS "+Substr(aCols[iW,nPD1ClasFis],2,2),;
+														0,;
+														0,;
+														aCols[iW,nPD1BaseIcm],;
+														aCols[iW,nPD1ValIcm],;
+														0})
+												Else
+													aImpXml[nPxScan,5] += aCols[iW,nPD1BaseIcm]
+													aImpXml[nPxScan,6] += aCols[iW,nPD1ValIcm]
+												Endif
+												
+												// Confronta origem
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "ORIORIGEM PRODUTO "+cOriB1 })) == 0
+													Aadd(aImpXml,{	"ORI",;
+														"ORIGEM PRODUTO "+cOriB1,;
+														(oMulti:aCols[iR,nPxTotNfe]-oMulti:aCols[iR,nPxValDesc]),;
+														0,;
+														0,;
+														0,;
+														0})
+												Else
+													aImpXml[nPxScan,3] += (oMulti:aCols[iR,nPxTotNfe]-oMulti:aCols[iR,nPxValDesc])
+												Endif
+												
+												If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "ORIORIGEM PRODUTO "+Substr(aCols[iW,nPD1ClasFis],1,1) })) == 0
+													Aadd(aImpXml,{	"ORI",;
+														"ORIGEM PRODUTO "+Substr(aCols[iW,nPD1ClasFis],1,1),;
+														0,;
+														0,;
+														aCols[iW,nPD1Total]-aCols[iW,nPD1Valdesc],;
+														0,;
+														0})
+												Else
+													aImpXml[nPxScan,5] += aCols[iW,nPD1Total]-aCols[iW,nPD1Valdesc]
+												Endif
+												
+												// Adicionada a validação em 26/04/2014
+												// Busca informação de ST antecipado, para validar confronto de impostos
+												If MaFisRet(iW,"IT_VALANTI") > 0
+													If (nPxScan := aScan(aImpXml,{|x| x[1]+x[2] == "ICR" })) == 0
+														Aadd(aImpXml,{	"ICR",;
+															"ICMS Retido",;
+															MaFisRet(iW,"IT_BICMORI"),;
+															MaFisRet(iW,"IT_VALANTI"),;
+															0,;
+															0,;
+															0})
+													Else
+														aImpXml[nPxScan,3] += MaFisRet(iW,"IT_BICMORI")//aCols[iW,nPD1BaseIcm]
+														aImpXml[nPxScan,4] += MaFisRet(iW,"IT_VALANTI")//aCols[iW,nPD1ValIcm]
+													Endif
+												Endif
+											Endif
+										Endif
+									Next
+								Endif
+							Next
+							// Verifica os TES se gera Duplicata ou não
+							For iW := 1 To Len(aCols)
+								If !aCols[iW,Len(aHeader)+1]
+									DbSelectArea("SF4")
+									DbSetOrder(1)
+									If DbSeek(xFilial("SF4")+aCols[iW,nPxD1Tes])
+										If SF4->F4_DUPLIC == "S"
+											lGeraDupl	:= .T.
+										Endif
+									Endif
+								Endif
+							Next iW 
+							
+							// Restauro a area da SF4
+							RestArea(aSF4Area)
+							
+							For iR := 1 To Len(aImpNfe)
+								If !Empty(aImpNfe[iR,3])
+									If (nPxScan := aScan(aImpXml,{|x| x[1] == aImpNfe[iR,1] })) == 0
+										Aadd(aImpXml,{aImpNfe[iR,1],aImpNfe[iR,2],0,0,aImpNfe[iR,3],aImpNfe[iR,4],iR})
+									Else
+										aImpXml[nPxScan,5] += aImpNfe[iR,3]
+										aImpXml[nPxScan,6] += aImpNfe[iR,4]
+										aImpXml[nPxScan,7] := iR
+									Endif
+								Endif
+							Next
+							
+							If Type("aInfIcmsCte") <> "U"
+								//aInfIcmsCte	:= {"ICM","I.C.M.S.",nBaseIcms,nAliqIcms,nValIcms}
+								//Aadd(aInfIcmsCte,{"ICR","ICMS Retido",nBaseRet,nAliqIcms,nIcmsSt})
+								For iR := 1 To Len(aInfIcmsCte)
+									If !Empty(aInfIcmsCte[iR,3])
+										If (nPxScan := aScan(aImpXml,{|x| x[1] == aInfIcmsCte[iR,1] })) == 0
+											Aadd(aImpXml,{aInfIcmsCte[iR,1],aInfIcmsCte[iR,2],aInfIcmsCte[iR,3],aInfIcmsCte[iR,5],0,0,0})
+										Else
+											aImpXml[nPxScan,3] += aInfIcmsCte[iR,3]
+											aImpXml[nPxScan,4] += aInfIcmsCte[iR,5]
+										Endif
+									Endif
+								Next
+								
+							Endif
+														// 25/01/2018 - Melhoria que valida se há consistência em gerar duplicatas mesmo não havendo TES que gere ou o contrário
+							If !lAutoExec .And. nSumDupl > 0 .And. !lGeraDupl
+								//lRet	:= MsgYesNo("Foram encontradas parcelas que gerarão títulos conforme a aba 'Duplicatas', porém nenhuma TES dos itens está configurada para gerar Duplicata! Deseja continuar assim mesmo?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Duplicatas")
+							Endif 
+							
+							If !lAutoExec .And. nSumDupl == 0 .And. lGeraDupl
+								//lRet	:= MsgYesNo("Não foram encontradas parcelas que gerarão títulos conforme a aba 'Duplicatas', porém há TES nos itens que está configurada para gerar Duplicata! Deseja continuar assim mesmo?",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Duplicatas")
+							Endif 
+							
+							
+							aSort(aImpXml,,,{|x,y| x[1] < y[1]}) // Ordena por impostos
+							If Len(aImpXml) > 0 .And. lRet
+								If !lAutoExec .And. !l103Auto
+									lRet	:= .F.
+									DEFINE MSDIALOG oDlgImp Title OemToAnsi(ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Confronto de impostos") FROM 001,001 TO 320,810 PIXEL
+									
+									oPanelImp := TPanel():New(0,0,'',oDlgImp, oDlgImp:oFont, .T., .T.,, ,200,40,.T.,.T. )
+									oPanelImp:Align := CONTROL_ALIGN_ALLCLIENT
+									
+									oLisImp := TWBrowse():New( 005,005,395,140,,{"Cod.","Descricao","Base Imposto XML","Vlr. Imposto XML","Base Imposto","Vlr Imposto","PosOri"},;
+										{30,90,50,50,50,50,10},oPanelImp,,,,,,,,,,,,.F.,,.T.,,.F.,,, ) //"Cod."###"Descricao"###"Base Imposto"###Vlr. Imposto"
+									oLisImp:SetArray(aImpXml)
+									oLisImp:bLine:= {|| {	aImpXml[oLisImp:nAt,1],;
+										aImpXml[oLisImp:nAt,2],;
+										Transform(aImpXml[oLisImp:nAt,3],"@E 99,999,999.99"),;
+										Transform(aImpXml[oLisImp:nAt,4],"@E 999,999.99"),;
+										Transform(aImpXml[oLisImp:nAt,5],"@E 99,999,999.99"),;
+										Transform(aImpXml[oLisImp:nAt,6],"@E 999,999.99"),;
+										aImpXml[oLisImp:nAt,7]}}
+									ACTIVATE MsDialog oDlgImp Centered On Init EnchoiceBar(oDlgImp,{||lRet := .T.,oDlgImp:End() },{|| lRet := .F. , oDlgImp:End()})
+								Else
+									
+									For iR := 1 To Len(aImpXml)
+										If aImpXml[iR,1] $ "ICR#ICM#IPI"
+											nDifBase	:= Round(aImpXml[iR,3],2) - Round(aImpXml[iR,5],2)
+											nDifVlr		:= Round(aImpXml[iR,4],2) - Round(aImpXml[iR,6],2)
+											
+											// Se estiver numa tolerância de até 2 centavos
+											// Força ajuste dos impostos pela função fiscal
+											If 	aImpXml[iR,7] > 0 .And. ((nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0) .Or.;
+													(nDifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0))
+												// Verifica se existe o objeto da Central XML
+												If Type("oArqXml") <> "U"
+													
+													If aImpXml[iR,1] $ "ICM" .And. (nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0)
+														MaFisAlt("IMP_BASEICM",Round(aImpXml[iR,3],2),aImpXml[iR,7])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste da Base '"+aImpXml[iR,1]+"' de "+cValToChar(aImpXml[iR,3]) +" para "+cValToChar(aImpXml[iR,5]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "ICM" .And. (nDifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0 )
+														MaFisAlt("IMP_VALICM",Round(aImpXml[iR,5],2),aImpXml[iR,7])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste do valor '"+aImpXml[iR,1]+"' de "+cValToChar(aImpXml[iR,4]) +" para "+cValToChar(aImpXml[iR,6]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "IPI" .And. (nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0)
+														MaFisAlt("IMP_BASEIPI",Round(aImpXml[iR,3],2),aImpXml[iR,7])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste da Base '"+aImpXml[iR,1]+"' de "+cValToChar(aImpXml[iR,3]) +" para "+cValToChar(aImpXml[iR,5]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "IPI" .And. (nDifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0 )
+														MaFisAlt("IMP_VALIPI",Round(aImpXml[iR,5],2),aImpXml[iR,7])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste do valor '"+aImpXml[iR,1]+"' de "+cValToChar(aImpXml[iR,4]) +" para "+cValToChar(aImpXml[iR,6]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "ICR" .And. (nDifBase <= nRounAcept .And. nDifBase >= (nRounAcept*-1) .And. nDifBase <> 0)
+														MaFisAlt("IMP_BASESOL",Round(aImpXml[iR,3],2),aImpXml[iR,7])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste da Base '"+aImpXml[iR,1]+"' de "+cValToChar(aImpXml[iR,3]) +" para "+cValToChar(aImpXml[iR,5]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													If aImpXml[iR,1] $ "ICR" .And. (nDifVlr <= nRounAcept .And. nDifVlr >= (nRounAcept*-1) .And. nDifVlr <> 0 )
+														MaFisAlt("IMP_VALSOL",Round(aImpXml[iR,5],2),aImpXml[iR,7])
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Forçou ajuste do valor '"+aImpXml[iR,1]+"' de "+cValToChar(aImpXml[iR,4]) +" para "+cValToChar(aImpXml[iR,6]))
+														Endif
+														lFirstExec	:= .F.
+													Endif
+													
+												Endif
+											ElseIf (nDifVlr <> 0 .Or. nDifBase <> 0 )
+												If Type("oArqXml") <> "U"
+													// Quando For ICMS Próprio e o Fornecedor for do Simples não valida
+													// Demais situações são validadas
+													If !(aImpXml[iR,1] $ "ICM" .And. lIsA2SIMPNAC)
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Validou rejeição imposto '"+aImpXml[iR,1]+"' "+;
+																" Base XML:"+cValToChar(aImpXml[iR,3])+;
+																" Valor XML:"+cValToChar(aImpXml[iR,4])+;
+																" Base NF:"+cValToChar(aImpXml[iR,5])+;
+																" Valor NF:"+cValToChar(aImpXml[iR,6]))
+														Endif
+														
+														aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+														Pergunte("XMLDCONDOR",.F.)
+														// Reposiciona o registro da chave eletronica
+														U_DbSelArea("CONDORXML",.F.,1)
+														Set Filter To
+														If DbSeek(cF1ChvNfe)
+															// Grava divergencia, forçando o lançamento semi-automático
+															//cOkMot,lAtuItens,cItem,cMsgAux,nLinXml,cInChave
+															StaticCall(XMLDCONDOR,sfAtuXmlOk,"DI"/*cOkMot*/,/*lAtuItens*/,/*cItem*/,/*cMsgAux*/,/*nLinXml*/,cF1ChvNfe/*cInChave*/)
+														Endif
+														lRet	:= .F.
+														StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+														Exit
+													Endif
+												Endif
+											Endif
+										Endif
+									Next
+									// Chamada recursiva do ponto de entrada
+									// Após acertos dos valores de impostos com tolerância de 2 centavo
+									If lRet .And. !lFirstExec .And. !(ExecBlock("MT103DNF",.F.,.F.,{aDanfe}))
+										If lSendAlert
+											StaticCall(	XMLDCONDOR,;
+												stSendMail,;
+												GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+												"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+												"Validou rejeição recursiva ")
+										Endif
+										
+										aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+										Pergunte("XMLDCONDOR",.F.)
+										// Reposiciona o registro da chave eletronica
+										U_DbSelArea("CONDORXML",.F.,1)
+										Set Filter To
+										If DbSeek(cF1ChvNfe)
+											// Grava divergencia, forçando o lançamento semi-automático
+											StaticCall(XMLDCONDOR,sfAtuXmlOk,"DI"/*cOkMot*/,/*lAtuItens*/,/*cItem*/,/*cMsgAux*/,/*nLinXml*/,cF1ChvNfe/*cInChave*/)
+										Endif
+										lRet	:= .F.
+										StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+									ElseIf lRet
+										For iR := 1 To Len(aImpXml)
+											If aImpXml[iR,1] $ "CST#ORI"
+												If Round(aImpXml[iR,3],2) <> Round(aImpXml[iR,5],2) .Or. Round(aImpXml[iR,4],2) <> Round(aImpXml[iR,6],2)
+													// Verifica se existe o objeto da Central XML
+													If Type("oArqXml") <> "U" .And. ( aImpXml[iR,1] $ "ORI" .Or. (aImpXml[iR,1] $ "CST" .And. !lIsA2SIMPNAC))
+														If lSendAlert
+															StaticCall(	XMLDCONDOR,;
+																stSendMail,;
+																GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+																"MT103DNF- NF:"+cSerie+"/"+cNFiscal ,;
+																"Validou rejeição imposto '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' "+;
+																"Base XML:"+cValToChar(aImpXml[iR,3])+;
+																"Valor XML:"+cValToChar(aImpXml[iR,4])+;
+																"Base NF:"+cValToChar(aImpXml[iR,5])+;
+																"Valor NF:"+cValToChar(aImpXml[iR,6]))
+														Endif
+														aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+														Pergunte("XMLDCONDOR",.F.)
+														
+														U_DbSelArea("CONDORXML",.F.,1)
+														Set Filter To
+														If DbSeek(cF1ChvNfe)
+															cMsgAtuXmlOk	:= "MT103DNF- NF:"+cSerie+"/"+cNFiscal+Chr(13)+Chr(10)+;
+																"Validou rejeição imposto '"+aImpXml[iR,1]+"-"+aImpXml[iR,2]+"' "+Chr(13)+Chr(10)+;
+																"Base XML:"+cValToChar(aImpXml[iR,3])+Chr(13)+Chr(10)+;
+																"Valor XML:"+cValToChar(aImpXml[iR,4])+Chr(13)+Chr(10)+;
+																"Base NF:"+cValToChar(aImpXml[iR,5])+Chr(13)+Chr(10)+;
+																"Valor NF:"+cValToChar(aImpXml[iR,6])
+															
+															StaticCall(XMLDCONDOR,sfAtuXmlOk,"OR",,,cMsgAtuXmlOk/*cMsgAux*/,/*nLinXml*/,cF1ChvNfe/*cInChave*/)
+														Endif
+														lRet	:= .F.
+														StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+													Endif
+												Endif
+											Endif
+										Next
+									Endif
+								Endif
+							Else
+								lRet	:= .T.
+							Endif
+							
+						Endif
+					Endif
+				Endif
+			Endif
+		Endif
+		
+		If lRet .And. lExistTblXml 
+			// 24/10/2016 - Melhoria que valida o valor total da Nota Fiscal com o valor total do XML
+			aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+			Pergunte("XMLDCONDOR",.F.)
+			U_DbSelArea("CONDORXML",.F.,1)
+			If DbSeek(cF1ChvNfe)
+							//</vOutro><vNF>3009.00</vNF>
+							//</vNF></ICMSTot>
+							//123456789012345
+				If CONDORXML->XML_VLRDOC > 0 
+					nXmlValNf 	:=	CONDORXML->XML_VLRDOC
+				Else
+				
+					nPxIniVlrTot	:= AT("</vOutro><vNF>",CONDORXML->XML_ARQ)
+					nPxIniVlrTot	+= 14
+					nPxFimVlrTot	:= AT("</vNF>",CONDORXML->XML_ARQ)
+							
+							//><vPrest><vTPrest>137.33</vTPrest>							
+					If nPxIniVlrTot == 14 //.And. nPxFimVlrTot == 0 
+						nPxIniVlrTot	:= At("<vPrest><vTPrest>",CONDORXML->XML_ARQ)
+						nPxIniVlrTot	+= 17
+						nPxFimVlrTot	:= At("</vTPrest>",CONDORXML->XML_ARQ)
+					Endif
+							
+							
+					If nPxIniVlrTot > 14 .And. nPxFimVlrTot > nPxIniVlrTot
+						nXmlValNf 	:= Val(Substr(CONDORXML->XML_ARQ,nPxIniVlrTot,(nPxFimVlrTot-nPxIniVlrTot)))
+					Endif
+				Endif
+				If nVlrTotalNf <> nXmlValNf
+					If l103Auto
+				
+						StaticCall(XMLDCONDOR,;
+									stSendMail,;
+									GetNewPar("XM_MAILADM","marcelolauschner@gmail.com"),;
+									"MT103DNF- NF: " +cSerie+"/"+cNFiscal + " Empresa:" + cEmpAnt+"/"+cFilAnt+" " + Capital(SM0->M0_NOMECOM) ,;
+									"Lançamento interrompido pois houve diferença de valor Total da nota entre o que consta no XML e o que seria escriturado!" + Chr(13) + Chr(10) + ;
+									"Chave NFe/CTe: " + Alltrim(CONDORXML->XML_CHAVE) + Chr(13)+ Chr(10)+;
+									"Valor Total da Nota no XML R$ "+ AllTrim(Transform(nXmlValNf,"@E 999,999,999.99")) + Chr(13)+ Chr(10)+;
+									"Valor Total a Escriturar R$ " + Alltrim(Transform(nVlrTotalNf,"@E 999,999,999.99")) )
+						lRet	:= .F. 	
+					Else
+						lRet := MsgYesNo("Diferença. Valor Total da Nota no XML R$ "+ AllTrim(Transform(nXmlValNf,"@E 999,999,999.99")) + " e Valor Total a Escriturar R$ " + Alltrim(Transform(nVlrTotalNf,"@E 999,999,999.99"))+ ". Deseja lançar a nota mesmo assim?" ,ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Diferença nos valores totais!")
+					Endif
+				Endif				
+			Endif
+			StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+		
+		Endif
+	Endif
+	
+	If !lRet .And. !Empty(cRetBlq)
+		aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+		Pergunte("XMLDCONDOR",.F.)
+		// Reposiciona o registro da chave eletronica
+		U_DbSelArea("CONDORXML",.F.,1)
+		Set Filter To
+		If DbSeek(cF1ChvNfe)
+			// Grava divergencia, forçando o lançamento semi-automático
+			cMsgAtuXmlOk	:= "Não validou MT103DNF por outros motivos: '"+cRetBlq+"'"
+			StaticCall(XMLDCONDOR,sfAtuXmlOk,"DI"/*cOkMot*/,/*lAtuItens*/,/*cItem*/,cMsgAtuXmlOk/*cMsgAux*/,/*nLinXml*/,cF1ChvNfe/*cInChave*/)
+		Endif
+		
+		StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+	ElseIf lRet .And. GetNewPar("XM_PRNFAUT",.F.) .And. Type("oMulti") <> "U" .And. Type("l103Class") <> "U" .And. !l103Class // Melhoria 24/09/2016 - Drugovich - Se o lançamento da nota não gera nenhuma restrição, aborta para gravar flag de Ok para lançar como pré-nota
+		
+		nPD1Item    := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_ITEM"})
+		nPD1Tes	    := aScan(aHeader,{|x| Alltrim(x[2]) == "D1_TES"})
+		lRet := MsgYesNo("Parâmetro 'XM_PRNFAUT' está ativado. Deseja lançar a nota mesmo assim?" ,ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Conferência Fiscal!")
+		nPZItem 	:= 0
+		nPzTes		:= 0
+		nPzTesCla	:= 0
+		// Verifica se existe objeto GetDados - Da Central XML
+		If Type("oMulti") <> "U"
+			// Percorre aCols dos itens da Nota
+			For iW := 1 To Len(aCols)
+				// Verifica deletado
+				If !aCols[iW,Len(aHeader)+1]
+					// Percorre aItems usado para montar ExecAuto Mata103/Mata140
+					For iR := 1 To Len(aItems)
+						// Zera variáveis
+						nPZItem 	:= 0
+						nPzTesCla	:= 0
+						nPzTes		:= 0
+						// Percorre campos da linha {{{"d1_item","01"},{"d1_cod","zz"}},{{"d1_item","02"},{"d1_cod","bb"}}}
+						For iB := 1 To Len(aItems[iR])
+							If aItems[iR,iB,1] == "D1_ITEM"
+								If  aCols[iW,nPD1Item] == aItems[iR,iB,2]
+									nPZItem	:= iR
+								Endif
+							ElseIf aItems[iR,iB,1] == "D1_TES"
+								nPzTes	:= iB
+							ElseIf aItems[iR,iB,1] == "D1_TESACLA"
+								nPzTesCla := iB
+							Endif
+						Next iB 
+						// Se encontrou o item e o campo TES atribui valor 
+						If nPzItem > 0 .And. nPzTes > 0
+							aItems[nPZItem,nPzTes,2] := aCols[iW,nPD1Tes]
+						Endif 
+						If nPzItem > 0 .And. nPzTesCla > 0
+							aItems[nPZItem,nPzTesCla,2] := aCols[iW,nPD1Tes]
+						Endif
+					Next iR
+				Endif
+			Next iW 
+		Endif
+							
+		aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+		Pergunte("XMLDCONDOR",.F.)
+		// Reposiciona o registro da chave eletronica
+		U_DbSelArea("CONDORXML",.F.,1)
+		Set Filter To
+		If DbSeek(cF1ChvNfe)
+			// Grava divergencia, forçando o lançamento semi-automático
+			cMsgAtuXmlOk	:= "Parâmetro 'XM_PRNFAUT' ativado. Validou MT103DNF sem restrições" 
+			StaticCall(XMLDCONDOR,sfAtuXmlOk,"PN"/*cOkMot*/,/*lAtuItens*/,/*cItem*/,cMsgAtuXmlOk/*cMsgAux*/,/*nLinXml*/,cF1ChvNfe/*cInChave*/)
+		Endif
+		
+		StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+	Endif
+	
+	RestArea(aAreaOld)
+
+	// Chamada para Ponto de entrada nativo do Cliente - Padrão adição da letra "X" ao nome do Ponto de entrada
+	// Adicionado em 03/12/2012
+	If lRet .And. !l103Auto
+		IF ((ExistBlock("XMT103DNF")) )
+			If (! ExecBlock("XMT103DNF",.F.,.F.,{ParamIXB[1]}) )
+				lRet := .F.
+			EndIf
+		EndIf
+	Endif
+EndIf
+//FIM - CENTRAL XML
+	
+Return lRet
+
+
+/*/{Protheus.doc} sfAutSefaz
+(Efetua consulta da Chave Eletroncia via WebService )
+
+@author MarceloLauschner
+@since 07/04/2012
+@version 1.0
+
+@param cInChave, character, (Chave eletronica)
+
+@return logico, consulta sefaz ok ou não
+
+@example
+(examples)
+
+@see (links_or_references)
+/*/
+
+Static Function sfAutSefaz ( cInChave, lExterno )
+
+//INICIO - CENTRAL XML	
+Local	aAreaOld	:= GetArea()
+Local	cURL     	:= PadR(GetNewPar("MV_SPEDURL","http://"),250)
+// Trecho para validar autorização da NF
+Local	cMensagem	:= ""
+Local	lRet		:= .F.
+Local	oWs:= WsNFeSBra():New()
+Default lExterno	:= .F. 
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML	
+	// Verifico se a empresa em cursor tem TSS configurado
+	cIdentSPED	:= Iif(GetNewPar("XM_TSSEXIS",.T.),StaticCall(SPEDNFE,GetIdEnt)," ")
+	If !Empty(cIdentSPED)
+		
+		oWs:cUserToken   := "TOTVS"
+		oWs:cID_ENT    	 := cIdentSPED
+		ows:cCHVNFE		 := cInChave
+		oWs:_URL         := AllTrim(cURL)+"/NFeSBRA.apw"
+		
+		If oWs:ConsultaChaveNFE()
+			cMensagem := ""
+			If !Empty(oWs:oWSCONSULTACHAVENFERESULT:cVERSAO)
+				cMensagem += STR0129+": "+oWs:oWSCONSULTACHAVENFERESULT:cVERSAO+CRLF
+			EndIf
+			cMensagem += STR0035+": "+IIf(oWs:oWSCONSULTACHAVENFERESULT:nAMBIENTE==1,STR0056,STR0057)+CRLF //"Produção"###"Homologação"
+			cMensagem += STR0068+": "+oWs:oWSCONSULTACHAVENFERESULT:cCODRETNFE+CRLF
+			cMensagem += STR0069+": "+oWs:oWSCONSULTACHAVENFERESULT:cMSGRETNFE+CRLF
+			If oWs:oWSCONSULTACHAVENFERESULT:nAMBIENTE==1 .And. !Empty(oWs:oWSCONSULTACHAVENFERESULT:cPROTOCOLO)
+				cMensagem += STR0050+": "+oWs:oWSCONSULTACHAVENFERESULT:cPROTOCOLO+CRLF
+			EndIf
+			// Se chamada externa retorna o código da validação da nota
+			If lExterno
+				RestArea(aAreaOld)
+				Return Alltrim(oWs:oWSCONSULTACHAVENFERESULT:cCODRETNFE)
+			Endif
+			
+			// Nota fiscal Autorizada
+			If Alltrim(oWs:oWSCONSULTACHAVENFERESULT:cCODRETNFE) == "100"
+				lRet	:= .T.
+			ElseIf Alltrim(oWs:oWSCONSULTACHAVENFERESULT:cCODRETNFE) == "101"
+				lRet	:= .F.
+				
+				aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+				Pergunte("XMLDCONDOR",.F.)
+				// Reposiciona o registro da chave eletronica
+				U_DbSelArea("CONDORXML",.F.,1)
+				Set Filter To
+				If DbSeek(cInChave)
+					If !lAutoExec
+						Aviso(STR0107,cMensagem+Chr(13)+Chr(10)+"Chave Eletrônica: "+CONDORXML->XML_CHAVE+Chr(13)+Chr(10)+"Nota fiscal '"+cSerie+"/"+cNFiscal+"' não está mais Autorizada na SEFAZ!",{"Ok"},3)
+						StaticCall(XMLDCONDOR,stConSefaz,cInChave)
+					Endif
+					StaticCall(XMLDCONDOR,stRejeita,cInChave,cMensagem,lAutoExec)
+				Endif
+				StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+				
+			ElseIf Alltrim(oWs:oWSCONSULTACHAVENFERESULT:cCODRETNFE) == "410"
+				lRet	:= .T.
+				If !l103Auto
+					MsgAlert(cMensagem+Chr(13)+Chr(10),ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - "+ STR0107)
+				Endif
+			ElseIf Alltrim(oWs:oWSCONSULTACHAVENFERESULT:cCODRETNFE) $ "003#678#239#410#999#217#526#584"
+				// Melhoria feita em 08/10/2013 permitindo que havendo rejeição do Webservice, permita a consulta manual da nota fiscal
+				lRet	:= .T.
+				If !l103Auto
+					MsgAlert(cMensagem+Chr(13)+Chr(10),ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - "+ STR0107)
+					aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+					Pergunte("XMLDCONDOR",.F.)
+					// Reposiciona o registro da chave eletronica
+					U_DbSelArea("CONDORXML",.F.,1)
+					Set Filter To
+					If DbSeek(cInChave)
+						If !lAutoExec
+							StaticCall(XMLDCONDOR,stConSefaz,cInChave,.T./*lExterna*/)
+						Endif
+					Endif
+					StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+				Endif
+			Else
+				lRet	:= .F.
+					
+			Endif
+			If !lRet
+				If !l103Auto
+					
+					MsgAlert(cMensagem+Chr(13)+Chr(10),"'MT103DNF.PRW.sfAutSefaz' - '"+STR0107)
+				Endif
+				cRetBlq += cMensagem
+			Endif
+		Else
+			If !l103Auto
+				
+				MsgAlert(IIf(Empty(GetWscError(3)),GetWscError(1),GetWscError(3)),ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - "+STR0114)
+				If "003 - Falha no retorno da SEFAZ" $  (IIf(Empty(GetWscError(3)),"", GetWscError(3)))
+					lRet	:= StaticCall(XMLDCONDOR,stConSefaz,cInChave,.T./*lExterna*/)
+				ElseIf "INTERNAL SERVER ERROR" $ (IIf(Empty(GetWscError(3)),"", GetWscError(3)))
+					lRet	:= StaticCall(XMLDCONDOR,stConSefaz,cInChave,.T./*lExterna*/)
+				ElseIf  "584 Rejeicao:" $ IIf(Empty(GetWscError(3)),"",GetWscError(3))
+					lRet	:= StaticCall(XMLDCONDOR,stConSefaz,cInChave,.T./*lExterna*/)
+				ElseIf  "526 Rejeicao:" $ IIf(Empty(GetWscError(3)),"",GetWscError(3))
+					lRet	:= StaticCall(XMLDCONDOR,stConSefaz,cInChave,.T./*lExterna*/)
+				Endif
+			Else
+				cRetBlq += IIf(Empty(GetWscError(3)),GetWscError(1),GetWscError(3))
+			Endif
+		EndIf
+	Else
+		//Retorno verdadeiro por que não tem como tratar
+		lRet	:= .T.
+		// Se chamada externa retorna o código da validação da nota
+		If lExterno
+			RestArea(aAreaOld)
+			Return ""
+		Endif
+	Endif
+EndIf
+//FIM - CENTRAL XML
+	
+Return lRet
+
+/*/{Protheus.doc} sfVldCond
+(Monta interface para confrontar as parcelas. Este ponto de entrada tem a situação de ser executado sempre que
+houver um Refresh em algo que interferi nos vencimentos, ou seja, poderá ser acionado diveras vezes)
+@author MarceloLauschner
+@since 22/08/2014
+@version 1.0
+@param aInDup, array, (Descrição do parâmetro)
+@param aInSE2, array, (Descrição do parâmetro)
+@return ${return}, ${return_description}
+@example
+(examples)
+@see (links_or_references)
+/*/
+Static Function sfVldCond(aInDup,aInSE2,cInChvNfe)
+
+//INICIO - CENTRAL XML	
+Local		oDlgDup
+Local		oLisDup
+Local		aDupXml		:= {}
+Local		iZ
+Local		cParcela	:= " "
+Local		lOnlyDup	:= Len(aInDup) == 1 .And. Len(aInSE2) == 1
+Local		lRet		:= .F.
+Local		lDifDup		:= .T. 
+Local		lDesblq		:= .F. 
+Local		cMotAlert	:= ""
+Local		nVlrTotDupl	:= MaFisRet(,'NF_BASEDUP')
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML	
+	// Se não existir duplicatas vindos do XML, assume da condição de pagamento informada
+	If Empty(aInSE2)
+		Return .T.
+	Endif
+	
+	For iZ := 1 To Len(aInDup)
+		If lOnlyDup
+			cParcela := " "
+		Else
+			cParcela := IF(iZ>1,MaParcela(cParcela),IIF(Empty(cParcela),"A",cParcela))
+		Endif
+		Aadd(aDupXml,{cParcela,aInDup[iZ,1],aInDup[iZ,2],"",CTOD(""),0,iZ})
+		// Incrementa valor das parcelas numa variável para validar se deve ou não existir duplicata para a nota
+		nSumDupl	+= aInDup[iZ,2]		
+	Next
+	cParcela := " "
+	For iZ := 1 To Len(aInSE2)
+		
+		If lOnlyDup
+			cParcela := " "
+		Else
+			cParcela := IF(iZ>1,MaParcela(cParcela),IIF(Empty(cParcela),"A",cParcela))
+		Endif
+		
+		If (nPxScan := aScan(aDupXml,{|x| x[1] == cParcela })) == 0
+			Aadd(aDupXml,{"",CTOD(""),0,cParcela,aInSE2[iZ,1],aInSE2[iZ,2],iZ})
+		Else
+			aDupXml[nPxScan,4] := Iif(Len(aInSE2) > 1 ,cParcela," ")
+			aDupXml[nPxScan,5] := aInSE2[iZ,1]
+			aDupXml[nPxScan,6] := aInSE2[iZ,2]
+		Endif
+	Next
+	
+	 
+	If !lAutoExec .And. !l103Auto
+		If Type("lDtVctoCte") <> "U" .And. lDtVctoCte
+			lDupSE4		:= .T.
+			lRet		:= .T.
+		Else
+			If nVlrTotDupl <> nSumDupl 
+				//lDifDup	:= MsgYesNo("Valor Total Base Duplicatas R$ " + Alltrim( Transform(nVlrTotDupl,"@E 999,999,999.99")) + " Difere da soma dos vencimentos da aba Duplictas R$ " + Alltrim( Transform(nSumDupl,"@E 999,999,999.99")) + " Deseja continuar? ",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Duplicatas")
+			Endif
+			If lDifDup 
+				DEFINE MSDIALOG oDlgDup Title OemToAnsi(ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" - Confronto de Duplicatas") FROM 001,001 TO 320,810 PIXEL
+			
+				oPanelDup := TPanel():New(0,0,'',oDlgDup, oDlgDup:oFont, .T., .T.,, ,200,40,.T.,.T. )
+				oPanelDup:Align := CONTROL_ALIGN_ALLCLIENT
+										
+				oLisDup := TWBrowse():New( 005,005,395,140,,{"Parcela NF","Vencto NF","R$ Valor NF","Parcela XML","Vencto XML","R$ Valor XML","PosOri"},;
+				{40,60,70,40,60,70,10},oPanelDup,,,,,,,,,,,,.F.,,.T.,,.F.,,, ) //"Cod."###"Descricao"###"Base Imposto"###Vlr. Imposto"
+			
+				oLisDup:SetArray(aDupXml)
+				oLisDup:bLine:= {|| {	aDupXml[oLisDup:nAt,1],;
+				aDupXml[oLisDup:nAt,2],;
+				Transform(aDupXml[oLisDup:nAt,3],"@E 99,999,999.99"),;
+				aDupXml[oLisDup:nAt,4],;
+				aDupXml[oLisDup:nAt,5],;
+				Transform(aDupXml[oLisDup:nAt,6],"@E 99,999,999.99"),;
+				aDupXml[oLisDup:nAt,7]}}
+				ACTIVATE MsDialog oDlgDup Centered On Init EnchoiceBar(oDlgDup,{||lRet := .T.,oDlgDup:End() },{|| lRet := .F. , oDlgDup:End()},,{{"PRETO"	,{|| lDesblq := .T. ,lDupSE4 := .T. , oDlgDup:End() } , "Desbloquear Cond.Pagto"}})
+			
+				If lDupSE4 .And. lDesblq
+					MsgAlert("Agora está liberada a alteração dos vencimentos baseado na condição de pagamento! Os valore do XML não serão mais considerados para montar as duplicatas!",ProcName(0)+"."+ Alltrim(Str(ProcLine(0)))+" Alterar condição de pagamento")
+				Endif
+			Endif
+		Endif
+	Else
+		If Type("lDtVctoCte") <> "U" .And. lDtVctoCte
+			lDupSE4		:= .T.
+			lRet		:= .T.
+		Else
+			lDupSE4		:= .T.
+			lRet		:= .T.
+		Endif
+	Endif
+	
+	If lDupSE4
+		For iZ := 1 To Len(aDupXml)
+			If aDupXml[iZ,1] <> aDupXml[iZ,4]
+				cMotAlert	+= "Diferença na sequencia de parcela: NFe/CTe: '"+aDupXml[iZ,1]+"' XML: '"+aDupXml[iZ,4]+"' "+Chr(13)+Chr(10)
+			Endif
+			// Verifica diferença de vencimentos e avalia tolerancia
+			If aDupXml[iZ,2] <> aDupXml[iZ,5]
+				If 	DataValida(aDupXml[iZ,2]) - DataValida(aDupXml[iZ,5]) > GetNewPar("XM_NDMAXNDP",7) .Or.;
+						DataValida(aDupXml[iZ,5]) - DataValida(aDupXml[iZ,2]) > GetNewPar("XM_NDMINDP",1)
+					cMotAlert	+= "Diferença na vencimento de parcela (fora tolerância): NFe/CTe: '"+DTOC(aDupXml[iZ,2])+"' XML: '"+DTOC(aDupXml[iZ,5])+"' "+Chr(13)+Chr(10)
+				Endif
+			Endif
+			If Round(aDupXml[iZ,3],2) <> Round(aDupXml[iZ,6],2)
+				cMotAlert	+= "Diferença no valor de parcela: NFe/CTe: '"+ Transform(aDupXml[iZ,3],"@E 99,999,999.99")+"' XML: '"+ Transform(aDupXml[iZ,6],"@E 99,999,999.99")+"' "+Chr(13)+Chr(10)
+			Endif
+		Next
+		
+		If !Empty(cMotAlert)
+			// A variável cCondicao já é alimentada com os dados da condição pagamento a partir do cadastro do fornecedor ou do pedido de compra
+			// Adicionado em 28/11/2014 
+			If Type("cCondicao") == "C"
+				cMotAlert += "Condição de Pagamento: "+cCondicao+"-"+Posicione("SE4",1,xFilial("SE4")+cCondicao,"E4_DESCRI") +Chr(13)+Chr(10) +Chr(13)+Chr(10)
+			Endif
+			
+			// Adicionada mensagem no final listando parcelas do XML original 
+			For iZ := 1 To Len(aDupXml)
+				cMotAlert	+= "Parcela: "+aDupXml[iZ,4] + " |Emissão: "+DTOC(dDemissao)+" |Vencimento: "+DTOC(aDupXml[iZ,5])+" | Diferença dias:  " + cValToChar(aDupXml[iZ,5]-dDEmissao ) +Chr(13)+Chr(10)
+			Next
+		
+			aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+			Pergunte("XMLDCONDOR",.F.)
+			// Reposiciona o registro da chave eletronica
+			U_DbSelArea("CONDORXML",.F.,1)
+			Set Filter To
+			If DbSeek(cInChvNfe)
+				// Grava divergencia, forçando o lançamento semi-automático
+				If lAutoExec
+					If Type("lMadeira") == "L" .And. lMadeira
+						lRet	:= .T.
+						cMsgAtuXmlOk	:= "Não validou MT103DNF por motivo: '"+cMotAlert+"'"
+						StaticCall(XMLDCONDOR,sfAtuXmlOk,"DP"/*cOkMot*/,/*lAtuItens*/,/*cItem*/,cMsgAtuXmlOk/*cMsgAux*/,/*nLinXml*/,cInChvNfe/*cInChave*/)
+					Else
+						cMsgAtuXmlOk	:= "Não validou MT103DNF por motivo: '"+cMotAlert+"'" 
+						StaticCall(XMLDCONDOR,sfAtuXmlOk,"DP"/*cOkMot*/,/*lAtuItens*/,/*cItem*/,cMsgAtuXmlOk/*cMsgAux*/,/*nLinXml*/,cInChvNfe/*cInChave*/)
+						lRet	:= .F.
+					Endif
+				Endif
+			Endif
+			StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+		Endif
+	Endif
+
+EndIf
+//FIM - CENTRAL XML	 
+
+Return lRet
+
+
+
+
+Static Function RetTipoCTE(cCTE)
+
+//INICIO - CENTRAL XML
+Local aCombo1  :={}
+Local aComboCte:={}
+Local cTPCTE   := ""
+Local nCT      := 0
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	If SF1->(FieldPos("F1_TPCTE"))>0
+		aCombo1:=x3CboxToArray("F1_TPCTE")[1]
+		aSize(aComboCte,Len(aCombo1)+1)
+		For nCT:=1 to Len(aComboCte)
+			aComboCte[nCT]:=IIf(nCT==1," ",aCombo1[nCT-1])
+		Next nCT
+		nCT:=Ascan(aComboCTE, {|x| Substr(x,1,1) == cCTE})
+		If nCT>0
+			cTPCTE:=aComboCte[nCT]
+		EndIf
+	EndIf
+EndIf
+//FIM - CENTRAL XML
+
+Return cTPCTE

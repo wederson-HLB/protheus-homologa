@@ -1,0 +1,514 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWC001 ºAutor  ³Eduardo C. Romanini  º  Data ³  02/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Cadastro de usuário do portal.                              º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWC001()
+*---------------------*
+Local cHtml	:= "" 
+
+WEB EXTENDED INIT cHtml
+
+HttpGet->Oper  := ""
+HttpGet->cOper := ""
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cHtml := ExecInPage("GTWC001")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : GTWCM01
+Objetivo: Manutenção do cadastro de usuários 
+Autor   : Eduardo C. Romanini
+Data    : 03/04/2012
+*/
+*---------------------*
+User Function GTWCM01()
+*---------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Define o tipo de operação
+cOper := HttpGet->Oper
+
+//No caso de alteração ou visualização utiliza o login para posicionar o registro.
+If cOper <> "INC"
+	cLogin := HttpGet->Login
+EndIf
+
+cHtml := ExecInPage("GTWCM01")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : WC001Grv()
+Objetivo: Gravação dos dados
+Autor   : Eduardo C. Romanini
+Data    : 04/04/2012
+*/
+*----------------------*
+User Function WC001Grv()
+*----------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+Local aPost := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Parametro recebido na chamada da função.
+cOper := HttpGet->cOper
+
+aPost := aClone(HttpPost->aPost)
+
+If Valtype(cOper) <> "U" .and. cOper <> "VIS"
+
+	//Verifica se o login está preenchido
+	If !Empty(HttpPost->ZW0_LOGIN)
+
+		//Inclusão
+		If cOper == "INC"
+		    ZW0->(RecLock("ZW0",.T.))
+			ZW0->ZW0_ALTSEN := "S"
+
+		
+		//Alteração
+		ElseIf cOper == "ALT"
+			ZW0->(DbSetOrder(1))
+			If ZW0->(DbSeek(xFilial("ZW0")+HttpPost->ZW0_LOGIN))
+				ZW0->(RecLock("ZW0",.F.))
+			Else
+				ZW0->(RecLock("ZW0",.T.))
+				ZW0->ZW0_ALTSEN := "S"
+			EndIf
+		EndIf
+		
+		SX3->(DbSetOrder(1))
+		If SX3->(DbSeek("ZW0"))
+			While SX3->(!EOF())
+				If  X3Usado(SX3->X3_CAMPO)
+					If AllTrim(SX3->X3_CAMPO) == "ZW0_BLOQUE"
+						If Type("HttpPost->ZW0_BLOQUE") == "U"
+							ZW0->ZW0_BLOQUE := "N"
+						Else
+							ZW0->ZW0_BLOQUE := "S"
+						EndIf
+					ElseIf AllTrim(SX3->X3_CAMPO) == "ZW0_SENHA"
+						ZW0->ZW0_SENHA := "/"+Encript(AllTrim(HttpPost->ZW0_SENHA),1)+"/"
+					Else
+						ZW0->&(SX3->X3_CAMPO) := &("HttpPost->"+AllTrim(SX3->X3_CAMPO))
+					EndIf
+				EndIf
+				SX3->(DbSkip())
+			EndDo
+		EndIf
+			
+		ZW0->(MsUnlock())
+	
+	    //Grava as empresas vinculadas
+        ZW1->(DbGoTop())
+        While ZW1->(!EOF())
+			
+			//Verifica se a empresa já está vinculada
+            ZW2->(DbSetOrder(1))
+            If ZW2->(DbSeek(xFilial("ZW2")+AvKey(HttpPost->ZW0_LOGIN,"ZW2_LOGIN")+ZW1->ZW1_CODIGO+ZW1->ZW1_CODFIL))
+
+				///Verfica se foi desmarcada            
+				If Type("HttpPost->E"+AllTrim(ZW1->ZW1_CODIGO)+AllTrim(ZW1->ZW1_CODFIL)) == "U"
+
+					ZW2->(RecLock("ZW2",.F.))
+					ZW2->(DbDelete())
+					ZW2->(MsUnlock())
+
+				EndIf
+
+			//Empresa não vinculadas
+			Else
+				//Verifica se foi marcada
+				If Type("HttpPost->E"+AllTrim(ZW1->ZW1_CODIGO)+AllTrim(ZW1->ZW1_CODFIL)) <> "U"
+					ZW2->(RecLock("ZW2",.T.))
+					
+					ZW2->ZW2_LOGIN  := HttpPost->ZW0_LOGIN
+					ZW2->ZW2_CODIGO	:= ZW1->ZW1_CODIGO
+					ZW2->ZW2_CODFIL	:= ZW1->ZW1_CODFIL
+
+					ZW2->(MsUnlock())					    	
+				EndIf
+
+			EndIf
+			ZW1->(DbSkip())		
+		EndDo
+        
+    	//Envia e-mail com a nova senha.
+		If cOper == "INC"
+			EnviaSenha(HttpPost->ZW0_LOGIN)
+		EndIf
+		
+	EndIf
+EndIf
+
+cHtml := ExecInPage("GTWC001")
+
+WEB EXTENDED END
+	 
+Return cHtml  
+
+/*
+Função  : WC001EmpVinc()
+Objetivo: Verifica se a empresa está vinculada ao usuário
+Autor   : Eduardo C. Romanini
+Data    : 12/04/2012
+*/
+*------------------------------------------------*
+User Function WC001EmpVinc(cLogin,cCodEmp,cFilEmp)
+*------------------------------------------------*
+Local lRet := .F.
+
+ZW2->(DbSetOrder(1))
+If ZW2->(DbSeek(xFilial("ZW2")+AvKey(cLogin,"ZW2_LOGIN")+cCodEmp+cFilEmp))
+	lRet := .T.
+EndIf
+
+Return lRet
+
+/*
+Função  : WC001TEmp()
+Objetivo: Carrega as empresas que podem ser vinculadas ao usuário.
+Autor   : Eduardo C. Romanini
+Data    : 05/09/2012
+Obs     : O layout do arquivo gerado está de acordo com o esperado no site http://datatables.net/release-datatables/examples/server_side/ids.html.
+*/
+*-----------------------*
+User Function WC001TEmp()
+*-----------------------*
+Local cHtml  := ""
+Local cDados := ""
+Local cOper  := HttpGet->cOper
+Local cLogin := HttpGet->cLogin
+
+Local nQtd := 0
+
+WEB EXTENDED INIT cHtml
+
+//Prepara o ambiente
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Query
+BeginSql Alias 'QRY'
+	SELECT ZW1_CODIGO,ZW1_CODFIL,ZW1_NFANT,ZW1_CNPJ
+	FROM %table:ZW1%
+	WHERE %notDel%
+	ORDER BY ZW1_CODIGO,ZW1_CODFIL
+EndSql
+
+QRY->(DbGoTop())
+While QRY->(!EOF())
+    
+	//Soma os registros
+	nQtd++
+	
+	If nQtd > 1 
+		cDados += ","
+	EndIf
+    
+	//Carrega as informações de cada registro
+	cDados += "{"
+
+	cDados += '"0":"'+RetCBox(cLogin,cOper,QRY->ZW1_CODIGO,QRY->ZW1_CODFIL)+'",'
+	cDados += '"1":"'+AllTrim(QRY->ZW1_CODIGO)+'",'
+	cDados += '"2":"'+AllTrim(QRY->ZW1_CODFIL)+'",'
+	cDados += '"3":"'+AllTrim(QRY->ZW1_NFANT)+'",'
+	cDados += '"4":"'+AllTrim(QRY->ZW1_CNPJ)+'"'
+	
+	cDados += "}"
+
+	QRY->(DbSkip())
+EndDo
+
+QRY->(DbCloseArea())
+
+//Monta o arquivo final
+If nQtd > 0
+	cHtml += "{"
+	cHtml += '"sEcho": 1,'
+	cHtml += '"iTotalRecords": "'+AllTrim(Str(nQtd))+'",'
+	cHtml += '"iTotalDisplayRecords": "'+AllTrim(Str(nQtd))+'",'
+	cHtml += '"aaData":['	
+	cHtml += cDados
+	cHtml += ']'	
+	cHtml += "}"
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml
+
+/*
+Função  : RetCBox()
+Objetivo: Carrega as empresas que podem ser vinculadas ao usuário.
+Autor   : Eduardo C. Romanini
+Data    : 05/09/2012
+*/
+*---------------------------------------------------*
+Static Function RetCBox(cLogin,cOper,cCodEmp,cFilEmp)
+*---------------------------------------------------*
+Local cInput := ""
+
+cLogin  := Alltrim(cLogin) 
+cOper   := Alltrim(cOper) 
+cCodEmp := Alltrim(cCodEmp)
+cfilEmp := Alltrim(cFilEmp)
+
+//Cria o checkbox, onde o nome e id é o código e a filial da empresa
+cInput := "<input type='checkbox'"
+cInput += " id='E"+cCodEmp+cFilEmp+"'"
+cInput += " name='E"+cCodEmp+cFilEmp+"'"
+cInput += " value='S'"
+
+//Verifica se a empresa está marcada
+If U_WC001EmpVinc(cLogin,cCodEmp,cFilEmp)
+	cInput += " checked='checked'"	
+EndIf
+
+//Bloqueia o controle na visualização
+If HttpGet->Oper=="VIS"
+	cInput += " disabled='disabled'"
+EndIf
+
+cInput += " >"
+
+Return cInput
+
+/*
+Função  : WC001Grupo
+Objetivo: Rotina de busca dos Grupos de Acesso
+Autor   : Eduardo C. Romanini
+Data    : 29/05/2012
+*/
+*-----------------------*
+User Function WC001Grupo()
+*-----------------------*
+Local cHtml  := ""
+Local cWhere := ""
+Local cTexto := HttpGet->term
+Local cBanco := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If Len(cTexto) > 0
+    
+	cWhere := "% UPPER(ZW6_CODIGO) LIKE '%"+Upper(AllTrim(cTexto))+"%' %"
+
+    BeginSql Alias 'QRY'
+		SELECT ZW6_CODIGO, ZW6_DESCRI
+		FROM %table:ZW6%
+		WHERE %notDel%
+		  AND %exp:cWhere%
+		ORDER BY ZW6_CODIGO
+    EndSql
+
+	QRY->(DbGoTop())
+	If QRY->(!BOF() .and. !EOF())	
+    	
+    	cHtml += "["
+	EndIf
+
+	//Monta o retorno no formato JSON.
+	nI := 1	
+	While QRY->(!EOF())
+
+		If nI > 1 
+    		cHtml += ","
+		EndIf
+	
+	    cHtml += "{"
+		cHtml += '"cod":"'+Alltrim(QRY->ZW6_CODIGO)+'","desc":"'+EncodeUTF8(Alltrim(QRY->ZW6_DESCRI))+'"'
+		cHtml += "}"
+
+		nI++          
+		
+		QRY->(DbSkip()) 		
+	EndDo	
+	
+	If Len(cHtml) > 0
+    	cHtml += "]"
+	EndIf
+	
+	QRY->(DbCloseArea())
+	
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml
+
+*--------------------------------*
+Static Function EnviaSenha(cLogin)
+*--------------------------------*
+Local cMensagem := ""
+Local cHora     := Time()
+Local cPass     := ""
+
+ZW0->(DbSetOrder(1))
+If ZW0->(DbSeek(xFilial("ZW0")+Alltrim(cLogin)))	
+	cMailConta	:= GETMV("MV_EMCONTA",,"totvs@br.gt.com")
+	cMailServer	:= GETMV("MV_RELSERV",,"mail.br.gt.com")
+	cMailSenha	:= GETMV("MV_EMSENHA",,"Email@14")
+
+	cMensagem += "<img src='http://www.grantthornton.com.br/images/logo.gif'>" + CRLF+ CRLF
+	cMensagem += Alltrim(ZW0->ZW0_NOME) + "," + CRLF
+
+	If Val(cHora) < 12
+		cMensagem += u_WFTraduzir("Bom Dia") + CRLF+ CRLF  
+	ElseIf Val(cHora) < 18
+		cMensagem += u_WFTraduzir("Boa Tarde") + CRLF+ CRLF  
+	Else
+		cMensagem += u_WFTraduzir("Boa Noite") + CRLF+ CRLF  	
+	EndIf
+
+	cPass := Alltrim(ZW0->ZW0_SENHA)
+	cPass := Substr(cPass,2,Len(cPass)-2)
+	cPass := Encript(cPass,0)
+
+	cMensagem += u_WFTraduzir("Você está recebendo a senha de utilização do portal do cliente da Grant Thornton.") + CRLF
+	cMensagem += u_WFTraduzir("A senha do usuário") + "<b>" + Alltrim(ZW0->ZW0_LOGIN) + "</b> " + u_WFTraduzir("é") + " <b>" + AllTrim(cPass)+"</b>"+ CRLF
+	cMensagem += u_WFTraduzir("Para acessar o portal, digite o endereço: portal.grantthornton.com.br no seu browse de internet e informe seu usuário e senha.") + CRLF
+	cMensagem += u_WFTraduzir("No primeiro acesso você deverá alterar sua senha.") + CRLF + CRLF 
+	cMensagem += u_WFTraduzir("Att") + CRLF
+	cMensagem += u_WFTraduzir("Grant Thornton")
+	                              
+	oMessage			:= TMailMessage():New()
+	oMessage:Clear()
+	oMessage:cDate		:= cValToChar(Date())
+	oMessage:cFrom		:= cMailConta
+	oMessage:cTo		:= AllTrim(ZW0->ZW0_EMAIL)
+	oMessage:cCC 		:= ''
+	oMessage:cBCC 		:= "log.sistemas@br.gt.com"
+	oMessage:cReplyTo	:= ""//responder para...
+	oMessage:cSubject	:= "Envio de senha do portal do cliente"
+	oMessage:cBody		:= cMensagem
+	
+	oServer				:= tMailManager():New()
+	oServer:SetUseTLS(.T.)
+	cUser				:= cMailConta
+	cPass				:= cMailSenha
+	xRet := oServer:Init( "", cMailServer, cUser, cPass, 0, 587 )
+	If xRet != 0
+		conout( "Could not initialize SMTP server: " + oServer:GetErrorString( xRet ) )
+		lEnvioOK := .F.
+	EndIf
+	xRet := oServer:SetSMTPTimeout( 60 )
+	If xRet != 0
+	    conout( "Could not set timeout to " + cValToChar( 60 ) ) 
+		lEnvioOK := .F.
+	EndIf
+	xRet := oServer:SMTPConnect()
+	If xRet <> 0
+		conout( "Could not connect on SMTP server: " + oServer:GetErrorString( xRet ) )
+		lEnvioOK := .F.
+	EndIf
+	xRet := oServer:SmtpAuth( cUser, cPass )
+	If xRet <> 0
+	    conout( "Could not authenticate on SMTP server: " + oServer:GetErrorString( xRet ) )
+	    lEnvioOK := .F.
+	    oServer:SMTPDisconnect()
+	EndIf      
+	//Envio
+	xRet := oMessage:Send( oServer )
+	If xRet <> 0
+	    conout( "Could not send message: " + oServer:GetErrorString( xRet ))
+	    lEnvioOK := .F.
+	EndIf
+	//Encerra
+	xRet := oServer:SMTPDisconnect()
+	If xRet <> 0
+	    conout("Could not disconnect from SMTP server: " + oServer:GetErrorString(xRet))
+	    lEnvioOK := .F.
+	EndIf
+EndIf	
+
+/*
+ZW0->(DbSetOrder(1))
+If ZW0->(DbSeek(xFilial("ZW0")+Alltrim(cLogin)))
+
+	cServer   := AllTrim(GetNewPar("MV_RELSERV"," "))
+	cAccount  := AllTrim(GetNewPar("MV_RELFROM"," "))
+	cEnvia    := "portal.cliente@br.gt.com"
+	cRecebe   := AllTrim(ZW0->ZW0_EMAIL)
+	cPassword := AllTrim(GetNewPar("MV_RELPSW" ," "))
+
+	cMensagem += "<img src='http://www.grantthornton.com.br/images/logo.gif'>" + CRLF+ CRLF
+	cMensagem += Alltrim(ZW0->ZW0_NOME) + "," + CRLF
+
+	If Val(cHora) < 12
+		cMensagem += u_WFTraduzir("Bom Dia") + CRLF+ CRLF  
+	ElseIf Val(cHora) < 18
+		cMensagem += u_WFTraduzir("Boa Tarde") + CRLF+ CRLF  
+	Else
+		cMensagem += u_WFTraduzir("Boa Noite") + CRLF+ CRLF  	
+	EndIf
+
+	cPass := Alltrim(ZW0->ZW0_SENHA)
+	cPass := Substr(cPass,2,Len(cPass)-2)
+	cPass := Encript(cPass,0)
+
+	cMensagem += u_WFTraduzir("Você está recebendo a senha de utilização do portal do cliente da Grant Thornton.") + CRLF
+	cMensagem += u_WFTraduzir("A senha do usuário") + "<b>" + Alltrim(ZW0->ZW0_LOGIN) + "</b> " + u_WFTraduzir("é") + " <b>" + AllTrim(cPass)+"</b>"+ CRLF
+	cMensagem += u_WFTraduzir("Para acessar o portal, digite o endereço: portal.grantthornton.com.br no seu browse de internet e informe seu usuário e senha.") + CRLF
+	cMensagem += u_WFTraduzir("No primeiro acesso você deverá alterar sua senha.") + CRLF + CRLF 
+	cMensagem += u_WFTraduzir("Att") + CRLF
+	cMensagem += u_WFTraduzir("Grant Thornton")
+	 
+	CONNECT SMTP SERVER cServer ACCOUNT cAccount PASSWORD cPassword Result lConectou     //realiza conexão com o servidor de internet
+	
+	If lConectou
+		SEND MAIL FROM cEnvia;
+		TO cRecebe;
+		SUBJECT u_WFTraduzir('Envio de senha do portal do cliente') ;
+		BODY cMensagem ;
+		RESULT lEnviado
+	Endif
+	 
+	DISCONNECT SMTP SERVER Result lDisConectou
+Endif
+*/
+
+Return Nil

@@ -1,0 +1,48 @@
+/*/{Protheus.doc} MT116AGR
+(Ponto Entrada apos gravação do CTRC/CTE   )
+
+@author Marcelo Lauschner
+@since 07/04/2012
+@version 1.0
+
+@return Sem retorno esperado
+
+@example
+(examples)
+
+@see (http://tdn.totvs.com/display/public/mp/MT116AGR)
+/*/
+User Function MT116AGR()
+
+//INICIO - CENTRAL XML
+Local	aInParamIxb	:= aClone(ParamIxb)
+Local	aAreaOld	:= GetArea()
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MT116AGR",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	// Depois da Gravação do CTR/CTE pela Rotina Mata116 forço a voltar a variavel para .T. para evitar o erro de fechar o dialog
+	If Type("l116Auto") <> "U" .And. Type("oMulti") <> "U"
+		l116Auto	:= .T.
+	Endif
+	
+	RestArea(aAreaOld)
+	
+	// Chamada para Ponto de entrada nativo do Cliente - Padrão adição da letra "X" ao nome do Ponto de entrada
+	// Adicionado em 03/12/2012
+	If ExistBlock("XMT116AGR")
+		ExecBlock("XMT116AGR",.F.,.F.)
+	EndIf
+EndIf
+//FIM - CENTRAL XML
+	
+Return

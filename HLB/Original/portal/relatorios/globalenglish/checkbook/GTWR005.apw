@@ -1,0 +1,532 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include "tbiconn.ch"
+#Include "Topconn.ch"
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR005 ºAutor  ³Eduardo C. Romanini  º  Data ³  21/05/2013 º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Relatorio de CheckBook da GlobalEnglish.                    º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal Grant Thornton                                      º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWR005()
+*---------------------*
+Local cHtml	:= "" 
+Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja   := Substr(HttpSession->cEmpresa,3,2)
+	
+WEB EXTENDED INIT cHtml
+	
+//Validação de acesso por outra empresa que não a GlobalEnglish.
+If cEmp <> "N7"
+	cHtml := "<html><body><h1>Essa empresa não possui acesso a esse relatorio</h1></body></html>" 
+Else
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	cHtml := ExecInPage("GTWR005")
+EndIf
+	
+WEB EXTENDED END
+
+Return cHtml
+
+/*
+Função  : WR005Bancos()
+Objetivo: Retorna os bancos cadastrados.
+Autor   : Eduardo C. Romanini
+Data    : 21/05/13
+*/
+*-------------------------*
+User Function WR005Bancos()
+*-------------------------*
+Local cEmp := Substr(HttpSession->cEmpresa,1,2)
+Local cFil := Substr(HttpSession->cEmpresa,3,2)
+Local cHtml  := ''
+Local cBanco := ''
+Local cIp    := ''
+Local aCon   := {}
+	
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+	
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cFil)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+nPorta:= 7891
+
+nCon := TCLink(cBanco,cIp,nPorta)
+
+If Select("SQL") > 0
+	SQL->(DbCloseArea())
+EndIf
+	
+BeginSql Alias 'SQL'
+	SELECT DISTINCT A6_COD
+	FROM SA6N70
+	WHERE D_E_L_E_T_ <> '*'
+	ORDER BY A6_COD
+EndSql
+	
+While ! SQL->(Eof())
+	cHtml += '<option value="' + SQL->A6_COD + '">' + SQL->A6_COD + '</option>' + CRLF
+	SQL->(DbSkip())
+EndDo
+	
+SQL->(DbCloseArea())
+TcUnlink(nCon)
+
+Return cHtml
+
+/*
+Função  : WR005Agencias()
+Objetivo: Retorna as agencias relacionadas a um banco.
+Autor   : Eduardo C. Romanini
+Data    : 21/05/13
+*/
+*---------------------------*
+User Function WR005Agencias()
+*---------------------------*
+Local cEmp := Substr(HttpSession->cEmpresa,1,2)
+Local cFil := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco := ''
+Local cIp    := ''
+Local cBco   := UnEscape(HttpPost->cBanco)
+Local cHtml  := ''
+Local aCon   := {}
+	
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+	
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cFil)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+nPorta:= 7891
+
+nCon := TCLink(cBanco,cIp,nPorta)
+	
+If Select("SQL") > 0
+	SQL->(DbCloseArea())
+EndIf
+	
+BeginSql Alias 'SQL'
+	SELECT DISTINCT A6_AGENCIA
+	FROM SA6N70 
+	WHERE %notDel%
+		AND A6_COD = %exp:cBco%
+EndSql
+	
+While ! SQL->(Eof())
+	cHtml += '<option value="' + SQL->A6_AGENCIA + '">' + SQL->A6_AGENCIA + '</option>' + CRLF
+	SQL->(DbSkip())
+EndDo
+	
+SQL->(DbCloseArea())
+TcUnlink(nCon)
+
+Return cHtml
+
+/*
+Função  : WR005Contas()
+Objetivo: Retorna as contas relacionadas a um banco e uma agência.
+Autor   : Eduardo C. Romanini
+Data    : 21/05/13
+*/
+*-------------------------*
+User Function WR005Contas()
+*-------------------------*
+Local cEmp     := Substr(HttpSession->cEmpresa,1,2)
+Local cFil     := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco   := ''
+Local cIp      := ''
+Local cBco     := UnEscape(HttpPost->cBanco)
+Local cAgencia := UnEscape(HttpPost->cAgencia)
+Local cHtml    := ''
+Local aCon     := {}
+	
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+	
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cFil)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+nPorta:= 7891              
+
+nCon := TCLink(cBanco,cIp,nPorta)
+	
+If Select("SQL") > 0
+	SQL->(DbCloseArea())
+EndIf
+	
+BeginSql Alias 'SQL'
+		SELECT DISTINCT A6_NUMCON
+		FROM SA6N70 
+		WHERE D_E_L_E_T_ <> '*'
+			AND A6_AGENCIA = %exp:cAgencia%
+			AND A6_COD = %exp:cBco%
+EndSql
+	
+While ! SQL->(Eof())
+	cHtml += '<option value="' + SQL->A6_NUMCON + '">' + SQL->A6_NUMCON + '</option>' + CRLF
+	SQL->(DbSkip())
+EndDo
+	
+SQL->(DbCloseArea())
+TcUnlink(nCon)
+
+Return cHtml  
+
+/*
+Função  : WR005Html()
+Objetivo: Retorna o relatório na tela
+Autor   : Eduardo C. Romanini
+Data    : 22/05/13
+*/
+*-----------------------*
+User Function WR005Html()
+*-----------------------*
+Local cHtml := ""
+Local cBco     := HttpPost->cBanco
+Local cAgencia := HttpPost->cAgencia
+Local cConta   := HttpPost->cConta
+Local cDataDe  := DtoS(CtoD(HttpPost->cDataDe))
+Local cDataAte := DtoS(CtoD(HttpPost->cDataAte))
+
+WEB EXTENDED INIT cHtml
+
+cHtml := WR005Gerar(.F.,cBco,cAgencia,cConta,cDataDe,CDataAte)
+
+WEB EXTENDED END
+
+Return cHtml
+
+/*
+Função  : WR005Gerar()
+Objetivo: Gera o relatório.
+Autor   : Eduardo C. Romanini
+Data    : 22/05/13
+*/
+*--------------------------------------------------------------------------*
+Static Function WR005Gerar(lPlanilha,cBco,cAgencia,cConta,cDataDe,CDataAte)
+*--------------------------------------------------------------------------*
+Local cEmp    := ''
+Local cFil    := ''
+Local cBanco  := ''
+Local cIp     := ''
+Local cHtml   := ''
+Local cAccNum := ''
+
+Local nCon   := 0
+Local nSaldo := 0
+
+Local lImpar := .F.
+
+Local aCon   := {}
+
+//Verifica se a sessão expirou.
+If  ValType(HttpSession->cLogin)<> "C" .or. Empty(HttpSession->cLogin);
+.or. ValType(HttpSession->cEmpresa)<> "C" .or. Empty(HttpSession->cEmpresa)
+	cHtml := ExecInPage("GTWP007") //Pagina de sessão expirada.
+	Return cHtml
+EndIf
+
+cEmp := Substr(HttpSession->cEmpresa,1,2)
+cFil := Substr(HttpSession->cEmpresa,3,2)
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+// Cabecalho
+cHtml :=	'<table id="tb1">' + CRLF
+cHtml +=	'	<thead>' + CRLF
+cHtml +=	'		<tr>' + CRLF
+cHtml +=	'			<th>Check Number</th>' + CRLF
+cHtml +=	'			<th>Check Date</th>' + CRLF
+cHtml +=	'			<th>Payee</th>' + CRLF
+cHtml +=	'			<th>Invoice Number</th>' + CRLF
+cHtml +=	'			<th>Account Number</th>' + CRLF
+cHtml +=	'			<th>Pryor Code</th>' + CRLF
+cHtml +=	'			<th>Account Despcription</th>' + CRLF
+cHtml +=	'			<th>Amount (R$)</th>' + CRLF
+cHtml +=	'			<th>Balance</th>' + CRLF
+cHtml +=	'			<th>Notes</th>' + CRLF
+cHtml +=	'		</tr>' + CRLF
+cHtml +=	'	</thead>' + CRLF
+
+cHtml +=	'	<tbody>' + CRLF	
+
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cFil)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+nPorta:= 7891              
+
+nCon := TCLink(cBanco,cIp,nPorta)
+
+/////////////////
+//Saldo Inicial//
+/////////////////
+If Select("SLD") > 0
+	SLD->(DbCloseArea())
+EndIf
+
+BeginSql Alias 'SLD'
+	
+	SELECT TOP 1 E8_SALATUA 
+	FROM SE8N70
+	WHERE %notDel%
+	  AND E8_BANCO = %exp:cBco%
+	  AND E8_AGENCIA = %exp:cAgencia%
+	  AND E8_CONTA = %exp:cConta%
+	  AND E8_DTSALAT < %exp:cDataDe%
+	ORDER BY E8_DTSALAT DESC
+
+EndSql
+
+SLD->(DbGoTop())
+If SLD->(!EOF())
+	
+	cHtml +=	'		<tr class="odd">' + CRLF
+    
+	If lPlanilha
+		cHtml +=	'			<td>=""</td>' + CRLF //Check Number
+		cHtml +=	'			<td>=""</td>' + CRLF //Check Date
+		cHtml +=	'			<td>=""</td>' + CRLF //Payee
+		cHtml +=	'			<td>=""</td>' + CRLF //Invoice Number
+		cHtml +=	'			<td>=""</td>' + CRLF //Account Number
+		cHtml +=	'			<td>=""</td>' + CRLF //Pryor Code
+		cHtml +=	'			<td>="PRIOR BANK BALANCE"</td>' + CRLF //Account Despcription
+		cHtml +=	'			<td>=""</td>' + CRLF //Amount
+		cHtml +=	'			<td>="'+Transform(SLD->E8_SALATUA,"@E 999,999,999.99")+'"</td>' + CRLF //Balance
+		cHtml +=	'			<td>=""</td>' + CRLF //Notes
+																											
+	Else
+		cHtml +=	'			<td></td>' + CRLF //Check Number
+		cHtml +=	'			<td></td>' + CRLF //Check Date
+		cHtml +=	'			<td></td>' + CRLF //Payee
+		cHtml +=	'			<td></td>' + CRLF //Invoice Number
+		cHtml +=	'			<td></td>' + CRLF //Account Number
+		cHtml +=	'			<td></td>' + CRLF //Pryor Code
+		cHtml +=	'			<td>PRIOR BANK BALANCE</td>' + CRLF //Account Despcription
+		cHtml +=	'			<td></td>' + CRLF //Amount
+		cHtml +=	'			<td>'+Transform(SLD->E8_SALATUA,"@E 999,999,999.99")+'</td>' + CRLF //Balance
+		cHtml +=	'			<td></td>' + CRLF //Notes
+	EndIf
+    
+    cHtml +=	'		</tr>' + CRLF
+    
+    nSaldo := SLD->E8_SALATUA
+	
+EndIf
+
+If Select("SLD") > 0
+	SLD->(DbCloseArea())
+EndIf
+
+
+/////////////////
+//Movimentações//
+/////////////////
+If Select("MOV") > 0
+	MOV->(DbCloseArea())
+EndIf
+
+BeginSql Alias 'MOV'
+	SELECT SE5.E5_NUMCHEQ,SE5.E5_DATA,SE5.E5_BENEF,SE5.E5_NATUREZ,ED_DESCING,SE5.E5_VALOR,SE5.E5_HISTOR,
+	       SE5.E5_RECPAG,SE5.E5_TIPODOC,SE5.E5_FORNECE,SE5.E5_LOJA
+	FROM SE5N70 SE5
+	LEFT JOIN SE5N70 REC ON REC.E5_DATA = SE5.E5_DATA AND REC.E5_BANCO = SE5.E5_BANCO
+	                    AND REC.E5_AGENCIA = SE5.E5_AGENCIA AND REC.E5_CONTA = SE5.E5_CONTA
+						AND REC.E5_NUMERO = SE5.E5_NUMERO AND REC.E5_SEQ = SE5.E5_SEQ
+						AND REC.E5_CLIFOR = SE5.E5_CLIFOR AND REC.E5_LOJA = SE5.E5_LOJA
+						AND REC.E5_TIPODOC IN ('ES')
+	LEFT JOIN SEDYY0 SED ON SED.ED_CODIGO = SE5.E5_NATUREZ
+	WHERE SE5.%notDel%
+	  AND SED.%notDel%
+	  AND SE5.E5_BANCO = %exp:cBco%
+	  AND SE5.E5_AGENCIA = %exp:cAgencia%
+	  AND SE5.E5_CONTA = %exp:cConta%
+	  AND SE5.E5_DATA >= %exp:cDataDe%
+	  AND SE5.E5_DATA <= %exp:cDataAte%
+	  AND SE5.E5_MOEDA <> ' '
+	  AND REC.R_E_C_N_O_ IS NULL
+	ORDER BY SE5.E5_DATA,SE5.E5_NUMCHEQ
+EndSql
+
+MOV->(DbGoTop())
+While MOV->(!EOF())
+    
+	//Calcula o saldo
+	If MOV->E5_RECPAG == "R"
+		nSaldo += MOV->E5_VALOR
+		nValor := MOV->E5_VALOR
+	Else
+		nSaldo -= MOV->E5_VALOR
+		nValor := MOV->E5_VALOR * -1
+	EndIf
+    
+	//Retona a invoice
+	If !Empty(MOV->E5_NUMCHEQ)
+
+		If Select("INV") > 0
+			INV->(DbCloseArea())
+		EndIf         
+
+		BeginSql Alias 'INV'
+			
+			SELECT EF_TITULO 
+			FROM SEFN70
+			WHERE %notDel%
+			  AND EF_BANCO = %exp:cBco%
+			  AND EF_AGENCIA =  %exp:cAgencia%
+			  AND EF_CONTA = %exp:cConta%
+			  AND EF_NUM = %exp:MOV->E5_NUMCHEQ%
+			  AND EF_FORNECE = %exp:MOV->E5_FORNECE%
+			  AND EF_LOJA = %exp:MOV->E5_LOJA%    	
+
+		EndSql	
+		
+        INV->(DbGoTop())
+        If INV->(!EOF())
+        	cInvoice := INV->EF_TITULO
+        EndIf
+        
+        If Select("INV") > 0
+			INV->(DbCloseArea())
+		EndIf 
+			
+	Else
+		cInvoice := ""
+	EndIf
+    
+	//Retorna o Account Number
+	If Select("ACC") > 0
+		ACC->(DbCloseArea())
+	EndIf
+	
+	BeginSql Alias 'ACC'
+		SELECT TOP 1 dpCodGlobal
+		FROM DBCLIC.DBCLIC.DBO.TBLDEPARAGLOBALENGLISH  
+		WHERE dpCodPryor COLLATE SQL_LATIN1_GENERAL_CP1_CI_AS = %exp:MOV->E5_NATUREZ%
+		%noparser% 
+	EndSql	
+    
+    ACC->(DbGoTop())
+    If ACC->(!EOF())
+     	cAccNum := ACC->DPCODGLOBAL
+    Else
+    	cAccNum := ""
+    EndIf
+
+	If Select("ACC") > 0
+		ACC->(DbCloseArea())
+	EndIf
+    
+	// Define linhas pares e impares
+	If lImpar
+		cHtml +=	'	<tr class="odd">' + CRLF
+		lImpar := .F.
+	Else
+		cHtml +=	'	<tr class="even">' + CRLF
+		lImpar := .T.
+	EndIf
+    
+	If lPlanilha
+		cHtml +=	'			<td>="'+AllTrim(MOV->E5_NUMCHEQ)+'"</td>' + CRLF //Check Number
+		cHtml +=	'			<td>="'+DtoC(StoD(MOV->E5_DATA))+'"</td>' + CRLF //Check Date
+		cHtml +=	'			<td>="'+AllTrim(MOV->E5_BENEF)+'"</td>' + CRLF //Payee
+		cHtml +=	'			<td>="'+AllTrim(cInvoice)+'"</td>' + CRLF //Invoice Number
+		cHtml +=	'			<td>="'+AllTrim(cAccNum)+'"</td>' + CRLF //Account Number
+		cHtml +=	'			<td>="'+AllTrim(MOV->E5_NATUREZ)+'"</td>' + CRLF //Pryor Code
+		cHtml +=	'			<td>="'+AllTrim(MOV->ED_DESCING)+'"</td>' + CRLF //Account Despcription
+		cHtml +=	'			<td>'+Transform(nValor,"@E 999,999,999.99")+'</td>' + CRLF //Amount
+		cHtml +=	'			<td>'+Transform(nSaldo,"@E 999,999,999.99")+'</td>' + CRLF //Balance
+		cHtml +=	'			<td>="'+AllTrim(MOV->E5_HISTOR)+'"</td>' + CRLF //Notes
+																										
+	Else
+		cHtml +=	'			<td>'+AllTrim(MOV->E5_NUMCHEQ)+'</td>' + CRLF //Check Number
+		cHtml +=	'			<td>'+DtoC(StoD(MOV->E5_DATA))+'</td>' + CRLF //Check Date
+		cHtml +=	'			<td>'+AllTrim(MOV->E5_BENEF)+'</td>' + CRLF //Payee
+		cHtml +=	'			<td>'+AllTrim(cInvoice)+'</td>' + CRLF //Invoice Number
+		cHtml +=	'			<td>'+AllTrim(cAccNum)+'</td>' + CRLF //Account Number
+		cHtml +=	'			<td>'+AllTrim(MOV->E5_NATUREZ)+'</td>' + CRLF //Pryor Code
+		cHtml +=	'			<td>'+AllTrim(MOV->ED_DESCING)+'</td>' + CRLF //Account Despcription
+		cHtml +=	'			<td align="right">'+Transform(nValor,"@E 999,999,999.99")+'</td>' + CRLF //Amount
+		cHtml +=	'			<td align="right">'+Transform(nSaldo,"@E 999,999,999.99")+'</td>' + CRLF //Balance
+		cHtml +=	'			<td>'+AllTrim(MOV->E5_HISTOR)+'</td>' + CRLF //Notes
+	EndIf	
+
+	MOV->(DbSkip())
+EndDo
+
+If Select("MOV") > 0
+	MOV->(DbCloseArea())
+EndIf
+		
+// Finaliza a tabela
+cHtml +=	'	</tbody>' + CRLF
+cHtml +=	'</table>'
+	
+TcUnlink(nCon)
+
+Return cHtml
+
+*------------------------*
+User Function WR005Excel()
+*------------------------*
+Local cHtml := ''
+Local cNome := 'globalenglish_checkbook_'
+Local cDia  := StrZero(Day(Date()), 2)
+Local cMes  := StrZero(Month(Date()), 2)
+Local cAno  := AllTrim(Str(Year(Date())))
+Local cBco     := HttpGet->cBanco
+Local cAgencia := HttpGet->cAgencia
+Local cConta   := HttpGet->cConta
+Local cDataDe  := DtoS(CtoD(HttpGet->cDataDe))
+Local cDataAte := DtoS(CtoD(HttpGet->cDataAte))
+	
+cNome += cAno + cMes + cDia + '_' + AllTrim(Str(Round(Seconds(),0)))
+			
+HttpCtDisp('attachment; filename="' + cNome + '.xls"')
+HttpCtType('application/vnd.ms-excel')
+	
+cHtml += '<!DOCTYPE html>'
+cHtml += '<html>'
+cHtml += '	<head>'
+cHtml += '		<title>Relat&oacute;rio CheckBook - GlobalEnglish</title>'
+cHtml += '		<style>
+cHtml += '			thead th {'
+cHtml += '				border-bottom: thin solid black;'
+cHtml += '				background-color: #DDDDEE;'
+cHtml += '			}'
+cHtml += '			tbody td {'
+cHtml += '				border-bottom: thin dashed black;'
+cHtml += '				border-right: thin solid white;'
+cHtml += '			}'
+cHtml += '			.odd {'
+cHtml += '				background-color: #F5F5FA;'
+cHtml += '			}'
+cHtml += '		</style>'
+cHtml += '	</head>'
+cHtml += '<body>'
+cHtml += WR005Gerar(.T.,cBco,cAgencia,cConta,cDataDe,CDataAte)
+cHtml += '</body>'
+cHtml += '</html>'
+
+Return cHtml

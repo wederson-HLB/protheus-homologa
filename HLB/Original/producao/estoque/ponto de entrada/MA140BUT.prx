@@ -1,0 +1,44 @@
+#Include 'Protheus.ch'
+
+
+/*/{Protheus.doc} MA140BUT
+(Ponto de entrada para força o Refresh do GetDados ao carregar a tela da Pré nota para corrigir o erro de visualização do item 2 duplicado na linha 1)
+@type function
+@author marce
+@since 18/03/2017
+@version 1.0
+@return ${return}, ${return_description}
+@example
+(examples)
+@see (links_or_references)
+/*/
+User Function MA140BUT()
+
+//INICIO - CENTRAL XML	
+Local	aUsButtons 	:= {}
+Local	aInParamIxb	:= aClone(ParamIxb)
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML	
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MA140BUT",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	// Força atualização Refresh do GetDados 
+	Eval(bGDRefresh)
+		
+	// Executa Ponto de Entrada do Cliente que adiciona botões na EnchoiceBar
+	If ExistBlock( "XMA140BUT" )
+		aUsButtons := ExecBlock( "XMA140BUT", .F., .F. )
+		Return aUsButtons
+	EndIf
+EndIf
+//FIM - CENTRAL XML
+
+Return Nil

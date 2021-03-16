@@ -1,0 +1,219 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWCM06   ºAutor  ³Eduardo C. Romanini º Data ³  28/05/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da manutenção do cadastro de grupos do           º±±
+±±º          ³portal Gt.                                                  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Local cOper   := HttpGet->Oper
+Local cParam  := ""
+Local cCodGrp := HttpGet->Chave
+
+Local nI := 0
+Local nY := 0
+
+Local aCabec  := {}
+Local aLinhas := {} 
+Local aCpos   := {}
+Local aReg    := {}
+
+aAdd(aCabec,"") //Adiciona linha em branco para o checkbox
+
+SX3->(DbSetOrder(1))
+If SX3->(DbSeek("ZW4"))
+	While SX3->(!EOF()) .and. SX3->X3_ARQUIVO = "ZW4"
+
+		//Define o cabeçalho da tabela
+		If SX3->X3_BROWSE == "S"
+        	aAdd(aCabec,AllTrim(SX3->X3_TITULO))
+			aAdd(aCpos,SX3->X3_CAMPO)
+		EndIf
+
+		SX3->(DbSkip())
+	EndDo
+EndIf
+
+ZW4->(DbSetOrder(1))
+ZW4->(DbGoTop())
+While ZW4->(!EOF())
+    
+	//Define as linhas da tabela
+	aReg := {""} //Linhas em branco para o botão de visualização e alteração.
+	For nI:=1 To Len(aCpos)
+		aAdd(aReg,ZW4->&(aCpos[nI]))
+	Next
+	
+	aAdd(aLinhas,aReg)		
+		
+	ZW4->(DbSkip())	
+EndDo
+
+%>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title><%= u_WFTraduzir("Cadastro de Menus") %></title>
+
+<link href='portal_cliente_gt/css/form.css' rel='stylesheet' type='text/css'> <% /*CSS de estilo para formularios do portal */ %>
+
+<script type="text/javascript" src="portal_cliente_gt/js/jquery.min.js">  </script> <% /*JavaScript padrão para utilizar JQuery */ %>
+
+<script language='javascript' type='text/javascript'>
+
+	function Valida() {
+	
+		<%
+		//Valida o preenchimento dos campos
+		SX3->(DbSetOrder(1))
+		If SX3->(DbSeek("ZW6"))
+			While SX3->(!EOF()) .and. SX3->X3_ARQUIVO == "ZW6"
+				
+				If  X3Usado(SX3->X3_CAMPO) .and. X3Obrigat(SX3->X3_CAMPO)
+		%>
+		
+					if(document.getElementById('<%= AllTrim(SX3->X3_CAMPO) %>').value == '')  {
+						alert("<%= u_WFTraduzir('Campos obrigatórios nao foram preenchidos!') %>");
+						return;
+					}
+		<%
+				EndIf	
+				SX3->(DbSkip())
+			EndDo
+		EndIf	                                          
+		
+		%> 
+		
+		document.form1.submit();
+	}
+</script>
+
+</head>
+
+<body>
+<table width="100%" border="0">
+	<% //Título da janela
+	%>
+	<tr>
+		<th scope="col">
+			<div align="left" class="titulo" style="height: 15px"><%= u_WFTraduzir("Cadastro de Grupos") %></div>
+		</th>
+	</tr>
+
+	<% //Linha horizontal
+	%>
+	<tr>
+		<td><hr /></td>
+	</tr>
+
+	<% //Botões
+	%>
+	<tr>
+    	<td>
+			<a href="javascript:Valida();" style="display:inline-block;" title="<%= u_WFTraduzir('Salvar') %>" >
+				<img src="portal_cliente_gt/Imagens/disk.png" width="16" height="16"/>
+			</a>
+			&nbsp;
+			<a href="U_GTWC006.apw" style="display:inline-block;" title="<%= u_WFTraduzir('Cancelar') %>" >
+				<img src="portal_cliente_gt/Imagens/Cancel.png" width="16" height="16" />
+			</a>
+		</td>
+	</tr>
+
+	<% //Campos do formulário
+	%>
+	<tr>
+		<td>
+			<form id="form1" name="form1" action="U_WC006Grv.apw?cOper=<%=HttpGet->Oper%>" method="post" target="principal">
+				<table class="painel">
+
+					<% //Monta a tabela com o formulário 
+					%>
+					<%= U_WFForm("ZW6",HttpGet->Oper,HttpGet->Chave) %>
+
+  					<tr>
+						<td colspan="4">&nbsp;</td>
+					</tr>
+
+				</table>
+
+				<br>
+				
+				<% //Monta a tabela para seleção das empresas.
+				%>
+				<table  width="100%" border="0">
+					<tr>
+						<td>
+							<div align="left" class="titulo" style="height: 12px"><%= u_WFTraduzir("Seleção de Rotinas") %></div>
+						</td>
+					</tr>
+					<tr>
+						<td><hr/></td>
+					</tr>
+					<tr>
+						<td><br></td>
+					</tr>
+					<tr>
+						<td>
+							<div class="scroll">
+								<table id="tb1" class="browse">
+									<tr>
+										<% For nI:=1 To Len(aCabec) %>
+											<th scope="col" class='th'>
+												<%= aCabec[nI] %>
+											</th>  
+										<% Next %>
+									</tr>
+									<% For nI:=1 To Len(aLinhas)  %>
+										<tr>
+											<% For nY:=1 To Len(aLinhas[nI]) %>
+												<% //Botão Visualizar 
+												If nY == 1 %>
+													<td class='td'>
+														<% /* Cria o checkbox, onde o nome e id é o código e a filial da empresa*/%>	
+														<input type='checkbox' id='<%= "R"+AllTrim(aLinhas[nI][2])%>' name='<%= "R"+AllTrim(aLinhas[nI][2])%>' value='S'
+															<%
+															If HttpGet->Oper<>"INC"
+															%>
+																<%= If(U_WC006RotVinc(cCodGrp,aLinhas[nI][2]),'checked','')%> 
+																<%= If(HttpGet->Oper=="VIS",'disabled="disabled"','')  %>															
+															<%
+															EndIf		
+														    %>   
+														>
+													</td>
+												<% Else %>
+													<td class='td'>
+														<%= aLinhas[nI][nY] %>
+													</td>
+												<% EndIf %>
+											</td>
+											<% Next %>
+										</tr>
+									<% Next %>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</table>
+
+			</form>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

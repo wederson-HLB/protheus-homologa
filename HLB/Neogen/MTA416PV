@@ -1,0 +1,11 @@
+#INCLUDE "RWMAKE.CH"
+#INCLUDE "PROTHEUS.CH"
+
+User Function MTA416PV()
+Local aAreaAtu := GetArea()
+Local _aAcols  := aClone(PARAMIXB[1])			
+aLERT(Ascan(aHeadC6,{|x| Alltrim(x[2]) == "C6_QTDLIB"}))
+
+RestArea(aAreaAtu)	
+Return()
+

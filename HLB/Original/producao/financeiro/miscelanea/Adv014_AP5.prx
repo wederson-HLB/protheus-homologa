@@ -1,0 +1,36 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 09/10/01
+
+User Function Adv014()        // incluido pelo assistente de conversao do AP5 IDE em 09/10/01
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CJINI,CJFIM,")
+
+//PROGRAMA PARA CANCELAR FLAG DE CHEQUE Jµ IMPRESSO - SIGAFIN
+//Autor - Lucio
+Pergunte("FIN485    ",.t.)
+cjini := mv_par01+mv_par02+mv_par03+mv_par04
+cjfim := mv_par01+mv_par02+mv_par03+mv_par05
+Alert("Por medidas de seguranca, so o CHEQUE No. "+AllTrim(mv_par04)+" foi alterado!!!")
+DbSelectArea("SEF")
+DbSetOrder(1)    // EF_FILIAL + EF_BANCO + EF_AGENCIA + EF_CONTA + EF_NUM
+DbSeek(xfilial("SEF")+cjini,.t.)
+//***do while SEF->(EF_BANCO+EF_AGENCIA+EF_CONTA+EF_NUM) <= cjfim .and. !Eof()
+//***alterado por Claudio em 23/08 por medidas de seguranca, ou seja evitar de
+//***desabilitar a impressao de cheques.
+do while SEF->(EF_BANCO+EF_AGENCIA+EF_CONTA+EF_NUM) == cjini 
+   if SEF->EF_IMPRESS == "S"
+      do while !RecLock("SEF",.f.)
+         inkey(.01)
+      enddo
+      SEF->EF_IMPRESS := " "
+      MsUnLock()
+   endif
+   DbSkip()
+enddo
+Return

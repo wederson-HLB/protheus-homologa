@@ -1,0 +1,24 @@
+#include "rwmake.ch"
+
+User Function LP510_01()
+
+Local cContaD := ""
+
+If SE2->(EOF()) .and. !Empty(SEV->EV_NUM)
+	SE2->(DbSetOrder(1))
+	SE2->(DbSeek(xFilial("SE2")+SEV->EV_PREFIXO+SEV->EV_NUM))
+EndIf
+
+If SE2->E2_MULTNAT <> "2"
+	SED->(DbSetOrder(1))
+	If SED->(DbSeek(xFilial("SED")+SEV->EV_NATUREZ))
+		cContaD:=SED->ED_CONTA
+    EndIf
+Else
+	SED->(DbSetOrder(1))
+	If SED->(DbSeek(xFilial("SED")+SE2->E2_NATUREZ))
+         cContaD:=SED->ED_CONTA
+	EndIf
+EndIf
+
+Return(cContaD)  

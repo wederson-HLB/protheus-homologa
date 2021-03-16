@@ -1,0 +1,49 @@
+/*/{Protheus.doc} MA116BUT
+(Ponto de entrada para adicionar botões a tela do MATA116)
+	
+@author MarceloLauschner
+@since 07/04/2012
+@version 1.0		
+
+@return aUsrBtt, Array com botões novos
+
+@example
+(User Function MA116BUT()Local nOpcX:= PARAMIXB[1]Local aBut := PARAMIXB[2]// Customizações desejadasReturn aBut)
+
+@see (http://tdn.totvs.com/pages/releaseview.action?pageId=6085723)
+@see (https://sites.google.com/site/microsigacentralxml/home/pontos-de-entrada/ma116but-1)
+/*/
+User Function MA116BUT()
+
+//INICIO - CENTRAL XML
+//({ nOpcx, aButtons } )
+Local	aInParamIxb	:= aClone(ParamIxb)
+Local	aBtnBack
+Local	aUsrBtt		:= ParamIxb[2] // aButtons	 := { {"S4WB013N",{||NfeRatCC(aHeadSDE,aColsSDE,l116Inclui)},STR0043,STR0044} } //"Rateio por Centro de Custo"
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MA116BUT",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	Aadd(aUsrBtt,{"AMARELO",{|| IIf(Type("l116Auto") <> "U" .And. Type("oMulti") <> "U" ,(l116Auto	:= .T.,MsgAlert("Fechar sem erro! Agora pode clicar no Cancelar com X!")),Nil) },"Marcar váriavel para fechar","Cancelar Lançamento"})
+
+// Verifica a existencia de um ponto de entrada do cliente permitindo a adição de mais botões.
+	If ExistBlock("XMA116BUT")
+		aBtnBack := aClone(aUsrBtt)
+		aUsrBtt := ExecBlock( "XMA116BUT", .F., .F.,{ParamIXB[1],aUsrBtt})
+		If ValType( aUsrBtt ) <> "A"
+			aUsrBtt := aClone(aBtnBack)
+		EndIf
+	EndIf
+EndIf
+//FIM - CENTRAL XML
+ 
+Return aUsrBtt

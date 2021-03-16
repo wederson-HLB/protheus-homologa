@@ -1,0 +1,208 @@
+#Include "apwebex.ch"
+#include "tbiconn.ch"     
+#include "totvs.ch"
+#Include "topconn.ch"  
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWGM002  ºAutor  ³Tiago Luiz Mendonça º Data ³  08/08/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Movimentação por empresa - Dashboard.                       º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/ 
+                               
+/*
+Funcao      : GTWGM002
+Parametros  : Nenhum
+Retorno     : Nil
+Objetivos   : Rotina APWBEX de grafico de movimentação.
+Autor       : Tiago Luiz Mendonça
+Data/Hora   : 08/08/12 20:00
+*/
+
+*--------------------------*
+  User Function GTWGM002()
+*--------------------------*    
+
+Local cHtml  := ""   
+Local aStru  := {}
+Local nCon   := 0    
+Local n      := 0
+
+
+WEB EXTENDED INIT  cHtml 
+
+	//Prepara o ambiente para execução.
+	If Select("SX2") == 0
+		PREPARE ENVIRONMENT EMPRESA '02' FILIAL '01' MODULO 'FIN'
+	EndIf 
+	         
+	//Posiciona na empresa logada. 
+	ZW1->(DbSetOrder(1))
+	If ZW1->(DbSeek(xFilial("ZW1")+HttpSession->cEmpresa))
+		cEmp   := ZW1->ZW1_CODIGO
+		cFil   := ZW1->ZW1_CODFIL   
+	EndIf 
+
+	//Abre conexão com banco DbCorporativo.
+ 	//nCon := TCLink("MSSQL7/DbCorporativo","10.0.30.5",7890)  
+	nCon := TCLink("MSSQL7/DbCorporativo","10.0.30.5",7894) //Alterado para a porta do novo TOP
+ 	
+ 	If Select("cMovLog") > 0
+		cMovLog->(DbCloseArea())	               
+	EndIf  
+
+	//Cria estrutura do temporario.
+	aStru := {     {"ANO"   ,"C" ,30 ,0  } }
+
+     
+    //Cria temporario agrupado pelo ano.                            
+ 	cQuery:=" SELECT ANO "
+	cQuery+=" FROM MOV_"+alltrim(cEmp)+" WHERE EMP='"+alltrim(cEmp)+"'  group by ANO order by ANO desc "
+    
+	//Executa o select. 
+	If !(TCSQLExec(cQuery) < 0)    
+	    
+		TCQuery cQuery ALIAS "cMovLog" NEW
+	
+		For nX := 1 To Len(aStru)
+		    If aStru[nX,2]<>"C"
+			    TcSetField("cMovLog",aStru[nX,1],aStru[nX,2],aStru[nX,3],aStru[nX,4])
+		    EndIf
+		Next nX
+	
+		cTMP := CriaTrab(NIL,.F.)
+		Copy To &cTMP
+		dbCloseArea()
+		dbUseArea(.T.,,cTMP,"cMovLog",.T.) 
+		
+		TcUnlink(nCon)
+		
+		cMovLog->(DbGoTop())
+	 	
+	 
+	 	cHtml += '<html> ' 
+	
+	 	cHtml +='<Head>'
+		cHtml +="	<link href='portal_cliente_gt/css/dashboard.css' rel='stylesheet' type='text/css'>" 
+		cHtml +="	<link href='portal_cliente_gt/css/botoes/gh-buttons.css' rel='stylesheet' type='text/css'>" 	 
+		
+		            //Script do efeito da data  
+		cHtml +='	<script type="text/javascript" src="portal_cliente_gt/js/jquery-1.7.2.js"></script>'
+		cHtml +='	<script type="text/javascript"> '
+		cHtml +="		$(document).ready(function(){"
+		cHtml +='  	   		$("#Processa").click(function(){'
+		cHtml +='   			$("#select2").toggle("slow");'
+		cHtml +="  				});"  
+		cHtml +="		});" 
+		cHtml +='		</script>'
+		cHtml +='</Head>'
+		   
+		//Validação da conecexão com o banco
+		If nCon <  0 
+		
+	  		cHtml += "<div class='msgBanco' align='center'>Erro TcLink<br />"
+	   	 	cHtml += ' Server 10.0.30.5 - Base DbCorporativo</div>'
+	   	 	
+		Else  
+	         
+			            //Tela da seleção de ano e processamento
+			cHtml +="	<Body align='center'>" 
+			cHtml +='  		<br><br><br>'
+			cHtml +="		<div class='msgLog' align='center'>" 		
+			cHtml +='			<form action="U_GTWGM003.apw" method="post" enctype="multipart/form-data" align="center">'
+			cHtml +='		    	</br>'     
+			cHtml +='           	Selecione o ano de movimentação da empresa que deseja visualizar: '    
+			cHtml +='         		<select id="select1" name="selecionado1"> '
+			cHtml +='  					<option></option>' 	  		 
+	  		 
+	  		//Meses processados 
+	  		While cMovLog->(!EOF())
+				cHtml +='<option>'+cMovLog->ANO+'</option>'   
+				cMovLog->(DbSkip())
+			EndDo
+		   
+		   
+			cHtml +='				</select>'    		
+			cHtml +='		    </br>' 
+			cHtml +='		    </br>'  
+			cHtml +='				<input value="Gerar" type="submit"  class="button primary"/>   
+			cHtml +='		    </br>' 
+	 		cHtml +='		    </br>'
+			cHtml +='		    <hr>'  	
+			cHtml +='		    </br>' 	 
+			cHtml +='		    </br>' 
+			cHtml +='				<input id="Processa"  type="checkbox" name="lProcessa" > Deseja reprocessar algum ano?'  
+			cHtml +='         		<select id="select2" name="selecionado2" style="display:none;"> '
+			cHtml +='  					<option></option>'   
+            For i:=1 to 4
+            	cHtml +='  					<option>'+Alltrim(str(Ano(dDataBase)-n))  +'</option> '   
+            	n++
+			Next
+			cHtml +='				</select>'                        	
+			cHtml +='		    	</br>' 
+			cHtml +='		    	</br>'			
+		 	cHtml +='				<input value="Processar" type="submit" class="button primary"/>'
+		 	cHtml +='		    	</br>' 
+			cHtml +='		    	</br>'		
+			cHtml +='  			</form>'   
+		  
+		EndIf				
+						
+   Else  
+   
+   	 	cHtml += '<html> ' 
+	
+	 	cHtml +='<Head>' 
+	 	cHtml +="	<link href='portal_cliente_gt/css/dashboard.css' rel='stylesheet' type='text/css'>"  
+ 		cHtml +="	<link href='portal_cliente_gt/css/botoes/gh-buttons.css' rel='stylesheet' type='text/css'>" 	 
+		cHtml +='</Head>'
+		
+		If nCon <  0 
+		
+	  		cHtml += "<div class='msgBanco' align='center'>Erro TcLink<br />"
+	   	 	cHtml += ' Server 10.0.30.5 - Base DbCorporativo</div>'
+	   	 	
+		Else 
+			 
+						//Tela para seleção do ano de processamento	
+			cHtml +='	<Body>' 
+			cHtml +='  		<br><br><br>'
+			cHtml +="		<div class='msgLog' align='center'>" 
+			cHtml +='		    </br>'		
+		 	cHtml +='           Status : Empresa ainda não processada</br></br>' 	
+	
+		    cHtml +='			<form action="U_GTWGM003.apw" method="post" enctype="multipart/form-data">
+		    cHtml +='		    </br>' 
+			cHtml +='				<input id="Processa"  type="checkbox" name="lProcessa" checked style="display:none;"> Selecione o ano para processsar ?'  
+			cHtml +='         		<select id="select" name="selecionado2">'
+			cHtml +='  					<option></option>' 
+            For i:=1 to 4
+            		cHtml +='  					<option>'+Alltrim(str(Ano(dDataBase)-n)) +'</option> '   
+            		n++
+			next
+			cHtml +='				</select>'                        	
+			cHtml +='		    	</br>' 
+			cHtml +='		    	</br>'			
+	        cHtml +='				<input value="Processar" type="submit" class="button primary"/>    		
+			cHtml +='  			</form>'       
+   
+		EndIf
+		
+	EndIf
+ 
+	cHtml +='		</div>'
+	cHtml +='	</Body>'
+	cHtml +='</html>'
+       
+
+WEB EXTENDED END     
+
+Return cHtml   

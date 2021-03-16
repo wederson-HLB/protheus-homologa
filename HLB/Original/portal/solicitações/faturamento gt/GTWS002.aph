@@ -1,0 +1,292 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWS002   ºAutor  ³Jean Victor Rocha   º Data ³  22/11/13   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da solicitação de faturamento GT.   .            º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/                                         	
+Local cChave := ""
+
+Local nI   := 0
+Local nY   := 0
+Local nCod := 0
+
+Local aCabec  := {}
+Local aLinhas := {} 
+Local aCpos   := {}
+Local aReg    := {}
+Local bCondicao
+
+aAdd(aCabec,"") //Adiciona linha em branco para o botão de visualização
+
+SX3->(DbSetOrder(1))
+If SX3->(DbSeek("ZF2"))
+	While SX3->(!EOF()) .and. SX3->X3_ARQUIVO = "ZF2"
+
+		//Define o cabeçalho da tabela
+		If SX3->X3_BROWSE == "S"        	
+			If Alltrim(SX3->X3_CAMPO) == "ZF2_STATUS"
+				aAdd(aCabec,"") //Botão Visualizar
+				aAdd(aCabec,"") //Botão Copiar
+			Else
+        		aAdd(aCabec,AllTrim(SX3->X3_TITULO))
+   			EndIf
+   			
+			aAdd(aCpos,{SX3->X3_CAMPO,SX3->X3_CBOX})
+		EndIf
+
+		SX3->(DbSkip())
+	EndDo
+EndIf
+
+If "Z4" $ alltrim(HttpSession->cEmpresa)
+	cQry := " Select *
+	cQry += " From ZF2020 ZF2
+	cQry += " 	Left outer join (SELECT *
+	cQry += " 					FROM [SQLTB717_P11].[GTCORP_P11].[dbo].[SA1"+LEFT(HttpSession->cEmpresa,2)+"0]
+	cQry += " 					Where D_E_L_E_T_ <> '*') AS SA1 ON SA1.A1_COD = ZF2.ZF2_CODCLI
+	cQry += " Where ZF2.ZF2_CODEMP = '"+LEFT(HttpSession->cEmpresa,2)+"'
+	cQry += " 	AND ZF2.ZF2_STATUS not in ('S','C')
+	cQry += " 	AND ZF2.ZF2_CODFIL = '"+RIGHT(HttpSession->cEmpresa,2)+"'
+  
+	If Select("TMP") <> 0
+		TMP->(DbCloseArea())
+	EndIf
+	
+	dbUseArea(.T., "TOPCONN", TCGENQRY(,,cQry), 'TMP', .T., .T.)
+	
+	While TMP->(!EOF())
+			//Define as linhas da tabela
+			aReg := {"",""} //Linhas em branco para o botão de visualização e copia.
+			For nI:=1 To Len(aCpos)
+				If AllTrim(aCpos[nI][1]) == "ZF2_STATUS"
+					//Exibe imagem para o status.
+					If TMP->ZF2_STATUS == "A" //Aguardando Atendimento
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Green.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Aguardando Atendimento' title='Aguardando Atendimento'>")
+					ElseIf TMP->ZF2_STATUS == "C" //Cancelado
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Red.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Cancelado' title='Cancelado'>")
+					ElseIf TMP->ZF2_STATUS == "S" //Solucionado
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Graphite.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Concluído' title='Concluído'>")
+					ElseIf TMP->ZF2_STATUS == "P" //Em Atendimento
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Purple.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Em Atendimento' title='Em Atendimento'>")
+					EndIf
+					
+	            ElseIf AllTrim(aCpos[nI][1]) == "ZF2_NOMCLI"
+					If !EMPTY(TMP->A1_NOME)
+				    	aAdd(aReg,ALLTRIM(TMP->A1_NOME))
+				 	Else
+				 		aAdd(aReg,"<Não Encontrado>")
+					EndIf                             
+				Else			
+					//Exibe o conteudo do campo.
+					If Empty(aCpos[nI][2])
+						aAdd(aReg,TMP->&(aCpos[nI][1]))
+					Else
+						//ComboBox                
+						aAdd(aReg,BscXBox(aCpos[nI][1],TMP->&(aCpos[nI][1])))
+					EndIf
+				EndIf
+			Next
+			aAdd(aLinhas,aReg)		
+			TMP->(DbSkip())	
+		EndDo
+
+
+Else
+
+	ZF2->(DbSetOrder(1))
+	nRecUlt:= iif( (ZF2->(reccount())-70)<0,0,ZF2->(reccount())-70)
+	bCondicao := {|| !(ZF2->ZF2_STATUS $ 'S/C' .AND. ZF2->(RECNO())<=iif( (ZF2->(reccount())-70)<0,0,ZF2->(reccount())-70)) .OR. ZF2->(RECNO())>iif( (ZF2->(reccount())-70)<0,0,ZF2->(reccount())-70) }
+	cCondicao := "!(ZF2->ZF2_STATUS $ 'S/C' .AND. ZF2->(RECNO())<="+cvaltochar(nRecUlt)+") .OR. ZF2->(RECNO())>nRecUlt"
+	ZF2->(DbSetFilter(bCondicao,cCondicao))
+	If ZF2->(DbSeek(xFilial("ZF2")+HttpSession->cEmpresa))
+		While ZF2->(!EOF()) .and. ZF2->(ZF2_FILIAL+ZF2_CODEMP+ZF2_CODFIL) == xFilial("ZF2")+HttpSession->cEmpresa
+			//Define as linhas da tabela
+			aReg := {"",""} //Linhas em branco para o botão de visualização e copia.
+			For nI:=1 To Len(aCpos)
+				If AllTrim(aCpos[nI][1]) == "ZF2_STATUS"
+					//Exibe imagem para o status.
+					If ZF2->ZF2_STATUS == "A" //Aguardando Atendimento
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Green.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Aguardando Atendimento' title='Aguardando Atendimento'>")
+					ElseIf ZF2->ZF2_STATUS == "C" //Cancelado
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Red.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Cancelado' title='Cancelado'>")
+					ElseIf ZF2->ZF2_STATUS == "S" //Solucionado
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Graphite.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Concluído' title='Concluído'>")
+					ElseIf ZF2->ZF2_STATUS == "P" //Em Atendimento
+						aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Purple.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Em Atendimento' title='Em Atendimento'>")
+					EndIf
+					
+	            ElseIf AllTrim(aCpos[nI][1]) == "ZF2_NOMCLI"
+					aCon  := U_WFRetBanco(ZF2->ZF2_CODEMP,ZF2->ZF2_CODFIL)
+					cBanco:= aCon[1]
+					cIp   := aCon[2]
+					nCon := 0
+
+					//JVR - 09/08/2016 - Tratamento para utilizar Linked Server para otimizar a performance
+					If LEFT(cBanco,12) == "MSSQL7/P1108" .and. aCon[3] <> "GTCORP11"
+						cTab := " SQL717TB_P1108."+ALLTRIM(aCon[3])+".dbo.SA1"+ZF2->ZF2_CODEMP+"0
+					ElseIf LEFT(cBanco,13) == "MSSQL7/GTCORP" .and. aCon[3] == "GTCORP11"
+						cTab := " SQLTB717_P11.GTCORP_P11.dbo.SA1"+ZF2->ZF2_CODEMP+"0
+					Else
+						cTab := " SA1"+ZF2->ZF2_CODEMP+"0
+						nCon := TCLink(cBanco,cIp,aCon[6])
+					EndIf
+
+					cQuery := "	Select TOP 1 A1_NOME
+					cQuery += " from "+cTab
+					cQuery += " Where D_E_L_E_T_ <> '*'
+					cQuery += " 	AND A1_COD = '"+Upper(AllTrim(ZF2->ZF2_CODCLI))+"'
+					cQuery += " 	AND (A1_FILIAL = '"+ZF2->ZF2_CODFIL+"' OR A1_FILIAL = '')
+
+					dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRY",.F.,.T.)
+
+					QRY->(DbGoTop())
+					If QRY->(!BOF() .and. !EOF())	
+					    aAdd(aReg,ALLTRIM(QRY->A1_NOME))
+				 	Else
+				 		aAdd(aReg,"<Não Encontrado>")
+					EndIf                             
+					QRY->(DbCloseArea())
+					
+					If nCon <> 0
+						TCunLink(nCon)
+					EndIf
+				Else			
+					//Exibe o conteudo do campo.
+					If Empty(aCpos[nI][2])
+						aAdd(aReg,ZF2->&(aCpos[nI][1]))
+					Else
+						//ComboBox                
+						aAdd(aReg,BscXBox(aCpos[nI][1],ZF2->&(aCpos[nI][1])))
+					EndIf
+				EndIf
+				
+			Next
+			
+			aAdd(aLinhas,aReg)		
+				
+			ZF2->(DbSkip())	
+		EndDo
+	EndIf
+
+EndIf
+
+
+
+//Verifica a posição do codigo no array
+nCod := aScan(aCpos,{|a| a[1] == "ZF2_CODIGO"})
+nCod := nCod +2 //Adiciona 2 por conta dos botões de visualizar e copiar.
+
+//Ordena o array de forma decrescente.
+aLinhas := aSort(aLinhas,,,{|x,y| x[nCod] > y[nCod]} )
+%>
+
+<html>
+
+<head>
+	<title><%= u_WFTraduzir("Solicitação de Faturamento GT") %></title>
+	<link href='portal_cliente_gt/css/form.css' rel='stylesheet' type='text/css'> <%/*CSS para formulários*/%>
+	<link href='portal_cliente_gt/css/paging.css' rel='stylesheet' type='text/css'><%/*CSS padrão para paginação*/%>
+	<script type="text/javascript" src="portal_cliente_gt/js/paging.js"></script> <%/*Script padrão para paginação*/%>
+</head>
+		
+<body>
+	<table id="tb" border="0" cellpadding="1" cellspacing="0" width="100%">
+		<tr>
+			<td class="titulo" style="height: 15px">
+				<%= u_WFTraduzir("Solicitação de Faturamento GT") %>
+			</td>
+		</tr>
+		<tr>
+			<td><hr/></td>
+		</tr>
+		<tr>
+			<td>
+				<table id="tb0" class="browse">
+					<tr>
+						<td width="50%">
+							<a href="U_GTWSM02.apw?oper=INC" title="<%= u_WFTraduzir('Incluir') %>" style="display:inline-block;" target="_self">
+								<img src="portal_cliente_gt/Imagens/inc_usr.png" height="35px" width="35px" border="0" style="vertical-align:middle"/>
+							</a>                                  	
+						</td>
+						<td width="50%">
+							<% /*
+							<input type="text" name="Pesquisa" size="25" nowrap="nowrap">
+							<img border="0" img src="portal_cliente_gt/Imagens/busca.jpg" width="16" height="16">
+							*/
+							%>
+							&nbsp;
+						</td>
+					</tr>	
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>	
+				<table id="tb1" class="browse">
+					<tr>
+						<% For nI:=1 To Len(aCabec) %>
+							<th scope="col" class='th'>
+								<%= u_WFTraduzir(aCabec[nI]) %>
+							</th>
+						<% Next %>
+					</tr>
+					<% For nI:=1 To Len(aLinhas)  %>
+						<tr>
+							<% For nY:=1 To Len(aLinhas[nI]) %>
+								<% //Botão Visualizar 
+								//Chave para busca do registro: Empresa e Codigo da Solicitação.								
+								cChave := HttpSession->cEmpresa+aLinhas[nI][nCod]
+								If nY == 1 %>
+									<td width="9" class='td'>
+										<a href="U_GTWSM02.apw?oper=VIS&chave=<%=cChave%>" title="<%= u_WFTraduzir('Visualizar') %>">
+											<img src="portal_cliente_gt/Imagens/lupa.png" height="16px" width="16px" border="0" style="vertical-align:middle"/>
+										</a>
+                                 	</td>
+								<% ElseIf nY==2 %>
+									<td class='td'>
+										<a href="U_GTWSM02.apw?oper=COP&chave=<%=cChave%>" title="<%= u_WFTraduzir('Copiar') %>">
+											<img src="portal_cliente_gt/Imagens/page_copy.png" height="16px" width="16px" border="0" style="vertical-align:middle"/>
+										</a>
+                                 	</td>
+								<% Else %>
+									<td class='td'>
+										<%= aLinhas[nI][nY] %>
+									</td>
+								<% EndIf %>
+								</td>
+							<% Next %>
+						</tr>
+					<% Next %>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+	<br>
+
+	<!-- div onde será criados os links da paginação -->
+	<div id="pageNav"></div>
+    <script>
+        var pager = new Pager('tb1', 10); 
+        pager.init(); 
+        pager.showPageNav('pager', 'pageNav'); 
+        pager.showPage(1);
+    </script>
+
+</body>	
+
+</html>

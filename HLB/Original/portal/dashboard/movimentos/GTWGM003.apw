@@ -1,0 +1,77 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWGM003 ºAutor  ³Tiago Luiz Mendonça  º  Data ³  08/08/12  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³ Movimentação por empresa - Dashboard.                      º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±'±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/ 
+
+/*
+Funcao      : GTWGM003
+Parametros  : Nenhum
+Retorno     : Nil
+Objetivos   : Rotina APWBEX de grafico de movimentação.
+Autor       : Tiago Luiz Mendonça
+Data/Hora   : 08/08/12 20:00
+*/
+                
+
+*-----------------------*
+User Function GTWGM003()
+*-----------------------*
+
+Local cHtml	:= ""
+
+Local nCon
+
+If Select("SX2") == 0
+	PREPARE ENVIRONMENT EMPRESA '02' FILIAL '01' MODULO 'FIN'
+EndIf    
+
+// HttpSession->lProcessa - variavel de processamento
+// HttpSession->cAno - variavel do ano que será utilizado
+
+If HttpPost->lProcessa == NIL
+	HttpSession->lProcessa:="F" 
+	HttpSession->cAno     := HttpPost->selecionado1  
+Else
+	HttpSession->lProcessa:="T"
+	HttpSession->cAno     := HttpPost->selecionado2  
+EndIf  
+  
+Conout("GTWGM003 / Processa: "+HttpSession->lProcessa) 
+Conout("GTWGM003 /Selecionado: "+HttpSession->cAno)	
+
+//Cria variavel com nome da empresa
+ZW1->(DbSetOrder(1))
+If ZW1->(DbSeek(xFilial("ZW1")+HttpSession->cEmpresa))
+	HttpSession->cNome := alltrim(ZW1->ZW1_NFANT)
+EndIf   
+
+Conout("GTWGM003 /Selecionado: "+HttpSession->cNome)	
+
+
+WEB EXTENDED INIT cHtml
+
+	//Verifica se a sessão expirou.
+	If  ValType(HttpSession->cLogin)<> "C" .or. Empty(HttpSession->cLogin);
+	.Or. ValType(HttpSession->cEmpresa)<> "C" .or. Empty(HttpSession->cEmpresa)
+		cHtml := ExecInPage("GTWP007") //Pagina de sessão expirada.
+	Else   
+   		cHtml := ExecInPage("GTWGM003")
+	EndIf
+	
+WEB EXTENDED END
+	 
+Return cHtml

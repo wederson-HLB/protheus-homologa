@@ -1,0 +1,269 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include "tbiconn.ch"
+#Include "Topconn.ch"
+
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR004 ºAutor  ³Daniel Fonseca Lira  º  Data ³  15/02/2013 º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Relatorio contas bancarias da globalenglish                 º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal Grant Thornton                                      º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+
+
+*---------------------*
+User Function GTWR004()
+*---------------------*
+	Local cHtml	:= "" 
+	Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+	Local cLoja   := Substr(HttpSession->cEmpresa,3,2)
+	
+	WEB EXTENDED INIT cHtml
+	
+	If cEmp <> "N7"
+		cHtml := "<html><body><h1>Essa empresa não possui acesso a esse relatorio</h1></body></html>" 
+	Else
+		If Select("SX2") == 0
+			U_WFPrepEnv()
+		EndIf
+		cHtml := ExecInPage("GTWR004")
+	EndIf
+	
+	WEB EXTENDED END
+Return cHtml
+
+
+
+User Function WR004Html()
+	Local cBanco   := HttpPost->cBanco
+	Local cAgencia := HttpPost->cAgencia
+Return WR004Gerar(.F., cBanco, cAgencia)
+
+
+
+User Function WR004Excel()
+	Local cHtml := ''
+	Local cNome := 'globalenglish_conta_'
+	Local cDia  := StrZero(Day(Date()), 2)
+	Local cMes  := StrZero(Month(Date()), 2)
+	Local cAno  := AllTrim(Str(Year(Date())))
+	
+	Local cBanco := Unescape(HttpGet->cBanco)
+	Local cAgencia := UnEscape(HttpGet->cAgencia)
+	
+	cNome += cAno + cMes + cDia + '_' + AllTrim(Str(Round(Seconds(),0)))
+			
+	HttpCtDisp('attachment; filename="' + cNome + '.xls"')
+	HttpCtType('application/vnd.ms-excel')
+	
+	cHtml += '<!DOCTYPE html>'
+	cHtml += '<html>'
+	cHtml += '	<head>'
+	cHtml += '		<title>Relat&oacute;rio de contas - GlobalEnglish</title>'
+	cHtml += '		<style>
+	cHtml += '			thead th {'
+	cHtml += '				border-bottom: thin solid black;'
+	cHtml += '				background-color: #DDDDEE;'
+	cHtml += '			}'
+	cHtml += '			tbody td {'
+	cHtml += '				border-bottom: thin dashed black;'
+	cHtml += '				border-right: thin solid white;'
+	cHtml += '			}'
+	cHtml += '			.odd {'
+	cHtml += '				background-color: #F5F5FA;'
+	cHtml += '			}'
+	cHtml += '		</style>'
+	cHtml += '	</head>'
+	cHtml += '<body>'
+	cHtml += WR004Gerar(.T., cBanco, cAgencia)
+	cHtml += '</body>'
+	cHtml += '</html>'
+Return cHtml
+
+
+
+Static Function WR004Gerar(lPlanilha, cBanco, cAgencia)
+	Local cEmp   := ''
+	Local cFil   := ''
+	Local cBanco := ''
+	Local cIp    := ''
+	Local nCon   := 0
+	Local cHtml  := ''
+	Local lImpar := .T.
+	Local aCon   := {}
+	
+	cEmp := Substr(HttpSession->cEmpresa,1,2)
+	cFil := Substr(HttpSession->cEmpresa,3,2)
+	
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	
+	//Retorna o ambiente da empresa logada
+	aCon  := U_WFRetBanco(cEmp,cLoja)
+	cBanco:= aCon[1]
+	cIp   := aCon[2]
+
+	nCon := TCLink(cBanco,cIp,aCon[6])
+	
+	BeginSql Alias 'SQL'
+		SELECT
+			A6_COD, A6_AGENCIA, A6_NUMCON
+		FROM
+			P11_06..SA6N70
+		WHERE D_E_L_E_T_ <> '*'
+			AND A6_COD LIKE %exp:cBanco%
+			AND A6_AGENCIA LIKE %exp:cAgencia%
+	EndSql
+	
+	SQL->(DbGoTop())
+	If SQL->(!Bof()) .and. SQL->(!Eof())
+		
+		// Cabecalho
+		cHtml :=	'<table id="tb1">' + CRLF
+		cHtml +=	'	<thead>' + CRLF
+		cHtml +=	'		<tr>' + CRLF
+		cHtml +=	'			<th>C&oacute;digo Banco</th>' + CRLF
+		cHtml +=	'			<th>N&uacute;mero Ag&ecirc;ncia</th>' + CRLF
+		cHtml +=	'			<th>N&uacute;mero Conta Corrente</th>' + CRLF
+		cHtml +=	'		</tr>' + CRLF
+		cHtml +=	'	</thead>' + CRLF
+		cHtml +=	'	<tbody>' + CRLF
+		
+		// Percorre registros do resultado
+		While ! SQL->(Eof())
+			
+			// Define linhas pares e impares
+			If lImpar
+				cHtml +=	'	<tr class="odd">' + CRLF
+				lImpar := .F.
+			Else
+				cHtml +=	'	<tr class="even">' + CRLF
+				lImpar := .T.
+			EndIf
+			
+			// Caso seja uma planilha muda formatacao do codigo
+			If lPlanilha
+				cHtml +=	'		<td>="'+AllTrim(SQL->A6_COD)+'"</td>' + CRLF
+				cHtml +=	'		<td>="'+AllTrim(SQL->A6_AGENCIA)+'"</td>' + CRLF
+				cHtml +=	'		<td>="'+AllTrim(SQL->A6_NUMCON)+'"</td>' + CRLF
+			Else
+				cHtml +=	'		<td>'+AllTrim(SQL->A6_COD)+'</td>' + CRLF
+				cHtml +=	'		<td>'+AllTrim(SQL->A6_AGENCIA)+'</td>' + CRLF
+				cHtml +=	'		<td>'+AllTrim(SQL->A6_NUMCON)+'</td>' + CRLF
+			EndIf
+			cHtml +=	'	</tr>' + CRLF
+			
+			SQL->(DbSkip())
+		EndDo
+		
+		// Finaliza a tabela
+		cHtml +=	'	</tbody>' + CRLF
+		cHtml +=	'</table>'
+		
+	Else
+		cHtml += '<div>N&atilde;o foram encontrados registros</div>'
+	EndIf
+	
+	SQL->(DbCloseArea())
+	TcUnlink(nCon)
+Return cHtml
+
+
+/* Apenas busca os bancos existentes na GlobalEnglish */
+User Function WR004Bancos()
+	Local cEmp := Substr(HttpSession->cEmpresa,1,2)
+	Local cFil := Substr(HttpSession->cEmpresa,3,2)
+	Local cHtml  := ''
+	Local cBanco := ''
+	Local cIp    := ''
+	Local aCon   := {}
+	
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	
+	//Retorna o ambiente da empresa logada
+	aCon  := U_WFRetBanco(cEmp,cFil)
+	cBanco:= aCon[1]
+	cIp   := aCon[2]
+
+	nCon := TCLink(cBanco,cIp,aCon[6])
+
+	If Select("SQL") > 0
+		SQL->(DbCloseArea())
+	EndIf
+	
+	BeginSql Alias 'SQL'
+		SELECT DISTINCT
+			A6_COD
+		FROM
+			SA6N70
+		WHERE D_E_L_E_T_ <> '*'
+		ORDER BY A6_COD
+	EndSql
+	
+	While ! SQL->(Eof())
+		cHtml += '<option value="' + SQL->A6_COD + '">' + SQL->A6_COD + '</option>' + CRLF
+		SQL->(DbSkip())
+	EndDo
+	cHtml += '<option value="_%_">Todos</option>' + CRLF
+	
+	SQL->(DbCloseArea())
+	TcUnlink(nCon)
+Return cHtml
+
+
+/* Apenas busca as agencias para um determinado banco */
+User Function WR004Agencias()
+	Local cEmp := Substr(HttpSession->cEmpresa,1,2)
+	Local cFil := Substr(HttpSession->cEmpresa,3,2)
+	Local cBanco := ''
+	Local cIp    := ''
+	Local cBco   := UnEscape(HttpPost->cBanco)
+	Local cHtml  := ''
+	Local aCon   := {}
+	
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	
+	//Retorna o ambiente da empresa logada
+	aCon  := U_WFRetBanco(cEmp,cFil)
+	cBanco:= aCon[1]
+	cIp   := aCon[2]
+
+	nCon := TCLink(cBanco,cIp,aCon[6])
+	
+	If Select("SQL") > 0
+		SQL->(DbCloseArea())
+	EndIf
+	
+	BeginSql Alias 'SQL'
+		SELECT DISTINCT
+			A6_AGENCIA
+		FROM SA6N70 
+		WHERE D_E_L_E_T_ <> '*'
+			AND A6_COD LIKE %exp:cBco%
+	EndSql
+	
+	While ! SQL->(Eof())
+		cHtml += '<option value="' + SQL->A6_AGENCIA + '">' + SQL->A6_AGENCIA + '</option>' + CRLF
+		SQL->(DbSkip())
+	EndDo
+	cHtml += '<option value="_%_">Todas</option>' + CRLF
+	
+	SQL->(DbCloseArea())
+	TcUnlink(nCon)
+Return cHtml

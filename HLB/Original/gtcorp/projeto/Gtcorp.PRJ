@@ -1,0 +1,1391 @@
+Group Gtcorp
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=12
+   Project Faturamento
+      FoldersCount=5
+      Folder Relatorios
+         VSSPath=Fontes
+         FilesCount=13
+         File \GtCorp\Faturamento\Relatorios\GTCORP02.PRW
+             Type=T
+         End
+         File \GtCorp\Faturamento\Relatorios\GTFATINV.PRW
+             Type=T
+         End
+         File \GtCorp\Faturamento\Relatorios\GTCORP04.PRW
+             Type=T
+         End
+         File \GtCorp\Faturamento\Relatorios\GTFAT003.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\GTCORP30.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\NZ4FAT04.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\Z4NFAT06.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\GTCORP47.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\ADV017_AP5.PRX
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\GTCORP67.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\GTCORP88.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\GTCORP97.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\relatorios\GTFAT018.prw
+             Type=T
+         End
+      End
+      Folder Miscelania
+         VSSPath=Nova Pasta2
+         FilesCount=7
+         File \GtCorp\Faturamento\Miscelania\GTCORP01.prw
+             Type=T
+         End
+         File \GtCorp\Faturamento\Miscelania\GTCORP14.PRW
+             Type=T
+         End
+         File \GtCorp\Faturamento\Miscelania\GTCORP13.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\miscelania\Z4SEQFAT01.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\miscelania\GTFAT006.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\miscelania\GTSXB008.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\miscelania\GTFAT016.prw
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta3
+         FilesCount=10
+         File \GtCorp\Faturamento\Ponto de Entrada\M460FIM.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\MS520VLD.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\TMK260A.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\M030INC.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\A010TOK.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\MA030TOK.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\A415CANC.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\MT416FIM.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\F022ATUNF.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\ponto de entrada\M460MOED.prw
+             Type=T
+         End
+      End
+      Folder WorkFlow
+         VSSPath=Nova Pasta4
+         FilesCount=1
+         File \GtCorp\Faturamento\WorkFlow\GTFAT002.prw
+             Type=T
+         End
+      End
+      Folder Nfse
+         VSSPath=Nova Pasta5
+         FilesCount=7
+         File \gtcorp\faturamento\nfse\PE01NFSEDESCR.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\nfse\NFSEXml002.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\nfse\NFSEXml001.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\nfse\NFSEXml102.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\nfse\NFSEXml003.PRW
+             Type=T
+         End
+         File \gtcorp\faturamento\nfse\nfsexmlenv.prw
+             Type=T
+         End
+         File \gtcorp\faturamento\nfse\NFSEMUNPRE.prw
+             Type=T
+         End
+      End
+   End
+   Project Contratos
+      FoldersCount=6
+      Folder Miscelania
+         VSSPath=Nova Pasta1
+         FilesCount=11
+         File \GtCorp\Contratos\Miscelania\RGCTV001.prw
+             Type=T
+         End
+         File \GtCorp\Contratos\Miscelania\RGCTG001.prw
+             Type=T
+         End
+         File \GtCorp\Contratos\Miscelania\AtuND.prw
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTCORP20.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTCORP18.prw
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTCORP22.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTGATZ88.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTCORP24.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTGATZ74.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTF3Z80.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\miscelania\GTCORP58.prw
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta2
+         FilesCount=6
+         File \GtCorp\Contratos\Ponto de Entrada\CN150APR.prw
+             Type=T
+         End
+         File \GtCorp\Contratos\Ponto de Entrada\CN100GRC.prw
+             Type=T
+         End
+         File \GtCorp\Contratos\Ponto de Entrada\CTA100MNU.prw
+             Type=T
+         End
+         File \gtcorp\contratos\ponto de entrada\C100VLAT.prw
+             Type=T
+         End
+         File \gtcorp\contratos\ponto de entrada\C200VLAT.prw
+             Type=T
+         End
+         File \gtcorp\contratos\ponto de entrada\CN120VMP.prw
+             Type=T
+         End
+      End
+      Folder Atualizacao
+         VSSPath=Nova Pasta3
+         FilesCount=17
+         File \GtCorp\Contratos\Atualização\GTCORP06.prw
+             Type=T
+         End
+         File \GtCorp\Contratos\Atualização\GTCORP07.prw
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP21.prw
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP26.prw
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP34.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP35.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP36.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP37.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP38.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP40.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP46.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP45.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP54.prw
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP53.prw
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP57.prw
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP61.prw
+             Type=T
+         End
+         File \gtcorp\contratos\atualização\GTCORP64.prw
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta4
+         FilesCount=4
+         File \gtcorp\contratos\relatorios\GTCORP28.prw
+             Type=T
+         End
+         File \gtcorp\contratos\relatorios\GTCORP29.prw
+             Type=T
+         End
+         File \gtcorp\contratos\relatorios\GTCORP66.prw
+             Type=T
+         End
+         File \gtcorp\contratos\relatorios\GTCORP96.prw
+             Type=T
+         End
+      End
+      Folder Genericos
+         VSSPath=Nova Pasta5
+         FilesCount=2
+         File \gtcorp\contratos\genericos\GTCORP48.prw
+             Type=T
+         End
+         File \gtcorp\contratos\genericos\GTGCT001.prw
+             Type=T
+         End
+      End
+      Folder WIP
+         VSSPath=Nova Pasta6
+         FilesCount=33
+         File \gtcorp\contratos\WIP\Atualizações\GTCORP73.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Atualizações\GTCORP75.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Atualizações\GTCORP77.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Atualizações\GTCORP82.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Cadastros\GTCORP69.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Cadastros\GTCORP70.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Cadastros\GTCORP71.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Cadastros\GTCORP79.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Cadastros\GTCORP80.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Cadastros\GTCORP81.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Genericos\ExecCNTA.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Genericos\GTSX7001.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Genericos\GTSXB001.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Genericos\GTSXB002.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Genericos\GTSXB003.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Ponto de Entrada\M030DEL.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Ponto de Entrada\MA030BUT.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Ponto de Entrada\TK260ROT.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Updates\IntegraWIP.prw
+             Type=T
+         End
+         File \gtcorp\contratos\WIP\Updates\UATUWIP.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\wip\relatorios\GTCORP83.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\genericos\GTSX7002.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\updates\UATUWIP2.PRW
+             Type=T
+         End
+         File \gtcorp\contratos\wip\updates\USX3042.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\updates\UZ28001.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\atualizações\GTCORP92.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\atualizações\GTCORP93.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\genericos\GTSX7003.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\genericos\GTSX7004.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\genericos\GTSX7005.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\genericos\GTSXB004.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\genericos\GTSXB005.prw
+             Type=T
+         End
+         File \gtcorp\contratos\wip\updates\UATUWIP3.prw
+             Type=T
+         End
+      End
+   End
+   Project Genericos
+      FoldersCount=8
+      Folder Miscelania
+         VSSPath=Nova Pasta1
+         FilesCount=17
+         File \GtCorp\Genericos\Miscelania\AJMEDICAO.PRW
+             Type=T
+         End
+         File \GtCorp\Genericos\Miscelania\GTCORP08.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTP2C.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTCORP25.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\P_ARQSVD.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\TableInd1.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\PADTES.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTCORP55.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTGEN016.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTGEN023.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\DEMAIL.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTGEN028.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTGEN025.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\SM0VIEWER.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTBAUD02.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTBAUD01.prw
+             Type=T
+         End
+         File \gtcorp\genericos\miscelania\GTBAUD03.prw
+             Type=T
+         End
+      End
+      Folder Updates
+         VSSPath=Nova Pasta2
+         FilesCount=53
+         File \GtCorp\Genericos\updates\USX3007.prw
+             Type=T
+         End
+         File \GtCorp\Genericos\Updates\USX3011.PRW
+             Type=T
+         End
+         File \GtCorp\Genericos\Updates\USX3013.PRW
+             Type=T
+         End
+         File \GtCorp\Genericos\Updates\USX3014.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX6007.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3020.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ88001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ86001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3021.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ81001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ80001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ79001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ84001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ83001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ82001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ76001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3022.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UGTGEN001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3024.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3023.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3025.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3029.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX5002.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UGEN001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ60001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3030.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UCDN001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ59001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ34001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UATUSIX.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3033.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3034.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UCD1001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ32001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3040.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UGTMIG11.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX6022.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3045.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3015.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3057.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX6024.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX6026.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ22001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3063.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3065.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\UZ18001.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3070.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX7001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX6028.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3071.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3061.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX6032.prw
+             Type=T
+         End
+         File \gtcorp\genericos\updates\USX3078.prw
+             Type=T
+         End
+      End
+      Folder Integracao
+         VSSPath=Nova Pasta3
+         FilesCount=11
+         File \GtCorp\Genericos\Integracao\GTGEN001.PRW
+             Type=T
+         End
+         File \GtCorp\Genericos\Integracao\GTCORP12.PRW
+             Type=T
+         End
+         File \GtCorp\Genericos\Integracao\GTGEN002.PRW
+             Type=T
+         End
+         File \GtCorp\Genericos\Integracao\INTPRYOR.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\integracao\GTCORP16.prw
+             Type=T
+         End
+         File \gtcorp\genericos\integracao\GTHDAEMP.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\integracao\PowerSh.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\integracao\GTGEN012.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\integracao\GTGEN014.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\relatorios\GTCORP95.prw
+             Type=T
+         End
+         File \gtcorp\genericos\integracao\WSBACEN.prw
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta5
+         FilesCount=5
+         File \gtcorp\genericos\relatorios\GTCFG001.prw
+             Type=T
+         End
+         File \gtcorp\genericos\relatorios\GTGEN017.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\relatorios\GTGEN019.prw
+             Type=T
+         End
+         File \gtcorp\genericos\relatorios\GTCORP94.prw
+             Type=T
+         End
+         File \gtcorp\genericos\relatorios\GTCORP95.prw
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta6
+         FilesCount=8
+         File \gtcorp\genericos\especificos\GTEnchBar.prw
+             Type=T
+         End
+         File \gtcorp\genericos\especificos\GTCORP68.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\especificos\GTGEN020.prw
+             Type=T
+         End
+         File \gtcorp\genericos\especificos\GTGEN022.prw
+             Type=T
+         End
+         File \gtcorp\genericos\especificos\GTCORP90.PRW
+             Type=T
+         End
+         File \gtcorp\genericos\especificos\GTSXB006.prw
+             Type=T
+         End
+         File \gtcorp\genericos\especificos\GTSXB007.prw
+             Type=T
+         End
+         File \gtcorp\genericos\especificos\GTGEN036.PRW
+             Type=T
+         End
+      End
+      Folder Objetos
+         VSSPath=Nova Pasta7
+         FilesCount=2
+         File \gtcorp\genericos\objetos\GTOBJ003.prw
+             Type=T
+         End
+         File \gtcorp\genericos\objetos\GTOBJ004.PRW
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta8
+         FilesCount=3
+         File \gtcorp\genericos\Ponto de entrada\AFTERLOGIN.prw
+             Type=T
+         End
+         File \gtcorp\genericos\ponto de entrada\MDIOK.prw
+             Type=T
+         End
+         File \gtcorp\genericos\ponto de entrada\VLDMOEDA.prw
+             Type=T
+         End
+      End
+      Folder Rdmake Padrao
+         VSSPath=Nova Pasta9
+         FilesCount=1
+         File \gtcorp\gpe\Rdmake Padrão\RECIBO.PRX
+             Type=T
+         End
+      End
+   End
+   Project Contabilidade
+      FoldersCount=5
+      Folder Lançamento Padrão
+         VSSPath=Nova Pasta1
+         FilesCount=43
+         File \GtCorp\Contabilidade\Lancamento Padrao\LP572002C.prw
+             Type=T
+         End
+         File \GtCorp\Contabilidade\Lancamento Padrao\LP572001D.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP588VAL1.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP523.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP521.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP520.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP527.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\61013CLVR.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp61015.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP61013VAL.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP508.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP509.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP6507VAL.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP6511VL.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP6501VAL_AP5.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP510_01.PRX
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP510.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6505val_AP5.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP6504VAL.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP6503VAL.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6502val_AP5.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6403val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6402val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6401val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP562_01.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP520VAL1.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP520CC.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP6506VAL.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\Lp5906val.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp5108val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp5107val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP56201D.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\Lm56201u_AP5.prx
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6101val_AP5.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6109val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6108val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6107val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6105val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6104val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\lp6106val.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\GTGPE013.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP65001.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\lancamento padrao\LP6505CRE.prw
+             Type=T
+         End
+      End
+      Folder Específicos
+         VSSPath=Nova Pasta2
+         FilesCount=7
+         File \GtCorp\Contabilidade\especificos\GTCORP10.prw
+             Type=T
+         End
+         File \GtCorp\Contabilidade\especificos\VldTplcto.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\especificos\CFGPAR-C_AP5.PRX
+             Type=T
+         End
+         File \gtcorp\contabilidade\especificos\GTCTB006.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\especificos\GTCTB007.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\especificos\ATUCT1.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\especificos\GTCTB008.prw
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta3
+         FilesCount=0
+      End
+      Folder Atualização
+         VSSPath=Nova Pasta4
+         FilesCount=2
+         File \gtcorp\contabilidade\atualização\YYBCON01.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\atualização\GTCORP42.PRW
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta5
+         FilesCount=3
+         File \gtcorp\contabilidade\relatorios\GTCTB001.prw
+             Type=T
+         End
+         File \gtcorp\contabilidade\relatorios\GTCTB002.PRW
+             Type=T
+         End
+         File \gtcorp\contabilidade\relatorios\GTCTB003.prw
+             Type=T
+         End
+      End
+   End
+   Project Financeiro
+      FoldersCount=7
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta1
+         FilesCount=12
+         File \GtCorp\Financeiro\Ponto de Entrada\F560CPOS.prw
+             Type=T
+         End
+         File \GtCorp\Financeiro\Ponto de Entrada\FA070SE5.PRW
+             Type=T
+         End
+         File \GtCorp\Financeiro\Ponto de Entrada\FA110SE5.PRW
+             Type=T
+         End
+         File \GtCorp\Financeiro\Ponto de Entrada\F200ABAT.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\200GEMBX.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\FINR460_RDM.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\MAT070OK.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\FA060QRY.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\F050MDVC.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\F200PORT.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\FA050CT.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\ponto de entrada\FIRSTNFSE.prw
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta2
+         FilesCount=20
+         File \GtCorp\Financeiro\Relatorios\GTCORP03.PRW
+             Type=T
+         End
+         File \GtCorp\Financeiro\Relatorios\GTRelSE1.prw
+             Type=T
+         End
+         File \GtCorp\Financeiro\Relatorios\GTRELE1P.prw
+             Type=T
+         End
+         File \GtCorp\Financeiro\Relatorios\FINT940.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\BOLITAU.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\Check Report.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\FATITAUGT.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\FATNDITAU.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTCORP32.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTCORP41.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTCORP65.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\Z4FIN001.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTCORP84.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\4KFIN001.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\FATNDSANT.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTCORP98.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTFIN013.Prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTFIN014.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTFIN027.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\relatorios\GTFIN024.prw
+             Type=T
+         End
+      End
+      Folder WorkFlow
+         VSSPath=Nova Pasta3
+         FilesCount=1
+         File \GtCorp\Financeiro\WorkFlow\RTPRECOB.prw
+             Type=T
+         End
+      End
+      Folder Atualizacao
+         VSSPath=Nova Pasta4
+         FilesCount=2
+         File \GtCorp\Financeiro\Atualizacao\FA240LOTE.prw
+             Type=T
+         End
+         File \GtCorp\Financeiro\Atualizacao\GTCORP05.prw
+             Type=T
+         End
+      End
+      Folder Especificos
+         VSSPath=Nova Pasta5
+         FilesCount=9
+         File \GtCorp\Financeiro\especificos\GTCORP09.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\Adv014_AP5.prx
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\SISPAGFUN.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\axsE5_AP5.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\GTFIN002.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\DataPry.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\GTFIN030.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\GTFIN029.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\especificos\GTFIN031.prw
+             Type=T
+         End
+      End
+      Folder cnab
+         VSSPath=Nova Pasta6
+         FilesCount=15
+         File \GtCorp\Financeiro\cnab\GTCORP11.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\Z4RFIN05.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\P_NNSANT.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\P_VALSANT.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\P_JRDSANT.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\P_ECCODBAR.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\CNABXFUR.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\GTFIN012.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\8FFIN001.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\GTFIN016.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\GTFIN028.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\TRAILLER.PRW
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\GTFIN017.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\GTFIN007.prw
+             Type=T
+         End
+         File \gtcorp\financeiro\cnab\GTFIN006.prw
+             Type=T
+         End
+      End
+      Folder Integracoes
+         VSSPath=Nova Pasta7
+         FilesCount=1
+         File \gtcorp\financeiro\integracoes\GTCORP59.prw
+             Type=T
+         End
+      End
+   End
+   Project Livros Fiscais
+      FoldersCount=3
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta1
+         FilesCount=2
+         File \GtCorp\Livros Fiscais\Ponto de Entrada\MTDESCRNFE.prw
+             Type=T
+         End
+         File \gtcorp\livros fiscais\ponto de entrada\GTCORP33.PRW
+             Type=T
+         End
+      End
+      Folder Atualização
+         VSSPath=Nova Pasta2
+         FilesCount=5
+         File \GtCorp\Livros Fiscais\Atualização\CYYFAT01.PRW
+             Type=T
+         End
+         File \GtCorp\Livros Fiscais\Atualização\CYYFAT02.PRW
+             Type=T
+         End
+         File \GtCorp\Livros Fiscais\Atualização\CYYFAT03.PRW
+             Type=T
+         End
+         File \GtCorp\Livros Fiscais\Atualização\CYYFAT04.PRW
+             Type=T
+         End
+         File \GtCorp\Livros Fiscais\Atualização\EYYFAT01.PRW
+             Type=T
+         End
+      End
+      Folder Miscelania
+         VSSPath=Nova Pasta3
+         FilesCount=1
+         File \gtcorp\livros fiscais\miscelania\MUDAFIS_AP5.prw
+             Type=T
+         End
+      End
+   End
+   Project Estoque
+      FoldersCount=1
+      Folder Ponto de entrada
+         VSSPath=Nova Pasta1
+         FilesCount=4
+         File \GtCorp\Estoque\ponto de entrada\MT100TOK.PRW
+             Type=T
+         End
+         File \gtcorp\estoque\ponto de entrada\MT103CWH.prw
+             Type=T
+         End
+         File \gtcorp\estoque\ponto de entrada\MA020TDOK.prw
+             Type=T
+         End
+         File \gtcorp\estoque\ponto de entrada\SF1100I.prw
+             Type=T
+         End
+      End
+   End
+   Project GPE
+      FoldersCount=4
+      Folder Especificos
+         VSSPath=Nova Pasta1
+         FilesCount=4
+         File \gtcorp\gpe\GTGPE001.prw
+             Type=T
+         End
+         File \gtcorp\gpe\Especificos\GTGPE004.prw
+             Type=T
+         End
+         File \gtcorp\gpe\4KGPE001.prw
+             Type=T
+         End
+         File \gtcorp\gpe\especificos\P_VPROLL.prw
+             Type=T
+         End
+      End
+      Folder Ponto de entrada
+         VSSPath=Nova Pasta2
+         FilesCount=6
+         File \gtcorp\gpe\ponto de entrada\GP450DES.PRW
+             Type=T
+         End
+         File \gtcorp\gpe\ponto de entrada\GPE10BTN.prw
+             Type=T
+         End
+         File \gtcorp\gpe\ponto de entrada\GTGPE007.prw
+             Type=T
+         End
+         File \gtcorp\gpe\ponto de entrada\GP410DES.prw
+             Type=T
+         End
+         File \gtcorp\gpe\ponto de entrada\GPALTSAL.PRW
+             Type=T
+         End
+         File \gtcorp\gpe\ponto de entrada\GP010VALPE.PRW
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta3
+         FilesCount=7
+         File \gtcorp\gpe\relatorios\WGPP051.PRW
+             Type=T
+         End
+         File \gtcorp\gpe\relatorios\GTCORP50.PRW
+             Type=T
+         End
+         File \gtcorp\gpe\relatorios\GTCORP51.prw
+             Type=T
+         End
+         File \gtcorp\gpe\relatorios\GTGPE006.prw
+             Type=T
+         End
+         File \gtcorp\gpe\relatorios\GTGPE011.prw
+             Type=T
+         End
+         File \gtcorp\gpe\relatorios\GTpon10.prx
+             Type=T
+         End
+         File \gtcorp\gpe\relatorios\GTRELFOL.PRW
+             Type=T
+         End
+      End
+      Folder Integração
+         VSSPath=Nova Pasta4
+         FilesCount=10
+         File \gtcorp\gpe\Integração\GTGEN004.prw
+             Type=T
+         End
+         File \gtcorp\gpe\Integração\GTGEN006.prw
+             Type=T
+         End
+         File \gtcorp\gpe\Integração\GTGEN011.prw
+             Type=T
+         End
+         File \gtcorp\gpe\Integração\GTGPE005.prw
+             Type=T
+         End
+         File \gtcorp\gpe\Integração\GTGEN021.PRW
+             Type=T
+         End
+         File \gtcorp\gpe\integração\GTGPE008.prw
+             Type=T
+         End
+         File \gtcorp\gpe\integração\GTGPE009.prw
+             Type=T
+         End
+         File \gtcorp\gpe\integração\GTGPE010.prw
+             Type=T
+         End
+         File \gtcorp\gpe\integração\GTGEN026.prw
+             Type=T
+         End
+         File \gtcorp\gpe\integração\GTGPE012.prw
+             Type=T
+         End
+      End
+   End
+   Project PortalRH
+      FoldersCount=3
+      Folder Solicitação de ferias
+         VSSPath=Nova Pasta1
+         FilesCount=5
+         File \gtcorp\PortalRH\Solicitação de ferias\GTWRHO01.apw
+             Type=T
+         End
+         File \gtcorp\PortalRH\Solicitação de ferias\GTWRHO01.aph
+             Type=T
+         End
+         File \gtcorp\PortalRH\Solicitação de ferias\GTWRHO02.prw
+             Type=T
+         End
+         File \gtcorp\PortalRH\Solicitação de ferias\GTWRHO02.aph
+             Type=T
+         End
+         File \gtcorp\PortalRH\Solicitação de ferias\GTWRH003.prw
+             Type=T
+         End
+      End
+      Folder Aprovação de ferias
+         VSSPath=Nova Pasta2
+         FilesCount=5
+         File \gtcorp\portalrh\aprovação de ferias\GTWRH006.prw
+             Type=T
+         End
+         File \gtcorp\portalrh\aprovação de ferias\GTWRHO04.aph
+             Type=T
+         End
+         File \gtcorp\portalrh\aprovação de ferias\GTWRHO04.prw
+             Type=T
+         End
+         File \gtcorp\portalrh\aprovação de ferias\GTWRHO05.aph
+             Type=T
+         End
+         File \gtcorp\portalrh\aprovação de ferias\GTWRHO05.prw
+             Type=T
+         End
+      End
+      Folder Generico
+         VSSPath=Nova Pasta3
+         FilesCount=2
+         File \gtcorp\portalrh\generico\GTWRHG02.prw
+             Type=T
+         End
+         File \gtcorp\portalrh\generico\GTWRHG01.prw
+             Type=T
+         End
+      End
+   End
+   Project PON
+      FoldersCount=3
+      Folder Miscelania
+         VSSPath=Nova Pasta1
+         FilesCount=2
+         File \gtcorp\PON\miscelania\GTGEN008.prw
+             Type=T
+         End
+         File \gtcorp\pon\miscelania\GTPON001.prw
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta2
+         FilesCount=1
+         File \gtcorp\pon\relatorios\GTPON002.prw
+             Type=T
+         End
+      End
+      Folder Ponto de Entrada
+         VSSPath=Nova Pasta3
+         FilesCount=1
+         File \gtcorp\pon\Ponto de Entrada\PNM090VER.prw
+             Type=T
+         End
+      End
+   End
+   Project Fluig
+      FoldersCount=1
+      Folder WS
+         VSSPath=Nova Pasta1
+         FilesCount=2
+         File \gtcorp\Fluig\WS\GED.prw
+             Type=T
+         End
+         File \gtcorp\Fluig\WS\_GOLBLPD.prw
+             Type=T
+         End
+      End
+   End
+   Project Automação fiscal
+      FoldersCount=1
+      Folder Específicos
+         VSSPath=Nova Pasta1
+         FilesCount=1
+         File \gtcorp\automação fiscal\específicos\GTTAF001.prw
+             Type=T
+         End
+      End
+   End
+End

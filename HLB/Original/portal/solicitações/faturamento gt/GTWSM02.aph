@@ -1,0 +1,368 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWSM02   ºAutor  ³Jean Victor Rocha   º Data ³  22/11/13   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da manutenção da solicitação de faturamento GT.  º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Local cOper  := HttpGet->Oper
+Local cChave := HttpGet->chave
+
+Local nI := 0
+Local nY := 0
+
+Local aCpos   := {}
+Local aCabec  := {}
+Local aLinhas := {} 
+Local aReg    := {}
+
+//Retorna os campos que serão exibidos na tela
+aCabec := U_WS002CpItens()
+
+%>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta content="IE=8" http-equiv="X-UA-Compatible" />
+	
+	<link href='portal_cliente_gt/css/form.css' rel='stylesheet' type='text/css'> <% /*CSS de estilo para formularios do portal */ %>
+	<link href='portal_cliente_gt/css/jquery-ui.css' rel='stylesheet' type='text/css'>	<% /*CSS de estilo para as listas suspensas*/ %>
+	
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery-1.7.2.js">  </script> <% /*JavaScript padrão para utilizar JQuery */ %>
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery-ui.min.js"> </script> <% /*JavaScript para gerar a lista suspensa */ %>
+	<script type="text/javascript" src="portal_cliente_gt/js/sol_faturamento_GT-1.0.js"> </script> <% /*JavaScript para validações e efeitos nessa pagina */ %>  
+
+	<script type="text/javascript">
+		ntotal = 1;
+		$(document).ready(function(){
+			/* No caso de cópia, carrega a variavel nTotal */
+			if (getURLParameter('oper') == 'COP'){
+				ntotal = $('#itens tbody tr').length;
+			}
+			$('#form1').submit(function() { 
+				$(".modal").hide();	 	
+			});
+		});
+
+		//Declaração das variaveis globais em JavaScript
+		var aDeletados = new Array();
+		var ncont = 0;
+		
+		/* Função para inclusão de linhas na tabela de itens */
+		function IncItem() {
+			// Soma 1 no controle de quatidade de linhas incluidas
+			ntotal = ntotal + 1;
+			//Retorna o num. de linhas da tabela
+			numOfRows = $('#itens tr').length;
+			cPage = 'U_WS002Itens.apw?cLin='+numOfRows+'&cOper=<%=cOper%>&cChave=<%=cChave%>';
+			//Requisição em ajax para retornar o valor da função em Advpl.
+			$.ajax({
+				url:cPage,
+				success:function(result){
+					//Adiciona a linha na tabela.
+					$("#itens").last().append(result);
+				}
+			})		
+		}
+		
+		/* Função para exclusão de linhas na tabela de itens */
+		function ExcItem(nLinha) {
+			aDeletados[ncont]=nLinha;
+		
+			var elem = document.getElementById('itens');
+			var rows = elem.rows;
+			rows.item(nLinha).style.visibility = 'hidden';
+			rows.item(nLinha).style.display = 'none'
+			ncont++;
+		}
+		
+		/* Função para validação e gravação da solicitação*/
+		function Valida() {
+			var nDel   = 0
+			var nTemC6 = 0
+
+			<%
+			//Valida o preenchimento dos campos
+			SX3->(DbSetOrder(1))
+			If SX3->(DbSeek("ZF2"))
+				While SX3->(!EOF()) .and. SX3->X3_ARQUIVO == "ZF2"
+				
+					If  X3Usado(SX3->X3_CAMPO) .and. X3Obrigat(SX3->X3_CAMPO)
+			%>
+		
+			   			if(document.getElementById('<%= AllTrim(SX3->X3_CAMPO) %>').value == '')  {
+							alert('<%= u_WFTraduzir("Campos obrigatórios nao foram preenchidos!") %>');
+							return;          		
+						}
+			<%
+					EndIf	
+					SX3->(DbSkip())
+				EndDo
+			EndIf	
+			%> 
+    
+			//Loop nos itens da solicitação
+			for(i=1;i<=ntotal;i++){
+				for(d=0;d<=aDeletados.length;d++){
+					if(aDeletados[d]==i){
+						nDel=1;
+					}
+				}
+			    
+				//Verifica se o item não está deletado.
+				if (nDel==0){
+					nTemC6=1; 
+			        
+					//Valida os campos obrigatorios
+					<%
+						SX3->(DbSetOrder(1))
+						If SX3->(DbSeek("ZF3"))
+							While SX3->(!EOF()) .and. SX3->X3_ARQUIVO == "ZF3"
+								If  X3Usado(SX3->X3_CAMPO) .and. X3Obrigat(SX3->X3_CAMPO) .and. !(ALLTRIM(SX3->X3_CAMPO) $ "ZF3_VTOTA|ZF3_VUNIT|ZF3_QTDE")
+					%>
+									if (document.getElementById('<%= AllTrim(SX3->X3_CAMPO) %>'+i.toString()).value == '') {
+										alert('<%= u_WFTraduzir("Campos obrigatórios nao foram preenchidos nos itens!") %>');
+										return;
+									}
+							
+					<%
+								EndIf	
+								SX3->(DbSkip())
+							EndDo
+						EndIf	
+					%>
+					if (document.getElementById('ZF2_MODPAG').value == 'H' && (document.getElementById('ZF3_QTDE'+i.toString()).value == "" || document.getElementById('ZF3_QTDE'+i.toString()).value == "0")) {
+						alert('Campos obrigatórios nao foram preenchidos nos itens!');
+						return;
+					}
+					if (document.getElementById('ZF2_MODPAG').value == 'F' && document.getElementById('ZF3_VTOTA'+i.toString()).value == "0,0000") {
+						alert('Campos obrigaórios nao foram preenchidos nos itens!');
+						return;
+					}
+					 
+				}
+				nDel=0;
+			}
+			    
+			//Verifica se ao menos um item foi incluido.
+			if(nTemC6==0){
+				alert('<%= u_WFTraduzir("Não foram informados itens!") %>');
+				return;
+			}
+
+			//Grava as informações
+			$(".modal").show(); 
+			
+			document.form1.action = 'U_WS002Grv.apw?cOper=<%=cOper%>&totalit='+ntotal+'&aDel='+aDeletados;
+			document.form1.submit();
+		}
+	
+		Number.prototype.format = function(n, x, s, c) {
+ 			var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',
+        	num = this.toFixed(Math.max(0, ~~n));
+       		return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
+		}
+	</script>
+	
+	<style>
+		.modal {
+		 	display:none;
+		 	position: fixed;
+		 	z-index: 1000;
+		 	top: 0;
+		 	left: 0;
+		 	height: 100%;
+	 	 	width: 100%;
+		   	background: rgba( 255, 255, 255, .8 ) 
+                url("portal_cliente_gt/Imagens/loader.gif") 
+                50% 50% 
+                no-repeat;	 	
+		}
+	</style>
+	
+	<title><%= u_WFTraduzir("Solicitação de Faturamento GT") %></title>
+</head>
+
+<body> 
+
+<div class="modal">
+</div>
+
+<table width="100%" border="0">
+	<% //Título da janela
+	%>
+	<tr>
+		<th scope="col">
+			<div align="left" class="titulo"><%= u_WFTraduzir("Solicitação de Faturamento GT") %></div>
+		</th>
+	</tr>
+
+	<% //Linha horizontal
+	%>
+	<tr>
+		<td><hr /></td>
+	</tr>
+
+	<% //Botões
+	%>
+	<tr>
+    	<td>
+			<a href="javascript:Valida();" style="display:inline-block;" title="<%= u_WFTraduzir('Salvar') %>" >
+				<img src="portal_cliente_gt/Imagens/disk.png" width="16" height="16" border="0"/>
+			</a>
+			&nbsp;
+			<a href="U_GTWS002.apw" style="display:inline-block;" title="<%= u_WFTraduzir('Cancelar') %>" >
+				<img src="portal_cliente_gt/Imagens/Cancel.png" width="16" height="16" border="0"/>
+			</a>
+		</td>
+	</tr>
+
+	<% /*Campos do formulário */%>
+	<tr>
+		<td>
+			<form id="form1" name="form1" method="post" target="principal">
+				<% /*Tabela de identificação da solicitação */%>
+				<table id='painel_solic' class="painel">
+
+					<tr>
+						<th scope="col" class='th' width='16%' colspan='4'>
+							<%= u_WFTraduzir("Dados da Solicitação") %>
+						</th>
+                	</tr>
+                    
+					<%//Define os campos que serão exibidos no quadro 'Dados da Solicitação'
+				        aArea := GetArea()
+						cDtEmis := STRZERO(DAY(dDataBase),2)+"/"+STRZERO(MONTH(dDataBase),2)+"/"+RIGHT(STR(YEAR(dDataBase)),2)
+						cNomeCli := "U_GetNomeCli(ZF2->ZF2_CODCLI,ZF2->ZF2_CODEMP,ZF2->ZF2_CODFIL)"
+						         //Campo         ,Conteudo Padrao						, Label                             ,Habilitado?,Editavel?,Classe
+						aCpos := {	{"ZF2_CODIGO",U_GTWS002COD(HttpSession->cEmpresa)	,u_WFTraduzir("Número:")			, .F.       ,.T.      },;
+									{"ZF2_DTEMIS",""									,u_WFTraduzir("Data Emissão:")      , .F.       ,.T.      ,"cpodata"},;
+									{"ZF2_DTFATU",""            						,u_WFTraduzir("Data Faturamento:")  , .T.       ,.T.      ,"cpodata"},;
+									{"ZF2_CODCLI",""           						  	,u_WFTraduzir("Cliente:")		    , .T.       ,.T.      ,"cpocodcli"},;
+									{"ZF2_LOJCLI",""           						  	,u_WFTraduzir("Loja:")	  		    , .T.       ,.T.      ,"cpolojcli"},;
+									{"ZF2_NOMCLI",cNomeCli								,u_WFTraduzir("Nome Cliente:")	    , .T.       ,.T.      ,"cpodescli"},;
+									{"ZF2_MODPAG",""            						,u_WFTraduzir("Modalidade:")        , .T.       ,.T.      ,"modpag"},;
+									{"ZF2_EMAIL" ,U_GTWS002EMA(HttpSession->cLogin)		,u_WFTraduzir("Email Gestor:")      , .T.       ,.T.      ,"cpomailges"}}
+					//Gera a tabela em html
+					RestArea(aArea)
+					%>
+					<%= U_WFForm("ZF2",cOper,cChave,aCpos) %>
+
+				</table>
+                
+                <br>
+				
+				<% /*Tabela de itens da solicitação */%>
+				<table id='painel_adic' class="painel">
+					<tr>
+						<th scope="col" class='th' width='100%'>
+							<%= u_WFTraduzir("Dados Adicionais") %>
+						</th>
+                	</tr>
+					<tr>
+						<td width='100%' >
+							<center>
+								<textarea id='ZF2_OBSERV' name='ZF2_OBSERV' class='inputarea' rows="5" cols="100" wrap="hard" maxlength='600' <%= If(cOper=="VIS", 'disabled="yes"',) %> >
+									<%
+									If cOper <> "INC"
+                                    	ZF2->(DbSetOrder(1))
+                                    	If ZF2->(DbSeek(xFilial("ZF2")+cChave))
+         							%>
+                                    		<%= AllTrim(ZF2->ZF2_OBSERV) %>
+									<% 
+										EndIf
+									EndIf %>
+								</textarea>
+							</center>
+						</td>
+					</tr>
+
+ 					<tr>
+						<td colspan="4">
+							&nbsp;        
+						</td>
+					</tr>
+				</table>                 
+
+				<% 
+				//Botão de inclusão de itens
+				If cOper=="VIS" %>
+					<a style="display:inline-block;" title="<%= u_WFTraduzir('Incluir') %>" >
+				<% Else %>
+					<a href="javascript:IncItem();" style="display:inline-block;" title="<%= u_WFTraduzir('Incluir') %>" >				
+				<% EndIf %>
+				
+					<img src="portal_cliente_gt/imagens/add.png" width="16" height="16" border="0"/>
+				</a>
+				<% /*Tabela de itens da solicitação */%>
+				<table id='painel_itens' class="painel">
+					    
+					<tr>
+						<td>
+							<table id='itens' width='100%' style='padding:1px'>
+								                            
+	                            <thead>
+									<tr>
+										<% For nI:=1 To Len(aCabec) %>
+											<th scope="col" class='th'>
+												<%= aCabec[nI][2] %>
+												
+												<%  //Exibe o asterisco para os campos obrigatórios.
+													If Alltrim(aCabec[nI][1]) $ "ZF3_PROD|ZF3_MODPAG|ZF3_VTOTA|ZF3_VUNIT|ZF3_QTDE"
+														<span id=<%="'obg_"+aCabec[nI][1]+Alltrim(Str(nI))+"'"%> style='color:Red;'>*</span>
+													EndIf
+												%> 
+											</th>  
+										<% Next %>
+									</tr>
+								</thead>
+								     
+							    <tbody>
+									<% If cOper=="INC" %>
+										<%= U_WS002Itens(cOper,"","1") %>
+									<% Else %>
+										<%= U_WS002LoadIt(cOper,cChave) %>
+									<% EndIf %>												
+								</tbody>
+							</table>
+
+						</td>
+					</tr>	
+     			</table>
+
+				<br>
+
+			</form>
+		</td>
+	</tr>
+	
+	<% //Botões
+	%>
+	<tr>
+    	<td>
+			<a href="javascript:Valida();" style="display:inline-block;" title="<%= u_WFTraduzir('Salvar') %>" >
+				<img src="portal_cliente_gt/Imagens/disk.png" width="16" height="16" border="0"/>
+			</a>
+			&nbsp;
+			<a href="U_GTWS002.apw" style="display:inline-block;" title="<%= u_WFTraduzir('Cancelar') %>" >
+				<img src="portal_cliente_gt/Imagens/Cancel.png" width="16" height="16" border="0"/>
+			</a>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

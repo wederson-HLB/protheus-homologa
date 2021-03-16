@@ -1,0 +1,604 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+#Include "Protheus.ch"
+#Include "Topconn.ch"
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR008A   ºAutor  ³Matheus Massarotto º Data ³  17/02/14    º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Arquivo html do Relatorio Margem Faturamento/Vendedor - SNF.º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal Grant Thornton                                      º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+Local cEmp    := ''
+Local cFil    := ''
+Local cBanco  := ''
+Local cIp     := ''
+Local cHtml   := ''
+Local cAccNum := ''
+
+Local nCon   := 0
+Local nSaldo := 0
+
+Local lImpar := .F.
+
+Local nQtd		:= 0
+Local nTotal 	:= 0
+Local nDesconto	:= 0
+Local nVlrIcms	:= 0
+Local nVlrIpi	:= 0
+Local nVlrIss	:= 0
+Local nVlrPis	:= 0
+Local nSeguro	:= 0
+Local nFrete	:= 0
+Local nMargem	:= 0
+
+cEmp := Substr(HttpSession->cEmpresa,1,2)
+cFil := Substr(HttpSession->cEmpresa,3,2)
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+// Cabecalho
+//RRP - 24/11/2015 - Ajuste para excel com muitos dados.
+If lPlanilha
+	%>
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>Relat&oacute;rio Margem Faturamento/Vendedor - SNF</title>
+			<style>
+				thead th {
+					border-bottom: thin solid black;
+					background-color: #DDDDEE;
+				}
+				tbody td {
+					border-bottom: thin dashed black;
+					border-right: thin solid white;
+				}
+				.odd {
+					background-color: #F5F5FA;
+	 			}
+			</style>
+		</head>
+	<body>  
+	<%
+EndIf
+
+%>
+<table id="tb1">
+	<thead> 
+		<tr> 
+			<th>Vendedor</th> 
+			<th>Grupo</th> 
+			<th>Grupo Descri&ccedil;&atilde;o</th> 
+			<th>Margem Grupo %</th> 
+			<th>S&eacute;rie N&uacute;mero Tipo-NF</th> 
+			<th>Cliente Loja</th> 
+			<th>Nome Cliente</th> 
+			<th>UF</th> 
+			<th>C&oacute;digo Produto</th> 
+			<th>Descri&ccedil;&atilde;o Produto</th> 
+			<th>Qtd</th>
+			<th>Pre&ccedil;o de Venda</th> 
+			<th>Total</th> 
+			<th>Data Emiss&atilde;o</th> 
+			<th>Desconto</th> 
+			<th>Comiss&atilde;o %</th> 
+			<th>ICMS %</th> 
+			<th>Base ICMS</th> 
+			<th>Valor ICMS</th> 
+			<th>IPI %</th> 
+			<th>Base IPI</th> 
+			<th>Valor IPI</th> 
+			<th>Base ISS</th>
+			<th>Valor ISS</th> 
+			<th>Valor COFINS</th> 
+			<th>Valor PIS</th> 
+			<th>Custo</th> 
+			<th>Seguro</th> 
+			<th>Despesa</th> 
+			<th>Frete</th> 
+			<th>Margem %</th> 
+		</tr> 
+	</thead> 
+
+	<tbody> 
+<%
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cFil)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+
+nCon := TCLink(cBanco,cIp,aCon[6])
+
+
+/////////////////
+//Movimentações//
+/////////////////
+If Select("MOV") > 0
+	MOV->(DbCloseArea())
+EndIf
+
+// NOVA QUERY
+cQry:=" 	SELECT SEQ, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       ( CASE WHEN F2_VEND1 = '' THEN 'NAO INFORMADO' ELSE F2_VEND1 END ) AS F2_VEND1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       ( CASE WHEN BM_GRUPO IS NULL THEN 'NAO ENCONTRADO' ELSE BM_GRUPO END ) AS BM_GRUPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       ( CASE WHEN BM_DESC IS NULL THEN 'NAO ENCONTRADO'  ELSE BM_DESC END ) AS BM_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       ( CASE WHEN BM_P_MARGE IS NULL THEN 0 ELSE BM_P_MARGE END ) AS BM_P_MARGE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       DOC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       CLIENTE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       A1_NOME, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_EST, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_COD, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       B1_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_QUANT, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_PRCVEN, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_TOTAL, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_EMISSAO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_COMIS1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_PICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_BASEICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_VALICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_IPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_BASEIPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_VALIPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_BASEISS, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_VALISS, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_VALIMP5, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_VALIMP6, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_CUSTO1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_SEGURO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_DESPESA, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       D2_VALFRE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       MARGEM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       CUSTO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       LIQUIDO 	 "+Chr(10)+CHR(13)	
+cQry+=" 	FROM   ( 	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	       SELECT 'SEQ'=1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              F2_VEND1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              BM_GRUPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              BM_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              BM_P_MARGE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'DOC'=D2_SERIE + '/' + D2_DOC + '/' + D2_TIPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'CLIENTE'=D2_CLIENTE + '/' + D2_LOJA, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              A1_NOME, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_EST, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_COD, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              B1_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_QUANT, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_PRCVEN, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_TOTAL, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'D2_EMISSAO'=CONVERT(VARCHAR(10), CONVERT(SMALLDATETIME,D2_EMISSAO),103), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_COMIS1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_PICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_BASEICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_VALICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_IPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_BASEIPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_VALIPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_BASEISS, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_VALISS, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_VALIMP5, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_VALIMP6, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_CUSTO1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_SEGURO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_DESPESA, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D2_VALFRE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'MARGEM'=CONVERT(NUMERIC(14, 2), 0),	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'CUSTO'=CONVERT(NUMERIC(14, 2), D2_CUSTO1 - (D2_SEGURO + D2_DESPESA + D2_VALFRE)), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'LIQUIDO'=CONVERT(NUMERIC(14, 2), D2_TOTAL - (D2_VALICM + D2_VALIPI + D2_VALISS + D2_VALIMP5 + D2_VALIMP6)) 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       FROM   SD2BH0 SD2 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SF2BH0 AS SF2 ON SF2.F2_FILIAL+SF2.F2_DOC+SF2.F2_SERIE+SF2.F2_CLIENTE+SF2.F2_LOJA=SD2.D2_FILIAL+SD2.D2_DOC+SD2.D2_SERIE+SD2.D2_CLIENTE+SD2.D2_LOJA	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SA1BH0 AS SA1 ON SA1.A1_COD = SD2.D2_CLIENTE AND SA1.A1_LOJA = SD2.D2_LOJA 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SF4YY0 AS SF4 ON SD2.D2_TES = SF4.F4_CODIGO	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SB1BH0 AS SB1 ON SD2.D2_COD = SB1.B1_COD	 "+Chr(10)+CHR(13)	
+cQry+=" 	              LEFT JOIN SBMBH0 AS SBM ON SB1.B1_GRUPO = SBM.BM_GRUPO	 "+Chr(10)+CHR(13)	
+cQry+=" 	       WHERE  SD2.D2_FILIAL = '01' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SD2.D2_EMISSAO >= '"+cDataDe+"' AND SD2.D2_EMISSAO <= '"+cDataAte+"'  "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SD2.D2_TIPO <> 'B' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SD2.D2_TIPO <> 'D' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SD2.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF4.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF4.F4_TIPO = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF4.F4_DUPLIC = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF4.F4_ESTOQUE = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF2.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)
+cQry+=" 	              AND SF2.F2_VEND1 >= '"+cVendDe+"' AND SF2.F2_VEND1 <= '"+cVendAte+"'  "+Chr(10)+CHR(13)  			
+cQry+=" 	              AND SA1.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SB1.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	       UNION ALL 	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	       SELECT 'SEQ'=1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              F2_VEND1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              BM_GRUPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              BM_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              BM_P_MARGE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'DOC'=F2_SERIE + '/' + F2_DOC + '/' + D1_TIPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'CLIENTE'=F2_CLIENTE + '/' + F2_LOJA, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              A1_NOME, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              F2_EST, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D1_COD, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              B1_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D1_QUANT *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D1_VUNIT *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D1_TOTAL *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'D1_EMISSAO'=CONVERT(VARCHAR(10), CONVERT(SMALLDATETIME,D1_EMISSAO),103), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              D1_CUSTO *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'MARGEM'=CONVERT(NUMERIC(14, 2), 0), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'CUSTO'=CONVERT(NUMERIC(14, 2), D1_CUSTO), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              'LIQUIDO'=CONVERT(NUMERIC(14, 2), D1_TOTAL *- 1) 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       FROM   SD1BH0 SD1 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SA1BH0 AS SA1 ON SA1.A1_COD = SD1.D1_FORNECE AND SA1.A1_LOJA = SD1.D1_LOJA 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SF4YY0 AS SF4 ON SD1.D1_TES = SF4.F4_CODIGO 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SF2BH0 AS SF2 ON SF2.F2_FILIAL+SF2.F2_DOC+SF2.F2_SERIE+SF2.F2_CLIENTE+SF2.F2_LOJA=SD1.D1_FILIAL+SD1.D1_NFORI+SD1.D1_SERIORI+SD1.D1_FORNECE+SD1.D1_LOJA 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              JOIN SB1BH0 AS SB1 ON SD1.D1_COD = SB1.B1_COD 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              LEFT JOIN SBMBH0 AS SBM ON SB1.B1_GRUPO = SBM.BM_GRUPO 	 "+Chr(10)+CHR(13)	
+cQry+=" 	       WHERE  SD1.D1_FILIAL = '01' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SD1.D1_DTDIGIT >= '"+cDataDe+"' AND SD1.D1_DTDIGIT <= '"+cDataAte+"'  "+Chr(10)+CHR(13)
+cQry+=" 	              AND SD1.D1_TIPO = 'D' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SD1.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF4.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF4.F4_DUPLIC = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF4.F4_ESTOQUE = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SF2.F2_EMISSAO <= '"+cDataAte+"' "+Chr(10)+CHR(13)
+cQry+=" 	              AND SF2.F2_VEND1 >= '"+cVendDe+"' AND SF2.F2_VEND1 <= '"+cVendAte+"'  "+Chr(10)+CHR(13)  	
+cQry+=" 	              AND SF2.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SA1.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+cQry+=" 	              AND SB1.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	        UNION ALL	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	        SELECT 'SEQ'=2, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               F2_VEND1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               'D2_QUANT'=SUM(D2_QUANT), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               'D2_PRCVEN'=SUM(D2_PRCVEN), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               'D2_TOTAL'=SUM(D2_TOTAL), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               '', 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               'D2_COMIS1'=SUM(D2_COMIS1), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               0.00 	 "+Chr(10)+CHR(13)	
+cQry+=" 	        FROM   ( 	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	               SELECT 'SEQ'=1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      F2_VEND1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      BM_GRUPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      BM_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      BM_P_MARGE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      'DOC'=D2_SERIE + '/' + D2_DOC + '/' + D2_TIPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      'CLIENTE'=D2_CLIENTE + '/' + D2_LOJA, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      A1_NOME, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_EST, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_COD, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      B1_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_QUANT, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_PRCVEN, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_TOTAL, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      'D2_EMISSAO'=CONVERT(VARCHAR(10), CONVERT(SMALLDATETIME,D2_EMISSAO),103), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_COMIS1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_PICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_BASEICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_VALICM, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_IPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_BASEIPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_VALIPI, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_BASEISS, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_VALISS, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_VALIMP5, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_VALIMP6, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_CUSTO1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_SEGURO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_DESPESA, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      D2_VALFRE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      'MARGEM'=CONVERT(NUMERIC(14, 2), 0), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      'CUSTO'=CONVERT(NUMERIC(14, 2), D2_CUSTO1 - (D2_SEGURO + D2_DESPESA + D2_VALFRE)), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      'LIQUIDO'=CONVERT(NUMERIC(14, 2), D2_TOTAL - (D2_VALICM + D2_VALIPI + D2_VALISS + D2_VALIMP5 + D2_VALIMP6)) 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               FROM   SD2BH0 SD2 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      JOIN SF2BH0 AS SF2 ON SF2.F2_FILIAL+SF2.F2_DOC+SF2.F2_SERIE+SF2.F2_CLIENTE+SF2.F2_LOJA=SD2.D2_FILIAL+SD2.D2_DOC+SD2.D2_SERIE+SD2.D2_CLIENTE+SD2.D2_LOJA 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      JOIN SA1BH0 AS SA1 ON SA1.A1_COD = SD2.D2_CLIENTE AND SA1.A1_LOJA = SD2.D2_LOJA 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      JOIN SF4YY0 AS SF4 ON SD2.D2_TES = SF4.F4_CODIGO 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      JOIN SB1BH0 AS SB1 ON SD2.D2_COD = SB1.B1_COD 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      LEFT JOIN SBMBH0 AS SBM ON SB1.B1_GRUPO = SBM.BM_GRUPO 	 "+Chr(10)+CHR(13)	
+cQry+=" 	               WHERE  SD2.D2_FILIAL = '01' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SD2.D2_EMISSAO >= '"+cDataDe+"' AND SD2.D2_EMISSAO <= '"+cDataAte+"' "+Chr(10)+CHR(13)		
+cQry+=" 	                      AND SD2.D2_TIPO <> 'B' AND SD2.D2_TIPO <> 'D' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SD2.D_E_L_E_T_ <> '*'  	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SF4.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SF4.F4_TIPO = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SF4.F4_DUPLIC = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SF4.F4_ESTOQUE = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SF2.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)
+cQry+=" 	                      AND SF2.F2_VEND1 >= '"+cVendDe+"' AND SF2.F2_VEND1 <= '"+cVendAte+"'  "+Chr(10)+CHR(13)  		
+cQry+=" 	                      AND SA1.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+cQry+=" 	                      AND SB1.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	                UNION ALL 	 "+Chr(10)+CHR(13)	
+
+cQry+=" 	                SELECT 'SEQ'=1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       F2_VEND1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       BM_GRUPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       BM_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       BM_P_MARGE, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       'DOC'=F2_SERIE + '/' + F2_DOC + '/' + D1_TIPO, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       'CLIENTE'=F2_CLIENTE + '/' + F2_LOJA, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       A1_NOME, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       F2_EST, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       D1_COD, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       B1_DESC, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       D1_QUANT *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       D1_VUNIT *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       D1_TOTAL *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       'D1_EMISSAO'=CONVERT(VARCHAR(10), CONVERT(SMALLDATETIME,D1_EMISSAO),103), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       D1_CUSTO *- 1, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       0.00, 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       'MARGEM'=CONVERT(NUMERIC(14, 2), 0), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       'CUSTO'=CONVERT(NUMERIC(14, 2), D1_CUSTO), 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       'LIQUIDO'=CONVERT(NUMERIC(14, 2), D1_TOTAL *- 1) 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                FROM   SD1BH0 SD1 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       JOIN SA1BH0 AS SA1 ON SA1.A1_COD = SD1.D1_FORNECE AND SA1.A1_LOJA = SD1.D1_LOJA 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       JOIN SF4YY0 AS SF4 ON SD1.D1_TES = SF4.F4_CODIGO	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       JOIN SF2BH0 AS SF2 ON SF2.F2_FILIAL+SF2.F2_DOC+SF2.F2_SERIE+ SF2.F2_CLIENTE+SF2.F2_LOJA=SD1.D1_FILIAL+SD1.D1_NFORI+SD1.D1_SERIORI+SD1.D1_FORNECE+SD1.D1_LOJA 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       JOIN SB1BH0 AS SB1 ON SD1.D1_COD = SB1.B1_COD 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       LEFT JOIN SBMBH0 AS SBM ON SB1.B1_GRUPO = SBM.BM_GRUPO 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                WHERE  SD1.D1_FILIAL = '01' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SD1.D1_DTDIGIT >= '"+cDataDe+"' AND SD1.D1_DTDIGIT <= '"+cDataAte+"' "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SD1.D1_TIPO = 'D' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SD1.D_E_L_E_T_ <> '*'  	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SF4.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SF4.F4_DUPLIC = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SF4.F4_ESTOQUE = 'S' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SF2.D_E_L_E_T_ <> '*' 	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SF2.F2_EMISSAO <= '"+cDataAte+"' "+Chr(10)+CHR(13)
+cQry+=" 	                       AND SF2.F2_VEND1 >= '"+cVendDe+"' AND SF2.F2_VEND1 <= '"+cVendAte+"' "+Chr(10)+CHR(13)  	
+cQry+=" 	                       AND SA1.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       AND SB1.D_E_L_E_T_ <> '*'	 "+Chr(10)+CHR(13)	
+cQry+=" 	                       )AS SOMAT	 "+Chr(10)+CHR(13)	
+cQry+=" 	        GROUP  BY SOMAT.F2_VEND1)AS TT 	 "+Chr(10)+CHR(13)	
+cQry+=" 	ORDER  BY F2_VEND1,SEQ	 "+Chr(10)+CHR(13)	
+
+DbUseArea( .T., "TOPCONN", TcGenqry( , , cQry), "MOV", .F., .F. )
+
+
+MOV->(DbGoTop())
+While MOV->(!EOF())
+    
+	if MOV->SEQ==2
+		conout("Entrou no amarelo:"+cvaltochar(MOV->SEQ))
+	%>
+		<tr style="background-color:yellow;">
+	<%	
+	else
+    
+		// Define linhas pares e impares
+		If lImpar
+	%>
+			<tr class="odd">
+	<%
+			lImpar := .F.
+		Else
+	%>
+			<tr class="even">
+	
+	<%		lImpar := .T.
+		EndIf
+    
+    endif
+    
+	If lPlanilha
+
+					<td><%='="'+AllTrim(MOV->F2_VEND1)+'"'%></td> 
+					<td><%='="'+AllTrim(MOV->BM_GRUPO)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->BM_DESC)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->BM_P_MARGE)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->DOC)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->CLIENTE)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->A1_NOME)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->D2_EST)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->D2_COD)+'"'%></td>
+					<td><%='="'+AllTrim(MOV->B1_DESC)+'"'%></td>
+					<td><%=Transform(MOV->D2_QUANT,"@E 999,999,999.99")%></td> 
+					<td><%=Transform(MOV->D2_PRCVEN,"@E 999,999,999.99")%></td> 
+					<td><%=Transform(MOV->D2_TOTAL,"@E 999,999,999.99")%></td> 
+					<td><%='="'+(MOV->D2_EMISSAO)+'"'%></td> 
+					<td><%=Transform(MOV->D2_DESC,"@E 999,999,999.99")%></td> 
+					<td><%=Transform(MOV->D2_COMIS1,"@E 999,999,999.99")%></td> 
+					<td><%=Transform(MOV->D2_PICM,"@E 999,999,999.99")%></td> 
+					<td><%=Transform(MOV->D2_BASEICM,"@E 999,999,999.99")%></td> 
+					<td><%=Transform(MOV->D2_VALICM,"@E 999,999,999.99")%></td> 		
+					<td><%=Transform(MOV->D2_IPI,"@E 999,999,999.99")%></td> 				
+					<td><%=Transform(MOV->D2_BASEIPI,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_VALIPI,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_BASEISS,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_VALISS,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_VALIMP5,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_VALIMP6,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_CUSTO1,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_SEGURO,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_DESPESA,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->D2_VALFRE,"@E 999,999,999.99")%></td>
+					<td><%=Transform(MOV->MARGEM,"@E 999,999,999.99")%></td>
+		
+																										
+	Else
+%>
+					<td><%=AllTrim(MOV->F2_VEND1)%></td> 
+					<td><%=AllTrim(MOV->BM_GRUPO)%></td> 
+					<td><%=AllTrim(MOV->BM_DESC)%></td> 
+					<td><%=AllTrim(MOV->BM_P_MARGE)%></td> 
+					<td><%=AllTrim(MOV->DOC)%></td> 
+					<td><%=AllTrim(MOV->CLIENTE)%></td> 
+					<td><%=AllTrim(MOV->A1_NOME)%></td> 
+					<td><%=AllTrim(MOV->D2_EST)%></td>		
+					<td><%=AllTrim(MOV->D2_COD)%></td>				
+					<td><%=AllTrim(MOV->B1_DESC)%></td>				
+					<td align="right"><%=Transform(MOV->D2_QUANT,"@E 999,999,999.99")%></td> 
+					<td align="right"><%=Transform(MOV->D2_PRCVEN,"@E 999,999,999.99")%></td> 
+					<td align="right"><%=Transform(MOV->D2_TOTAL,"@E 999,999,999.99")%></td>
+					<td><%=MOV->D2_EMISSAO%></td> 
+					<td align="right"><%=Transform(MOV->D2_DESC,"@E 999,999,999.99")%></td> 
+					<td align="right"><%=Transform(MOV->D2_COMIS1,"@E 999,999,999.99")%></td> 
+					<td align="right"><%=Transform(MOV->D2_PICM,"@E 999,999,999.99")%></td> 
+					<td align="right"><%=Transform(MOV->D2_BASEICM,"@E 999,999,999.99")%></td> 
+					<td align="right"><%=Transform(MOV->D2_VALICM,"@E 999,999,999.99")%></td> 		
+					<td align="right"><%=Transform(MOV->D2_IPI,"@E 999,999,999.99")%></td> 				
+					<td align="right"><%=Transform(MOV->D2_BASEIPI,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_VALIPI,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_BASEISS,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_VALISS,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_VALIMP5,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_VALIMP6,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_CUSTO1,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_SEGURO,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_DESPESA,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->D2_VALFRE,"@E 999,999,999.99")%></td>
+					<td align="right"><%=Transform(MOV->MARGEM,"@E 999,999,999.99")%></td>
+
+<%
+	EndIf	
+%>	
+	</tr>
+<%	
+	//RRP - 08/04/2015 - Ajuste no total do relatório.
+	If MOV->SEQ==2
+		nQtd		+= MOV->D2_QUANT	
+		nTotal 		+= MOV->D2_TOTAL
+		nDesconto	+= MOV->D2_DESC
+		nVlrIcms	+= MOV->D2_VALICM
+		nVlrIpi		+= MOV->D2_VALIPI
+		nVlrIss		+= MOV->D2_VALISS
+		nVlrPis		+= MOV->D2_VALIMP6
+		nSeguro		+= MOV->D2_SEGURO
+		nFrete		+= MOV->D2_VALFRE
+		nMargem		+= MOV->MARGEM
+	EndIf
+
+	MOV->(DbSkip())
+EndDo
+
+If Select("MOV") > 0
+	MOV->(DbCloseArea())
+EndIf
+
+    //Linha totalizadora
+%>
+	<tr style="background-color:#CCCC99;"> 
+	<td>Total</td> 
+	<td>&nbsp;</td> 
+	<td>&nbsp;</td> 
+	<td>&nbsp;</td> 
+	<td>&nbsp;</td> 
+	<td>&nbsp;</td> 
+	<td>&nbsp;</td> 
+	<td>&nbsp;</td>		
+	<td>&nbsp;</td>				
+	<td>&nbsp;</td>				
+	<td align="right"><%=Transform(nQtd,"@E 999,999,999.99")%></td> 
+	<td align="right">&nbsp;</td> 
+	<td align="right"><%=Transform(nTotal,"@E 999,999,999.99")%></td> 
+	<td>&nbsp;</td> 
+	<td align="right"><%=Transform(nDesconto,"@E 999,999,999.99")%></td> 
+	<td align="right">&nbsp;</td> 
+	<td align="right">&nbsp;</td> 
+	<td align="right">&nbsp;</td> 
+	<td align="right"><%=Transform(nVlrIcms,"@E 999,999,999.99")%></td> 		
+	<td align="right">&nbsp;</td> 				
+	<td align="right">&nbsp;</td>
+	<td align="right"><%=Transform(nVlrIpi,"@E 999,999,999.99")%></td>
+	<td align="right">&nbsp;</td>
+	<td align="right"><%=Transform(nVlrIss,"@E 999,999,999.99")%></td>
+	<td align="right">&nbsp;</td>
+	<td align="right"><%=Transform(nVlrPis,"@E 999,999,999.99")%></td>
+	<td align="right">&nbsp;</td>
+	<td align="right"><%=Transform(nSeguro,"@E 999,999,999.99")%></td>
+	<td align="right">&nbsp;</td>
+	<td align="right"><%=Transform(nFrete,"@E 999,999,999.99")%></td>
+	<td align="right"><%=Transform(nMargem,"@E 999,999,999.99")%></td>
+	</tr>
+	
+<%
+// Finaliza a tabela
+%>
+	</tbody>
+</table>
+<%
+//RRP - 24/11/2015 - Ajuste para excel com muitos dados.
+If lPlanilha
+	%>
+	</body>
+	</html>		
+	<%
+EndIf	
+
+TcUnlink(nCon)
+
+%>

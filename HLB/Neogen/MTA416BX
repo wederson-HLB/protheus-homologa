@@ -1,0 +1,9 @@
+#INCLUDE "RWMAKE.CH"
+#INCLUDE "PROTHEUS.CH"
+
+User Function MTA416BX()
+Local _aAlias  := PARAMIXB[1]			
+Local _lRet := .F. 
+Alert((PARAMIXB[1])->CJ_NUM)
+Alert((_aAlias)->CJ_NUM)
+Return(_lRet)

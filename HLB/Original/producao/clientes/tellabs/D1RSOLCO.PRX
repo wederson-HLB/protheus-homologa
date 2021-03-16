@@ -1,0 +1,779 @@
+#Include "FIVEWIN.CH"
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Emissao das Solicitacoes de Compras                        ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ Generico                                                   ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ ATUALIZACOES SOFRIDAS DESDE A CONSTRUCAO INICIAL.                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ PROGRAMADOR  ³ DATA   ³ BOPS ³  MOTIVO DA ALTERACAO                   ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³              ³        ³      ³                                        ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/ 
+
+
+/*
+Funcao      : D1RSOLCO
+Parametros  : cAlias,nReg,nOpcx
+Retorno     : Nenhum   
+Objetivos   : Emissao das Solicitacoes de Compras 
+Autor     	:  
+Data     	:  
+Obs         : 
+TDN         : 
+Revisão     : Tiago Luiz Mendonça 
+Data/Hora   : 15/03/2012
+Módulo      : Compras
+Cliente     : Tellabs
+*/
+
+*-------------------------------------------*
+ User Function D1RSOLCO(cAlias,nReg,nOpcx)
+*-------------------------------------------*
+
+LOCAL wnrel		:= "D1RSOLCO"
+LOCAL nCol		:= 0
+LOCAL cDesc1	:= "Emissao das solicitacoes de compras cadastradas"	//"Emissao das solicitacoes de compras cadastradas"
+LOCAL cDesc2	:= ""
+LOCAL cDesc3	:= ""
+STATIC aTamSXG,aTamSXG2, nPosLoja, nPosNome, nTamNome
+
+Setprvt("strHeader1,strHeader2")
+strHeader1 := "ITEM CODIGO PRODUTO            D  E  S  C  R  I  C  A  O      CODIGO     SALDO          PONTO DE          SALDO DA      UM  ARMAZEM            QUANT.POR        ULTIMO PRECO        LEAD        DATA DA         DATA PARA"
+strHeader2 := "     TELLABS                                                  PROJETO    ATUAL          PEDIDO            SOLICITACAO                          EMBALAGEM        DE COMPRA           TIME        NECESSIDADE     COMPRAR  "
+
+//ITEM CODIGO PRODUTO            D  E  S  C  R  I  C  A  O      CODIGO     SALDO          PONTO DE          SALDO DA      UM  ARMAZEM            QUANT.POR        ULTIMO PRECO        LEAD        DATA DA         DATA PARA 
+//0         1         2         3         4         5         6         7         8         9        10        11        12        13        14        15        16        17        18        19        20         21        22
+//01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+//     TELLABS                                                  PROJETO    ATUAL          PEDIDO            SOLICITACAO                          EMBALAGEM        DE COMPRA           TIME        NECESSIDADE     COMPRAR  
+
+
+PRIVATE lAuto	:= (nReg!=Nil)
+PRIVATE Titulo	:= "Solicitacao de Compra" //"Solicitacao de Compra"
+PRIVATE aReturn := {"Zebrado",10,"Administracao",2,2,1,"",0}		//"Zebrado"###"Administracao"
+PRIVATE aLinha	:= {}
+PRIVATE Tamanho	:= "G"
+PRIVATE Limite  := 220
+PRIVATE nomeprog:= "D1RSOLCO"
+PRIVATE nLastKey:= 0
+PRIVATE cString	:= "SC1"
+PRIVATE M_PAG	:= 1
+PRIVATE li      := 99
+If !lAuto
+	cPerg := "MTR140    "
+EndIf
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+pergunte("MTR140    ",.F.)
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para parametros                         ³
+//³ mv_par01    Do Numero                                        ³
+//³ mv_par02    Ate o Numero                                     ³
+//³ mv_par03    Todas ou em Aberto                               ³
+//³ mv_par04    A Partir da data de emissao                      ³
+//³ mv_par05    Ate a data de emissao                            ³
+//³ mv_par06    Do Item                                          ³
+//³ mv_par07    Ate o Item                                       ³
+//³ mv_par08    Campo Descricao do Produto.                      ³
+//³ mv_par09    Imprime Empenhos ?                               ³
+//³ mv_par10    Utiliza Amarracao ?  Produto   Grupo             ³
+//³ mv_par11    Imprime Qtos Pedido Compra?                      ³
+//³ mv_par12    Imprime Qtos Fornecedores?                       ³
+//³ mv_par13    Impr. SC's Firmes, Previstas ou Ambas            ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verif. conteudo das variaveis Grupo Forn. (001) e Loja (002) ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+aTamSXG  := If(aTamSXG  == NIL, TamSXG("001"), aTamSXG)
+aTamSXG2 := If(aTamSXG2 == NIL, TamSXG("002"), aTamSXG2)
+
+wnrel:=SetPrint(cString,wnrel,If(!lAuto,cPerg,Nil),@Titulo,cDesc1,cDesc2,cDesc3,.F.,,,Tamanho,,!lAuto)
+
+If nLastKey == 27
+	Set Filter To
+	Return
+Endif
+
+SetDefault(aReturn,cString)
+
+If nLastKey == 27
+	Set Filter To
+	Return
+Endif
+
+RptStatus({|lEnd| R140Imp(@lEnd,wnrel,cString,nReg)},Titulo)
+
+Return
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ C140IMP  ³ Autor ³ Cristina M. Ogura     ³ Data ³ 09.11.95 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Chamada do Relatorio                                       ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ MATR140                                                    ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function R140Imp(lEnd,wnrel,cString,nReg)
+
+LOCAL cGrupo
+LOCAL nContador
+LOCAL j
+LOCAL Cabec1	:= ""
+LOCAL Cabec2	:= ""
+LOCAL Cabec3	:= ""
+LOCAL cbCont	:= 0
+LOCAL aMeses	:= {"Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"}		//"Jan"###"Fev"###"Mar"###"Abr"###"Mai"###"Jun"###"Jul"###"Ago"###"Set"###"Out"###"Nov"###"Dez"
+LOCAL aOrdem 	:= {},cMeses,nAno,nMes,cMes,cCampos,cDescri,i
+LOCAL cAliasSC1	:= "SC1"
+LOCAL cArqInd	:= ""
+
+dbSelectArea("SC1")
+dbSetOrder(1)
+If lAuto
+	dbGoto(nReg)
+	mv_par01 := SC1->C1_NUM
+	mv_par02 := SC1->C1_NUM
+	mv_par03 := 1
+	mv_par04 := SC1->C1_EMISSAO
+	mv_par05 := SC1->C1_EMISSAO
+	mv_par06 := "  "
+	mv_par07 := "ZZ"
+	mv_par09 := 1
+	mv_par13 := 3
+Else
+#IFDEF TOP
+	If (TcSrvType()#'AS/400')
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Query para SQL                 ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		cQuery := "SELECT * "
+		//			cQuery += "C1_FILIAL,C1_NUM,C1_QUANT,C1_QUJE,C1_EMISSAO,C1_ITEM,C1_CC,C1_PRODUTO,"
+		//			cQuery += "C1_LOCAL,C1_DESCRI,C1_OBS,C1_SOLICIT,C1_UM,C1_DATPRF "
+		cQuery += "FROM "	    + RetSqlName( 'SC1' ) +" SC1 "
+		cQuery += " WHERE "
+		cQuery += "C1_FILIAL='" + xFilial( 'SC1' )    	+ "' AND "
+		cQuery += "C1_NUM>='"   + MV_PAR01           	+ "' AND "
+		cQuery += "C1_NUM<='"   + MV_PAR02          	+ "' AND "
+		cQuery += "C1_EMISSAO>='"  + DTOS(MV_PAR04)   	+ "' AND "
+		cQuery += "C1_EMISSAO<='"  + DTOS(MV_PAR05)   	+ "' AND "
+		cQuery += "C1_ITEM>='"  + MV_PAR06          	+ "' AND "
+		cQuery += "C1_ITEM<='"  + MV_PAR07            	+ "' AND "
+		If mv_par03 == 2
+			cQuery += "C1_QUANT<>C1_QUJE  AND "
+		EndIf
+		cQuery += "SC1.D_E_L_E_T_<>'*' "
+		cQuery += "ORDER BY " + SqlOrder(SC1->(IndexKey()))
+		cQuery := ChangeQuery(cQuery)
+		
+		cAliasSC1 := "QRYSC1"
+		dbUseArea( .T., 'TOPCONN', TCGENQRY(,,cQuery), 'QRYSC1', .F., .T.)
+		aEval(SC1->(dbStruct()),{|x| If(x[2]!="C",TcSetField("QRYSC1",AllTrim(x[1]),x[2],x[3],x[4]),Nil)})
+	Else
+#ENDIF
+		If !Empty(mv_par01)
+			SC1->(dbSeek(xFilial("SC1")+MV_PAR01,.T.))
+		Else
+			cArqInd   := CriaTrab( , .F. )
+			cQuery := "C1_FILIAL=='" +xFilial("SC1")+"'.AND."
+			cQuery += "C1_NUM>='"+MV_PAR01+"'.AND."
+			cQuery += "C1_NUM<='"+MV_PAR02+"'.AND."
+			cQuery += "DTOS(C1_EMISSAO)>='"+DTOS(MV_PAR04)+"'.AND."
+			cQuery += "DTOS(C1_EMISSAO)<='"+DTOS(MV_PAR05)+"'.AND."
+			cQuery += "C1_ITEM >= '"  +MV_PAR06+"'.AND."
+			cQuery += "C1_ITEM <= '"  +MV_PAR07+"'"
+			
+			IndRegua( "SC1", cArqInd, IndexKey(), , cQuery )
+			SC1->( dbSetIndex( cArqInd + OrdBagExt() ) )
+		EndIf
+#IFDEF TOP
+	EndIf
+#ENDIF
+EndIf
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Inicia a Impressao                                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+dbSelectArea(cAliasSC1)
+SetRegua(LastRec())
+While !EOF()	.And. (cAliasSC1)->C1_FILIAL==xFilial("SC1");
+	.And. (cAliasSC1)->C1_NUM >= mv_par01 ;
+	.And. (cAliasSC1)->C1_NUM <= mv_par02
+	If lEnd
+		@PROW()+1,001 PSAY "CANCELADO PELO OPERADOR"	//"CANCELADO PELO OPERADOR"
+		Exit
+	Endif
+	
+	IncRegua()
+	
+	If !Empty(aReturn[7]) .And. !&(aReturn[7])
+		dbSkip()
+		Loop
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Filtra as que ja' tem pedido cadastrado                      ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If mv_par03 == 2
+		If ((cAliasSC1)->C1_QUANT - (cAliasSC1)->C1_QUJE) == 0
+			dbSkip()
+			Loop
+		EndIf
+	EndIf
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Filtra a data de emissao e os itens a serem impressos        ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If (cAliasSC1)->C1_EMISSAO < mv_par04 .Or. (cAliasSC1)->C1_EMISSAO > mv_par05
+		dbSkip()
+		Loop
+	EndIf
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Filtra Tipo de OPs Firmes ou Previstas                       ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If !MtrAValOP(mv_par13, 'SC1')
+		dbSkip()
+		Loop
+	EndIf
+	
+	If (cAliasSC1)->C1_ITEM < mv_par06 .Or. (cAliasSC1)->C1_ITEM > mv_par07
+		dbSkip()
+		Loop
+	EndIf
+
+	Titulo := "Solicitacao de Compra"+"     "+"Numero "+" "+Substr((cAliasSC1)->C1_NUM,1,6)+" "+"  C.Custo : "+" "+(cAliasSC1)->C1_CC //"Solicitacao de Compra  C.Custo : "	
+	Cabec1 := strHeader1
+	Cabec2 := strHeader2
+
+	If li > 55
+		cabec(titulo,cabec1,cabec2,nomeprog,Tamanho,IIF(aReturn[4]==1,15,18))
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Posiciona os arquivos no registro a ser impresso             ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	dbSelectArea("SB1")
+	dbSeek(xFilial()+(cAliasSC1)->C1_PRODUTO)
+	cGrupo := SB1->B1_GRUPO
+	
+	If mv_par10 == 1
+		dbSelectArea("SA5")
+		dbSetOrder(2)
+		dbSeek(xFilial()+(cAliasSC1)->C1_PRODUTO)
+	Else
+		dbSelectArea("SAD")
+		dbSetOrder(2)
+		dbSeek(xFilial()+cGrupo)
+	EndIf
+	
+	dbSelectArea("SB2")
+	dbSeek(xFilial()+(cAliasSC1)->C1_PRODUTO+(cAliasSC1)->C1_LOCAL)
+	
+	dbSelectArea("SB3")
+	dbSeek(xFilial()+(cAliasSC1)->C1_PRODUTO)
+	
+	dbSelectArea("SD4")
+	dbSeek(xFilial()+(cAliasSC1)->C1_PRODUTO)
+	
+	dbSelectArea("SC7")
+	dbSetOrder(1)
+	dbSeek(xFilial()+(cAliasSC1)->C1_NUM+(cAliasSC1)->C1_ITEM)
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Inicializa o descricao do Produto conf. parametro digitado.  ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	cDescri := " "
+	If Empty(mv_par08)
+		mv_par08 := "B1_DESC"
+	EndIf
+	If AllTrim(mv_par08) == "C1_DESCRI"    // Impressao da Descricao do produto
+		cDescri := (cAliasSC1)->C1_DESCRI           // do arquivo de Solicitacao.
+	EndIf
+	If AllTrim(mv_par08) == "B5_CEME"      // Descricao cientifica do Produto.
+		dbSelectArea("SB5")
+		dbSetOrder(1)
+		dbSeek( xFilial()+(cAliasSC1)->C1_PRODUTO )
+		If Found()
+			cDescri := B5_CEME
+		EndIf
+	EndIf
+	If Empty(cDescri)                      // Impressao da descricao do Produto SB1.
+		dbSelectArea("SB1")
+		dbSeek( xFilial()+(cAliasSC1)->C1_PRODUTO )
+		cDescri := SB1->B1_DESC
+	EndIf
+	
+	A140Solic(cDescri,cAliasSC1)
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Impressao das observacoes da solicitacao (caso exista)       ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If !Empty((cAliasSC1)->C1_OBS)
+		li++
+		@ li,000 PSAY __PrtThinLine()
+		li++
+		@ li,000 PSAY "OBSERVACOES:"	//"OBSERVACOES:"
+		li++
+		For i:= 1 To 258 Step 129
+			@ li,003 PSAY Subs((cAliasSC1)->C1_OBS,i,129)   Picture "@!"
+			li++
+			If Empty(Subs((cAliasSC1)->C1_OBS,i+129,129))
+				Exit
+			Endif
+		Next i
+	Endif
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Impressao da requisicoes empenhadas                          ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	li++
+	If mv_par09 == 1
+		@ li,000 PSAY __PrtThinLine()
+		li++
+		@ li,000 PSAY "REQUISICOES EMPENHADAS:"	//"REQUISICOES EMPENHADAS:"
+		@ li,069 PSAY '|'
+		@ li,144 PSAY '|'
+		@ li,219 PSAY '|'
+		
+		li++
+		dbSelectArea("SD4")
+		If EOF()
+			@ li,002 PSAY "Nao existem requisicoes empenhadas deste item."	//"Nao existem requisicoes empenhadas deste item."
+			li++
+		Else
+			
+			@ li,000 PSAY "Ordem de        Produto a ser          Inicio          Quantidade    |     Ordem de        Produto a ser          Inicio          Quantidade    |     Ordem de        Produto a ser          Inicio          Quantidade    |" 	//"Ordem de        Produto a ser           inicio        quantidade |Ordem de        Produto a ser           inicio        quantidade |"
+			li++
+			@ li,000 PSAY "Producao        produzido              Previsto        Necessaria    |     Producao        produzido              Previsto        Necessaria    |     Producao        produzido              Previsto        Necessaria    |"	//"Producao        produzido              previsto       necessaria |Producao        produzido              previsto       necessaria |"
+			li++
+			nCol := 0
+			While !EOF() .And. D4_FILIAL+D4_COD == xFilial()+(cAliasSC1)->C1_PRODUTO
+				If D4_QUANT = 0
+					dbSkip()
+					Loop
+				Endif
+				If li > 55
+					cabec(titulo,cabec1,cabec2,nomeprog,Tamanho,IIF(aReturn[4]==1,15,18))
+					A140Solic(cDescri,cAliasSC1)
+				EndIf
+				dbSelectArea("SC2")
+				dbSeek(xFilial()+SD4->D4_OP)
+				dbSelectArea("SD4")
+				
+				@ li,nCol    PSAY D4_OP
+				@ li,nCol+16 PSAY SubStr(SC2->C2_PRODUTO,1,15)
+				@ li,nCol+38 PSAY D4_DATA
+				@ li,nCol+53 PSAY D4_QUANT       Picture PesqPict("SD4","D4_QUANT",12)
+				@ li,nCol+69 PSAY '|'
+				nCol+=75
+				If nCol > 210
+					li++
+					nCol := 0
+				EndIf
+				
+				dbSkip()
+			End
+			
+			If nCol = 75
+				@ li,144 PSAY '|'
+				@ li,219 PSAY '|'
+				li++
+			Elseif nCol = 150
+				@ li,219 PSAY '|'
+				li++
+			Endif
+			
+		EndIf
+	EndIf
+	
+	If li > 55
+		cabec(titulo,cabec1,cabec2,nomeprog,Tamanho,IIF(aReturn[4]==1,15,18))
+		A140Solic(cDescri,cAliasSC1)		
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Impressao dos Consumos nos ultimos 12 meses                  ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	@ li,000 PSAY __PrtThinLine()
+	li++
+	@ li,000 PSAY "CONSUMO DOS ULTIMOS 12 MESES:"	//"CONSUMO DOS ULTIMOS 12 MESES:"
+	li++
+	dbSelectArea("SB3")
+	If EOF()
+		@ li,002 PSAY "Nao existe registro de consumo anterior deste item."	//"Nao existe registro de consumo anterior deste item."
+		li++
+	Else
+		cMeses := "   "
+		nAno := YEAR(dDataBase)
+		nMes := MONTH(dDataBase)
+		aOrdem := {}
+		For j := nMes To 1 Step -1
+			cMeses += aMeses[j]+"/"+Substr(Str(nAno,4),3,2)+Space(4)
+			AADD(aOrdem,j)
+		Next j
+		nAno--
+		For j := 12 To nMes+1 Step -1
+			cMeses += aMeses[j]+"/"+Substr(Str(nAno,4),3,2)+Space(4)
+			AADD(aOrdem,j)
+		Next j
+		@ li,000 PSAY Trim(cMeses)+"    Media C"	//"    Media C"
+		li++
+		nCol := 0
+		For j := 1 To Len(aOrdem)
+			cMes    := StrZero(aOrdem[j],2)
+			cCampos := "B3_Q"+cMes
+			@ li,nCol PSAY  &cCampos   PicTure  PesqPict("SB3","B3_Q01",9) //"@E 99,999,99"
+			nCol += 10
+		Next j
+		@ li,120 PSAY B3_MEDIA         PicTure  PesqPict("SB3","B3_MEDIA",8) //"@E 9,999,99"
+		@ li,129 PSAY B3_CLASSE
+		li++
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Rotina para imprimir dados dos ultimos pedidos               ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	@ li,000 PSAY __PrtThinLine()
+	li++
+	@ li,000 PSAY "ULTIMOS PEDIDOS:"	//"ULTIMOS PEDIDOS:"
+	@ li,219 PSAY '|'
+	li++
+	dbSelectArea("SC7")
+	dbSetOrder(4)
+	Set SoftSeek On
+	dbSeek(xFilial()+(cAliasSC1)->C1_PRODUTO+"z")
+	Set SoftSeek Off
+	dbSkip(-1)
+	If xFilial()+(cAliasSC1)->C1_PRODUTO != C7_FILIAL+C7_PRODUTO
+		@ li,002 PSAY "Nao existem pedidos cadastrados para este item."	//"Nao existem pedidos cadastrados para este item."
+		li++
+	Else
+		nPosLoja := 17
+		If cPaisLoc <> "BRA" // STR Usado por Localizacoes - Sergio Camurca
+			@ li,00 PSAY "Numero Item Codigo do Fornecedor Loja  Nome                                   Quantidade   Und.Medida     Vlr.Unitario    Valor Total  Emissao       Necessidade    Prazo  Condicao    Qtde Entregue    Saldo Res.   Eli.  |"   // "Numero It Codigo do Fornecedor
+		Else
+			@ li,00 PSAY "Numero Item Codigo do Fornecedor Loja  Nome                                   Quantidade   Und.Medida     Vlr.Unitario    Valor Total  Emissao       Necessidade    Prazo  Condicao    Qtde Entregue      Saldo Res. Eli.  |"   // "Numero It Codigo do Fornecedor
+		Endif
+		li++
+		nContador := 0
+		While !BOF() .And. xFilial()+(cAliasSC1)->C1_PRODUTO == C7_FILIAL+C7_PRODUTO
+			
+			dbSelectArea("SA2")
+			dbSeek(xFilial()+SC7->C7_FORNECE+SC7->C7_LOJA)
+			dbSelectArea("SC7")
+			
+			nContador++
+			If nContador > mv_par11
+				Exit
+			EndIf
+			
+			If li > 55
+				cabec(titulo,cabec1,cabec2,nomeprog,Tamanho,IIF(aReturn[4]==1,15,18))
+				A140Solic(cDescri,cAliasSC1)
+			EndIf
+			
+			@ li,000 PSAY C7_NUM
+			@ li,007 PSAY C7_ITEM
+			@ li,012 PSAY SubStr(C7_FORNECE,1,20)
+			@ li,033 PSAY SubStr(C7_LOJA,1,5)
+			@ li,039 PSAY SubStr(SA2->A2_NOME,1,34)
+			@ li,074 PSAY C7_QUANT   Picture PesqPict("SC7","C7_QUANT",14)
+			@ li,091 PSAY C7_UM
+
+			// Se for diferente de Brasil nao utiliza a funcao Right - Sergio Camurca
+			
+			If cPaisLoc <> "BRA"
+				@ li,104 PSAY C7_PRECO  Picture PesqPict("SC7","c7_preco",14)
+				@ li,119 PSAY C7_TOTAL  Picture PesqPict("SC7","c7_total",14)
+			Else
+				@ li,104 PSAY C7_PRECO  Picture Right(PesqPict("SC7","c7_preco"),14)
+				@ li,119 PSAY C7_TOTAL  Picture Right(PesqPict("SC7","c7_total"),14)
+			Endif
+			
+			@ li,135 PSAY C7_EMISSAO
+			@ li,149 PSAY C7_DATPRF
+			@ li,165 PSAY C7_DATPRF-C7_EMISSAO  Picture "999"
+			@ li,168 PSAY "D"
+			@ li,171 PSAY C7_COND
+			@ li,182 PSAY C7_QUJE Picture PesqPict("SC7","C7_QUJE",14)
+			@ li,198 PSAY If(Empty(C7_RESIDUO),C7_QUANT-C7_QUJE,0)  Picture PesqPict("SC7","C7_QUJE",14)
+			@ li,213 PSAY If(Empty(C7_RESIDUO),'Nao','Sim')+"   |"
+			li++
+			dbSkip(-1)
+		End
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Imprime os fornecedores indicados para este produto          ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	@ li,000 PSAY __PrtThinLine()
+	li++
+	@ li,000 PSAY "FORNECEDORES:"	//"FORNECEDORES:"
+	li++
+	
+	If mv_par10 == 1                                                   // Amarracao por Produto
+		nPosLoja := 07
+		nTamNome := 28
+		nPosNome := 10
+		If aTamSXG[1] != aTamSXG[3]
+			nPosLoja += aTamSXG[4] - aTamSXG[3]
+			nPosNome += ((aTamSXG[4] - aTamSXG[3]) + (aTamSXG2[4] - aTamSXG2[3]))
+			nTamNome -= ((aTamSXG[4] - aTamSXG[3]) + (aTamSXG2[4] - aTamSXG2[3]))
+		Endif
+		
+		dbSelectArea("SA5")
+		If EOF()
+			@ li,002 PSAY "Nao existem fornecedores cadastrados para este item."	//"Nao existem fornecedores cadastrados para este item."
+			li++
+		Else
+			// Verif. se utilizara tamanho maximo (Fornec. com 20 pos. e Loja com 4 pos.)
+			If aTamSXG[1] != aTamSXG[3]
+				@ li,000 PSAY "Codigo               Lj.  RAZAO SOCIAL Telefone        Contato    Fax             Ult.Compr.  Municipio      UF Ris Cod. no Fornec."	//"Codigo               Lj.  RAZAO SOCIAL Telefone        Contato    Fax             Ult.Compr.  Municipio      UF Ris Cod. no Fornec."
+				//				                              12345678901234567890 1234 123456789012 123456789012345 1234567890 123456789012345 11/11/1199 123456789012345 12   1 123456789012345
+				//    		    		            	      0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
+				//          	        			            0         1         2         3         4         5         6         7         8         9         0         1         2         3
+			Else
+				@ li,000 PSAY "Codigo Lj Nome                         Telefone        Contato    Fax             Ul.Compr   Municipio       UF Ris  Cod. no Fornec."	//"Codigo Lj Nome                         Telefone        Contato    Fax             Ult.Compr.  Municipio      UF Ris Cod. no Fornec."
+				//				                              123456 12 1234567890123456789012345678 123456789012345 1234567890 123456789012345 11/11/1199 123456789012345 12   1 123456789012345
+				//    		    		            	      0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
+				//          	        			            0         1         2         3         4         5         6         7         8         9         0         1         2         3
+			Endif
+			li++
+			nContador := 0
+			While !EOF() .And. xFilial()+(cAliasSC1)->C1_PRODUTO == A5_FILIAL+A5_PRODUTO
+				dbSelectArea("SA2")
+				dbSeek(xFilial()+SA5->A5_FORNECE+SA5->A5_LOJA)
+				If EOF()
+					dbSelectArea("SA5")
+					dbSkip()
+					Loop
+				EndIf
+				dbSelectArea("SA5")
+				nContador++
+				If nContador > mv_par12
+					Exit
+				EndIf
+				If li > 55
+					cabec(titulo,cabec1,cabec2,nomeprog,Tamanho,IIF(aReturn[4]==1,15,18))
+					A140Solic(cDescri,cAliasSC1)
+				EndIf
+				@ li,000 PSAY A5_FORNECE
+				@ li,nPosLoja PSAY A5_LOJA
+				@ li,nPosNome PSAY SubStr(SA2->A2_NOME,1,nTamNome)
+				@ li,039 PSAY Substr(SA2->A2_TEL,1,15)
+				@ li,055 PSAY Substr(SA2->A2_CONTATO,1,10)
+				@ li,066 PSAY SA2->A2_FAX
+				@ li,082 PSAY SA2->A2_ULTCOM
+				@ li,093 PSAY Left( SA2->A2_MUN, 15 ) 
+				@ li,109 PSAY SA2->A2_EST
+				@ li,112 PSAY SA2->A2_RISCO
+				@ li,116 PSAY SubStr(A5_CODPRF,1,15)
+				li++
+				dbSkip()
+			End
+		EndIf
+		dbSelectArea("SA5")
+		dbSetOrder(1)
+	Else                                                                            // Amarracao por Grupo
+		dbSelectArea("SAD")
+		If EOF()
+			@ li,002 PSAY "Nao existem fornecedores cadastrados para este item."	//"Nao existem fornecedores cadastrados para este item."
+			li++
+		Else
+			
+			nPosLoja := 07
+			nTamNome := 30
+			nPosNome := 10
+			If aTamSXG[1] != aTamSXG[3]
+				nPosLoja += aTamSXG[4] - aTamSXG[3]
+				nPosNome += ((aTamSXG[4] - aTamSXG[3]) + (aTamSXG2[4] - aTamSXG2[3]))
+				nTamNome -= (aTamSXG[4] - aTamSXG[3])
+			Endif
+			
+			// Verif. se utilizara tamanho maximo (Fornec. com 20 pos. e Loja com 5 pos.)
+			If aTamSXG[1] != aTamSXG[3]
+				
+				@ li,000 PSAY "Codigo Lj Nome       Loja Razao Social   Telefone        Contato    Fax             Ul.Compr Municipio       UF Ris Cod. no Fornec."	//"Codigo Lj Nome       Loja Razao Social   Telefone        Contato    Fax             Ul.Compr Municipio       UF Ris Cod. no Fornec."
+				//				                           12345678901234567890 1234 12345678901234 123456789012345 1234567890 123456789012345 11/11/11 123456789012345 12 123 123456789012345
+				//              	                       0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
+				//                  	                   0         1         2         3         4         5         6         7         8         9         0         1         2         3
+				
+				
+				@ li,000 PSAY "Codigo Lj Nome                         Telefone        Contato    Fax             Ul.Compr   Municipio       UF Ris  Cod. no Fornec."	//"Codigo Lj Nome                           Telefone        Contato    Fax             Ul.Compr Municipio       UF Ris Cod. no Fornec."
+				//  	                                   111111 11 123456789012345678901234567890 123456789012345 1234567890 123456789012345 11/11/11 123456789012345 12 123 123456789012345
+				//      	                               0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
+				//          	                           0         1         2         3         4         5         6         7         8         9         0         1         2         3
+			Endif
+			li++
+			nContador := 0
+			While !EOF() .And. SAD->AD_FILIAL+SAD->AD_GRUPO == xFilial()+cGrupo
+				dbSelectArea("SA2")
+				dbSeek(xFilial()+SAD->AD_FORNECE+SAD->AD_LOJA)
+				If EOF()
+					dbSelectArea("SAD")
+					dbSkip()
+					Loop
+				EndIf
+				dbSelectArea("SAD")
+				nContador++
+				If nContador > 9
+					Exit
+				EndIf
+				If li > 55
+					cabec(titulo,cabec1,cabec2,nomeprog,Tamanho,IIF(aReturn[4]==1,15,18))
+					
+					A140Solic(cDescri,cAliasSC1)
+					
+				EndIf
+				@ li,000 PSAY AD_FORNECE
+				@ li,nPosLoja PSAY AD_LOJA
+				@ li,nPosNome PSAY SubStr(SA2->A2_NOME,1,nTamNome)
+				@ li,041 PSAY Substr(SA2->A2_TEL,1,15)
+				@ li,057 PSAY Substr(SA2->A2_CONTATO,1,10)
+				@ li,068 PSAY SA2->A2_FAX
+				@ li,084 PSAY SA2->A2_ULTCOM
+				@ li,095 PSAY Left( SA2->A2_MUN, 15 ) 
+				@ li,111 PSAY SA2->A2_EST              
+				@ li,114 PSAY SA2->A2_RISCO
+				li++
+				dbSkip()
+			End
+		EndIf
+		dbSelectArea("SAD")
+		dbSetOrder(2)
+	EndIf
+	
+	If li > 55
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,IIF(aReturn[4]==1,15,18))
+		A140Solic(cDescri,cAliasSC1)
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Imprime o codigo alternativo                                 ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	li++
+	@ li,000 PSAY __PrtThinLine()
+	li++
+	
+	@ li,002 PSAY "Codigo Alternativo : "	//"Codigo Alternativo : "
+	If !Empty(SB1->B1_ALTER)
+		@ li,023 PSAY SB1->B1_ALTER
+		@ li,060 PSAY "Saldo do Alternativo :"	//"Saldo do Alternativo :"
+		dbSelectArea("SB2")
+		dbSeek(xFilial()+SB1->B1_ALTER+(cAliasSC1)->C1_LOCAL)
+		@ li,083 PSAY B2_QATU  Picture PesqPict("SB2","B2_QATU",12)
+		@ li,096 PSAY SC1->C1_UM
+	Else
+		@ li,023 PSAY "Nao ha'"	//"Nao ha'"
+	EndIf
+	
+	li++
+	@ li,000 PSAY __PrtThinLine()
+	li++
+	
+	If li > 40
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,IIF(aReturn[4]==1,15,18))
+		A140Solic(cDescri,cAliasSC1)
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Imprime o quadro de concorrencias                            ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	li++
+	@ li,000 PSAY __PrtThinLine()
+	li++
+	
+	@ li,00 PSAY "| C O N C O R R E N C I A S                   | ENTREGA         | OBSERVACOES                        | COND.PGTO        | CONTATO          | QUANTIDADE     | PRECO UNITARIO              | IPI     | VALOR                |" //"|  C O N C O R R E N C I A S                  | ENTREGA         | OBSERVACOES                        | COND.PGTO        |  CONTATO         |QUANTIDADE      |  PRECO UNITARIO             | IPI     |     VALOR            |"
+	li++
+	@ li,000 PSAY     "|---------------------------------------------|-----------------|------------------------------------|------------------|------------------|----------------|-----------------------------|---------|----------------------|"
+	For j :=1 To 4
+		li++
+		@ li,000 PSAY "|                                             |                 |                                    |                  |                  |                |                             |         |                      |"
+		li++
+		@ li,000 PSAY "|---------------------------------------------|-----------------|------------------------------------|------------------|------------------|----------------|-----------------------------|---------|----------------------|"
+	Next j
+	dbSelectArea(cAliasSC1)
+	li++
+	@ ++li,000 PSAY   "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
+	@ ++li,000 PSAY "|                 REQUISITANTE                                                                               |                    AUTORIZANTE                                                                              |" // "|                 REQUISITANTE                                             |                  AUTORIZANTE                                             |"
+	@ ++li,000 PSAY   "|                                                                                                            |                                                                                                             |"
+	@ ++li,000 PSAY   "|   ------------------------------------------------------------------------------------------------------   |   -------------------------------------------------------------------------------------------------------   |"
+	@ ++li,000 PSAY   "|                "+PADC(ALLTRIM(C1_SOLICIT),15)+"                                                                             |                                                                                                             |"
+	@ ++li,000 PSAY   "|                                                                                                            |                                                                                                             |"
+	@ ++li,000 PSAY   "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
+	
+	li:=80
+	dbSkip()
+	
+End
+
+dbSelectArea("SC1")
+RetIndex("SC1")
+If File(cArqInd+ OrdBagExt())
+	FErase(cArqInd+ OrdBagExt() )
+EndIf
+
+#IFDEF TOP
+	If !lAuto
+		dbSelectArea("QRYSC1")
+		dbCloseArea()
+	EndIf
+#ENDIF
+
+If aReturn[5] = 1
+	Set Printer TO
+	Commit
+	OurSpool(wnrel)
+EndIf
+
+MS_FLUSH()
+
+Return  .T.
+
+
+Static Function A140Solic(cDescri,cAliasSC1)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Impressao da Linha do Produto Solicitado                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+// 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+// 0        1         2         3         4         5         6         7         8         9         0         1         2         3         4         5         6         7         8         9         0         1         2
+//"IT  CODIGO PRODUTO   D  E  S  C  R  I  C  A  O                  SALDO          PONTO DE          SALDO DA      UNIDADE       ALMOXARIFADO       QUANT.POR        ULTIMO PRECO        LEAD        DATA DA          DATA PARA "
+//"                                                                ATUAL            PEDIDO       SOLICITACAO      MEDIDA                           EMBALAGEM           DE COMPRA        TIME        NECESSIDADE      COMPRAR   "
+//123  123456           123456789012345678901234567890      123456789012      123456789012      123456789012      12            12                 123              123456789012         123        12/45/7890       12/45/7890
+Local j
+@ li,000 PSAY (cAliasSC1)->C1_ITEM                        Picture PesqPict("SC1","C1_ITEM")
+//@ li,005 PSAY SubStr((cAliasSC1)->C1_PRODUTO,1,15)
+@ li,005 PSAY SB1->B1_P_COD
+@ li,031 PSAY SubStr(cDescri,1,30)
+@ li,062 PSAY (cAliasSC1)->C1_P_PRJ
+@ li,073 PSAY SB2->B2_QATU                                 Picture PesqPict("SB2","B2_QATU" ,12)
+@ li,088 PSAY SB1->B1_EMIN                                 Picture PesqPict("SB1","B1_EMIN" ,12)
+@ li,106 PSAY (cAliasSC1)->C1_QUANT-(cAliasSC1)->C1_QUJE  Picture PesqPict("SC1","C1_QUANT",12)
+@ li,120 PSAY (cAliasSC1)->C1_UM                           Picture PesqPict("SC1","C1_UM")
+@ li,124 PSAY (cAliasSC1)->C1_LOCAL                        Picture PesqPict("SC1","C1_LOCAL")
+@ li,143 PSAY SB1->B1_QE                                   Picture PesqPict("SB1","B1_QE"   ,09)
+@ li,160 PSAY SB1->B1_UPRC                                 Picture PesqPict("SB1","B1_UPRC",12)
+@ li,180 PSAY CalcPrazo((cAliasSC1)->C1_PRODUTO,(cAliasSC1)->C1_QUANT) 	Picture "999"
+@ li,192 PSAY If(Empty((cAliasSC1)->C1_DATPRF),(cAliasSC1)->C1_EMISSAO,(cAliasSC1)->C1_DATPRF)
+@ li,208 PSAY If(Empty((cAliasSC1)->C1_DATPRF),(cAliasSC1)->C1_EMISSAO,(cAliasSC1)->C1_DATPRF)-CalcPrazo((cAliasSC1)->C1_PRODUTO,(cAliasSC1)->C1_QUANT)
+li++
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Impressao da Descricao Adicional do Produto (se houver)      ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+For j:=31 TO Len(Trim(cDescri)) Step 30
+	@ li, 21 PSAY SubStr(cDescri,j,30)
+	li++
+Next j
+
+Return .T.

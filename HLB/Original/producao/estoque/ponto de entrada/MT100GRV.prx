@@ -1,0 +1,68 @@
+#Include 'Protheus.ch'
+#include "topconn.ch"
+
+/*/{Protheus.doc} MT100GRV
+(Ponto de entrada durante gravação de documento entrada )
+
+@author MarceloLauschner
+@since 16/07/2012
+@version 1.0
+
+@return lExp02,Informa se a nota pode ou não ser gravada/excluída.
+
+@example
+(User Function MT100GRV()Local lExp01 := PARAMIXB[1]Local lExp02 := .T.//Validações do usuárioReturn lExp01 )
+
+@see (http://tdn.totvs.com/pages/releaseview.action?pageId=6085394)
+/*/
+User Function MT100GRV()
+	
+//INICIO - CENTRAL XML	
+// lRetGrv := ExecBlock("MT100GRV",.F.,.F.,{lDeleta})
+Local	aInParamIxb		:= aClone(ParamIxb)
+
+Local	aAreaOld		:= GetArea()
+Local	lRetGrv			:= .T.
+Local	lVldDeleta		:= ParamIxb[1]
+Local	lContinua		:= Nil
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MT100GRV",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	
+	If !lVldDeleta
+		
+		lVldAuto := If(Type("L103AUTO")=="U",.F.,l103Auto)
+		lVldAuto := If(Type("L116AUTO")=="U",lVldAuto,L116AUTO)
+		// Se a rotina está no execauto força a chamada do ponto de entrada MT103DNF para executar as devidas validações.
+		If lVldAuto .And. Type("aNFEDanfe") == "A"
+			If ExistBlock("MT103DNF")
+				lRetGrv	:= ExecBlock("MT103DNF",.F.,.F.,{aNFEDanfe})
+			Endif
+		Endif
+	Endif
+	
+	RestArea(aAreaOld)
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Ponto de entrada anterior a gravacao do Documento de Entrada ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If lRetGrv .And. (ExistBlock("XMT100GRV"))
+		lContinua := ExecBlock("XMT100GRV",.F.,.F.,{ParamIxb[1]})
+		If ValType( lContinua ) == "L"
+			lRetGrv	:= lContinua
+		EndIf
+	EndIf
+EndIf
+//FIM - CENTRAL XML	
+	
+Return lRetGrv

@@ -1,0 +1,936 @@
+#Include "Matr120.ch"
+#Include "FIVEWIN.Ch"
+
+/*/
+ээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбддддддддддд©╠╠
+╠╠ЁFun┤┘o    Ё D1RPEDCP  Ё Autor Ё Marcos COuto         Ё Data Ё 19.01.05  Ё╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддаддддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё EmissЦoo da RelatСrio de Pedidos de Compras                 Ё╠╠
+╠╠цддддддддддеддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё Tellabs                                                     Ё╠╠
+╠╠цддддддддддаддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+/*/                                                                           
+
+/*
+Funcao      : D1RPEDCO
+Parametros  : Nenhum
+Retorno     : Nenhum   
+Objetivos   : EmissЦo da RelatСrio de Pedidos de Compras 
+Autor     	: Marcos Couto 
+Data     	: 19/01/2005 
+Obs         : 
+TDN         : 
+RevisЦo     : Tiago Luiz MendonГa 
+Data/Hora   : 15/03/2012
+MСdulo      : Compras
+Cliente     : Tellabs
+*/
+
+
+*------------------------*
+ User Function D1RPEDCO()
+*------------------------*  
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Define Variaveis                                             Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+LOCAL CbTxt  := ""
+Local wnrel  := ""
+LOCAL cDesc1 :=STR0001	//"Emissao da Relacao de  Pedidos de Compras."
+LOCAL cDesc2 :=STR0002	//"Sera solicitado em qual Ordem, qual o Intervalo para"
+LOCAL cDesc3 :=STR0003	//"a emissao dos pedidos de compras."
+LOCAL aOrd   := {STR0004,STR0005,STR0006}		//" Por Numero         "###" Por Produto        "###" Por Fornecedor   "
+Setprvt("strHeader1,strHeader2")
+strHeader1 := "ITEM CODIGO          COD. PROD.                DESCRICAO                      CODIGO     LINHA DATA DE  ENTREGA   QUANTIDADE  UM VALOR      VALOR        VALOR TOTAL    QUANT.      QUANT. A    SALDO                RES. "
+strHeader2 := "     PRODUTO         TELLABS                   DO PRODUTO                     PROJETO    PROD. EMISSAO  PREVISTA  PEDIDA         UNIT.      IPI          (C/IPI)        ENTREGUE    RECEBER     RECEBER              ELIM."
+
+//ITEM CODIGO          COD. PROD.                DESCRICAO                      CODIGO     LINHA DATA DE  ENTREGA   QUANTIDADE  UM VALOR      VALOR        VALOR TOTAL    QUANT.      QUANT. A    SALDO                RES.
+//0         1         2         3         4         5         6         7         8         9        10        11        12        13        14        15        16        17        18        19        20         21        22
+//01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+//     PRODUTO         TELLABS                   DO PRODUTO                     PROJETO    PROD. EMISSAO  PREVISTA  PEDIDA         UNIT.      IPI          (C/IPI)        ENTREGUE    RECEBER     RECEBER              ELIM.	
+
+PRIVATE aTamSXG  := TamSXG("001")
+PRIVATE nDifNome := 0
+PRIVATE nTamNome := 35
+PRIVATE titulo   :=STR0007	//"Relacao de Pedidos de Compras"
+PRIVATE cPerg    := "MTR120    "
+PRIVATE cString  := "SC7"
+PRIVATE aReturn  := { STR0008, 1,STR0009, 1, 2, 1, "",1 }		//"Zebrado"###"Administracao"
+PRIVATE nomeprog := "D1RPEDCO"
+PRIVATE nLastKey := 0 
+PRIVATE aLinha   := { }
+PRIVATE LIMITE   :=220
+PRIVATE cabec1   := ""
+PRIVATE cabec2   := ""
+PRIVATE tamanho  := "G"
+If aTamSXG[1] != aTamSXG[3]
+	nDifNome := aTamSXG[4] - aTamSXG[3]
+	nTamNome := if(aTamSXG[1] != aTamSXG[3],35-(aTamSXG[4]-aTamSXG[3]),35)
+Endif
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Variaveis utilizadas para Impressao do Cabecalho e Rodape    Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+Imprime  := .T.
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Verifica as perguntas selecionadas                           Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+AjustaSX1()
+Pergunte("MTR120    ",.F.)
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Variaveis utilizadas para parametros                         Ё
+//Ё mv_par01       // do produto                                 Ё
+//Ё mv_par02       // ate o produto                              Ё
+//Ё mv_par03       // data de emissao de                         Ё
+//Ё mv_par04       // data de emissao ate                        Ё
+//Ё mv_par05       // data de entrega inicial                    Ё
+//Ё mv_par06       // data de entrega final                      Ё
+//Ё mv_par07       // todas ou em aberto ou residuos ou atendidosЁ
+//Ё mv_par08       // pedido inicial                             Ё
+//Ё mv_par09       // pedido final                               Ё
+//Ё mv_par10       // Listar  PC    AE    Ambos                  Ё
+//Ё mv_par11       // Pedidos Liberados  Bloqueados Ambos        Ё
+//Ё mv_par12       // Impr. SC's Firmes, Previstas ou Ambas      Ё
+//Ё mv_par13       // Qual Moeda                                 Ё
+//Ё mv_par14       // Descricao do produto                       Ё
+//Ё mv_par15       // Fornecedor de                              Ё
+//Ё mv_par16       // Fornecedor ate                             Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Envia controle para a funcao SETPRINT                        Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+wnrel := "D1RPEDCO"
+wnrel := SetPrint(cString,wnrel,cPerg,@titulo,cDesc1,cDesc2,cDesc3,.F.,aOrd,.f.,Tamanho)
+
+If nLastKey == 27
+	Set Filter To
+	Return
+Endif
+SetDefault(aReturn,cString)
+If nLastKey == 27
+	Set Filter To
+	Return
+Endif
+
+RptStatus({|lEnd| R120Imp(@lEnd,tamanho,wnrel,cString)},Titulo)
+
+Return .T.
+
+/*/
+эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё Chamada do Relatorio                                       Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё D1RPEDCO                                                    Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+Static Function R120Imp(lEnd,tamanho,wnrel,cString)
+
+LOCAL cbtxt := SPACE(10)
+LOCAL nQuebra,cCabQuebra,cQuebrant,cCOndBus
+LOCAL CbCont
+LOCAL nQuant_a_Rec := 0
+Local nTotParc := 0
+Local nTxMoeda := 1
+
+CbCont   := 00
+nQuebra  := 00
+li       := 80
+m_pag    := 01
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Variaveis utilizadas para Totalizar os valores do relatorio  Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+nT_qtd_ped := 0		// qtde pedida
+nT_vl_ipi  := 0		// valor do ipi
+nT_vl_total:= 0      // valor total do pedido
+nT_qtd_entr:= 0		// qtde entregue
+nT_sd_receb:= 0		// saldo a receber
+nT_desc    := 0		// total de desconto
+nTotIVA    := 0    // Total de IVA (impostos)
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Variaveis utilizadas para Totalizar os valores p/ item de acordo com a ordem Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+nPedida    := 0	// qtde pedida
+nValIpi    := 0 	// valor do ipi
+nTotal     := 0   // valor total do pedido
+nQuant     := 0	// qtde entregue
+nSaldo     := 0 	// saldo a receber
+nFlag		  := 0	// flag que indica se imprime totais por item ou nao
+nITemIpi   := 0
+nSalIpi    := 0
+nFrete	  := 0	// valor do frete
+nDesc      := 0 	// valor do desconto
+nValIVA    := 0     // valor do IVA
+nItemIVA   := 0     // valor do item do imposto
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Monta os Cabecalhos de acordo com os parametros              Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+cabec1    := STR0011		//"RELACAO DOS PEDIDOS DE COMPRAS"
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Localiza o ponto inicial para a impressao                    Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+nOrdem := aReturn[8]
+
+dbSelectArea("SC7")
+dbSetOrder(nOrdem)
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Verifica qual ordem foi selecionada                          Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Verifica qual ordem foi selecionada                          Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If nOrdem == 1
+	cCondBus	:=	mv_par08
+	
+	dbSeek(xFilial("SC7")+cCondBus,.T.)
+	cCampo     := "SC7->C7_NUM"
+
+	If mv_par10 == 2
+		cTexQuebra := STR0012	//"AUTOR. N. : "
+	Else
+		cTexQuebra := STR0013	//"PEDIDO N. : "
+	EndIf
+	titulo     += STR0014		//" - POR NUMERO"
+	
+	// Verifica se utilizara LayOut Maximo
+	cabec1 := strHeader1
+	cabec2 := strHeader2
+ElseIf nOrdem == 2
+	dbSeek(xFilial("SC7")+mv_par01,.T.)
+	cCampo     := "SC7->C7_PRODUTO"
+	cTexQuebra := STR0017	//"PRODUTO : "
+	titulo     += STR0018	//" - POR PRODUTO"
+	// Verifica se utilizara LayOut Maximo
+	cabec1 := strHeader1
+	cabec2 := strHeader2
+Else				// Ordem == 3
+	dbSeek(xFilial("SC7"))
+	cCampo     := "SC7->C7_FORNECE+SC7->C7_LOJA"
+	cTexQuebra := STR0021	//"FORNECEDOR : "
+	titulo     += STR0022	//" - POR FORNECEDOR"
+	cabec1 := strHeader1
+	cabec2 := strHeader2
+Endif
+
+If mv_par07==1
+	titulo+=STR0025	//", Todos"
+Elseif mv_par07==2
+	titulo+=STR0026	//", Em Abertos"
+Elseif mv_par07==3
+	titulo+=STR0027	//", Residuos"
+Elseif mv_par07==4
+	titulo+=STR0028	//", Atendidos"
+Endif
+
+titulo += " - " + GetMv("MV_MOEDA"+STR(mv_par13,1))		//" MOEDA "
+SetRegua(RecCount())
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Inicia a leitura do arquivo SC7                              Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+Do While !Eof() .And. C7_FILIAL = xFilial()
+
+    nTxMoeda := IIF(SC7->C7_TXMOEDA > 0,SC7->C7_TXMOEDA,Nil)
+	IncRegua()
+	If lEnd
+		@PROW()+1,001 PSAY STR0029	//"CANCELADO PELO OPERADOR"
+		Exit
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. POR PEDIDO                               Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If C7_NUM < mv_par08 .Or. C7_NUM > mv_par09
+		dbSkip()
+		Loop
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. POR PRODUTO                              Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If C7_PRODUTO < mv_par01 .Or. C7_PRODUTO > mv_par02
+		dbSkip()
+		Loop
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. POR EMISSAO                              Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If C7_EMISSAO < mv_par03 .Or. C7_EMISSAO > mv_par04
+		dbSkip()
+		Loop
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. POR DATA ENTREGA                         Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If C7_DATPRF < mv_par05 .Or. C7_DATPRF > mv_par06
+		dbSkip()
+		Loop
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste se o pedidos esta liberado.                         Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If (C7_CONAPRO == "B" .And. mv_par11 == 1) .Or.;
+	   (C7_CONAPRO != "B" .And. mv_par11 == 2)
+		dbSkip()
+		Loop
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. EM ABERTO                                Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If mv_par07 == 2
+		If C7_QUANT-C7_QUJE <= 0 .Or. !EMPTY(C7_RESIDUO)
+			dbSkip()
+			Loop
+		Endif
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. RESIDUOS                                 Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If mv_par07 == 3
+		If EMPTY(C7_RESIDUO)
+			dbSkip()
+			Loop
+		Endif
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. ATENDIDOS                                Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If mv_par07 == 4
+		If C7_QUANT > C7_QUJE
+			dbSkip()
+			Loop
+		Endif
+	Endif
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste Tipo	de Pedido  1-PC    2-AE    3-Ambos             Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If mv_par10 == 1 .And. C7_TIPO != 1
+		dbSkip()
+		Loop
+	ElseIf mv_par10 == 2 .And.	C7_TIPO !=2
+		dbSkip()
+		Loop
+	Endif
+  
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Consiste este item. por fornecedor                           Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If C7_FORNECE < mv_par15 .Or. C7_FORNECE > mv_par16
+		dbSkip()
+		Loop
+	Endif
+
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Filtra Tipo de SCs Firmes ou Previstas                       Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If !MtrAValOP(mv_par12, 'SC7')
+		dbSkip()
+		Loop
+	EndIf
+
+	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Verifica se e nova pagina                                    Ё
+	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	If li > 60
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+	Endif
+
+	If nQuebra == 0
+		cQuebrant := &cCampo
+		li++
+		If li > 60
+			cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+		Endif
+		If nOrdem = 1
+			cCabQuebra := " "
+		ElseIf nOrdem = 2
+			dbSelectArea("SC7")
+			cCabQuebra := Alltrim(SC7->C7_DESCRI)
+
+			If Empty(mv_par14)
+				mv_par14 := "B1_DESC"
+			EndIf
+			
+			//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			//Ё Impressao da descricao generica do Produto.                  Ё
+			//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+			If AllTrim(mv_par14) == "B1_DESC"
+				dbSelectArea("SB1")
+				dbSetOrder(1)
+				dbSeek(cFilial+&cCampo)
+				cCabQuebra := Alltrim(SB1->B1_DESC)
+			EndIf
+			//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			//Ё Impressao da descricao cientifica do Produto.                Ё
+			//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+			If AllTrim(mv_par14) == "B5_CEME"
+				dbSelectArea("SB5")
+				dbSetOrder(1)
+				If dbSeek(cFilial+&cCampo)
+					cCabQuebra := Alltrim(B5_CEME)
+				EndIf
+			EndIf
+			
+			dbSelectArea("SC7")
+			If AllTrim(mv_par14) == "C7_DESCRI"
+				cCabQuebra := Alltrim(SC7->C7_DESCRI)
+			EndIf
+		ElseIf nOrdem = 3
+			dbSelectArea("SA2")
+			dbSeek(cFilial+&cCampo)
+			cCabQuebra := A2_NOME
+		Endif
+      If nOrdem == 1 .And. !Empty(SC7->C7_NUMSC)
+		    @ li,000 PSAY cTexQuebra + &cCampo + " SOLICITUD DE COMPRAS NUM.:" + SC7->C7_NUMSC + " " + Substr(cCabQuebra,1,(nTamNome-5))
+      Else
+		    @ li,000 PSAY cTexQuebra + &cCampo + " " + Substr(cCabQuebra,1,(nTamNome-5))
+		Endif
+		
+		If nOrdem = 1 .or. nOrdem = 3
+			dbSelectArea("SA2")
+			If dbSeek(cFilial+SC7->C7_FORNECE+SC7->C7_LOJA)
+				If nOrdem = 1
+					@ li,055 PSAY SC7->C7_FORNECE
+					@ li,(062+nDifNome) PSAY Substr(SA2->A2_NOME,1,nTamNome)
+					@ li,098 PSAY STR0041+Substr(SA2->A2_TEL,1,15) // Fone.:
+				Else
+					@ li,055 PSAY STR0041+Substr(SA2->A2_TEL,1,15) + STR0044 + SA2->A2_FAX + STR0045 + SA2->A2_CONTATO   // Fone.: Fax: Contato:
+				Endif			
+			Endif
+			dbSelectArea("SC7")
+		Endif
+		nQuebra := 1
+		nFlag:=0
+	Endif
+
+	dbSelectArea("SC7")
+	If cQuebrant != &cCampo
+		nQuebra := 0
+		li++
+		If li > 60
+			cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+		Endif
+        If nFlag > 1 .Or. nOrdem != 2
+			Impitem()
+			nFlag:=0
+		EndIf
+		nPedida:=nValIpi:=nTotal:=nQuant:=nSaldo:=nValIVA:=0
+		@ li,000 PSAY __PrtThinLine()
+		Loop
+	Endif
+	li++
+	If li > 60
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+	Endif
+	nItemIpi := 0
+	nSalIpi := 0
+	nItemIVA  := 0
+	//зддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Verifica ordem a ser impressa           Ё
+	//юддддддддддддддддддддддддддддддддддддддддды
+	MaFisIniPC(SC7->C7_NUM,SC7->C7_ITEM,SC7->C7_SEQUEN)
+	If nOrdem = 1
+		nTotParc := ImpOrd1()
+	ElseIf nOrdem = 2
+		nTotParc := ImpOrd2()
+	Else
+		nTotParc := ImpOrd3()
+	Endif
+	nTotal 	+= xMoeda(nTotParc,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	//зддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Soma as variaveis dos totais p/item     Ё
+	//юддддддддддддддддддддддддддддддддддддддддды
+	nPedida = nPedida + C7_QUANT
+	nValIpi = nValIpi + xMoeda(nItemIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	nQuant  = nQuant  + C7_QUJE
+	nQuant_a_Rec := If(Empty(C7_RESIDUO),IIF(C7_QUANT-C7_QUJE<0,0,C7_QUANT-C7_QUJE),0)
+	nSaldo  = nSaldo  + (nQuant_a_Rec * IIf(Empty(C7_REAJUST),xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda),xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda))) + xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	nValIVA := nValIVA + xMoeda(nItemIVA,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	//здддддддддддддддддддддддд©
+	//Ё Valor do Frete         Ё
+	//юдддддддддддддддддддддддды
+	nFrete := C7_FRETE
+	//зддддддддддддддддддддддддддд©
+	//Ё Valor do Desconto         Ё
+	//юддддддддддддддддддддддддддды
+	If C7_DESC1 != 0 .or. C7_DESC2 != 0 .or. C7_DESC3 != 0
+		nDesc += CalcDesc(C7_TOTAL,C7_DESC1,C7_DESC2,C7_DESC3)
+	Else
+		nDesc += C7_VLDESC
+	Endif
+	//зддддддддддддддддддддддддддддддддддддддддд©
+	//Ё Soma as variaveis dos totais gerais     Ё
+	//юддддддддддддддддддддддддддддддддддддддддды
+	nT_vl_ipi   := nT_vl_ipi   + xMoeda(nItemIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	nT_vl_total := nT_vl_total + xMoeda(nTotParc,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	nT_sd_receb := nT_sd_receb + (nQuant_a_Rec * IIf(Empty(C7_REAJUST),xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda),xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda))) + xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	nTotIVA     := nTotIVA     + xMoeda(nItemIVA,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+	dbSelectArea("SC7")
+	dbSkip()
+EndDo
+If nOrdem <> 1
+	nT_Desc += xMoeda(nDesc,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+  	nDesc := 0
+EndIf
+
+If nFlag > 1 .Or. nOrdem != 2
+	If li > 60 .And. li != 80
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+	Endif
+	If li != 80
+        li++
+		Impitem()
+	Endif
+	nFlag:=0
+EndIf
+
+If nT_qtd_ped > 0 .Or. nT_vl_ipi > 0 .Or.;
+		nT_vl_total > 0 .Or. nT_qtd_entr > 0 .Or. nT_sd_receb > 0
+	Imptot(limite)
+Endif
+
+IF li != 80
+	li++
+	If li > 60
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+	Endif
+	@ li,000 PSAY __PrtThinLine()
+	roda(CbCont,STR0030,"G")		//"PEDIDOS"
+EndIF
+
+dbSelectArea("SC7")
+Set Filter To
+dbSetOrder(1)
+
+If aReturn[5] = 1
+	Set Printer TO
+	dbCommitAll()
+	ourspool(wnrel)
+Endif
+
+MS_FLUSH()
+
+Return
+
+/*/
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©╠╠
+╠╠ЁFun┤┘o    Ё IMPORD1  Ё Autor Ё Claudinei M. Benzi    Ё Data Ё 05.09.91 Ё╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё Impressao do relatorio na 1a ordem                         Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё D1RPEDCO                                                    Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+STATIC Function ImpOrd1()
+
+Local nQuant_a_Rec:=0
+Local aTam		:= TamSx3("C7_PRECO")
+Local aTamVal	:= TamSx3("C7_VALICM")
+Local nTotal	:= MaFisRet(,'NF_TOTAL')
+Local aValIVA   := MaFisRet(,"NF_VALIMP")
+Local nI
+Local cDescri := Alltrim(SC7->C7_DESCRI)
+Local nTxMoeda := IIF(SC7->C7_TXMOEDA > 0,SC7->C7_TXMOEDA,Nil)
+
+If Empty(mv_par14)
+	mv_par14 := "B1_DESC"
+EndIf
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Impressao da descricao generica do Produto.                  Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If AllTrim(mv_par14) == "B1_DESC"
+	dbSelectArea("SB1")
+	dbSetOrder(1)
+	dbSeek( xFilial()+SC7->C7_PRODUTO )
+	cDescri := Alltrim(SB1->B1_DESC)
+	dbSelectArea("SC7")
+EndIf
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Impressao da descricao cientifica do Produto.                Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If AllTrim(mv_par14) == "B5_CEME"
+	dbSelectArea("SB5")
+	dbSetOrder(1)
+	If dbSeek( xFilial()+SC7->C7_PRODUTO )
+		cDescri := Alltrim(B5_CEME)
+	EndIf
+	dbSelectArea("SC7")
+EndIf
+
+dbSelectArea("SC7")
+If AllTrim(mv_par14) == "C7_DESCRI"
+	cDescri := Alltrim(SC7->C7_DESCRI)
+EndIf
+
+dbSelectArea("SC7")
+@ li,000 PSAY C7_ITEM
+@ li,005 PSAY C7_PRODUTO
+@ li,021 PSAY C7_P_COD
+//nFlag++
+//@ li,047 PSAY Subs(cDescri,1,30)
+@ li,047 PSAY cDescri
+@ li,078 PSAY C7_P_PRJ
+@ li,089 PSAY C7_P_LINHA
+@ li,095 PSAY C7_EMISSAO
+@ li,104 PSAY C7_DATPRF
+@ li,114 PSAY C7_QUANT Picture Tm(C7_QUANT,9,2)
+@ li,126 PSAY C7_UM
+If !Empty(C7_REAJUST)
+	@ li,129 PSAY xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,aTam[2],nTxMoeda) Picture tm(Formula(C7_REAJUST),10,aTam[2])
+Else
+	@ li,129 PSAY xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,aTam[2],nTxMoeda) Picture tm(C7_PRECO,10,aTam[2])
+Endif
+nItemIPI := CalcIPI()[1]
+nSalIPI := CalcIPI()[2]
+@ li,140 PSAY xMoeda(nItemIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)  Picture tm(nItemIPI,12,aTamVal[2])
+@ li,153 PSAY xMoeda(nTotal,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(nTotal,14,aTamVal[2])
+@ li,168 PSAY C7_QUJE Picture tm(C7_QUJE,10,2)
+nQuant_a_Rec := If(Empty(C7_RESIDUO),IIF(C7_QUANT-C7_QUJE<0,0,C7_QUANT-C7_QUJE),0)
+@ li,180 PSAY nQuant_a_Rec Picture tm(C7_QUANT-C7_QUJE,10,2)
+
+If Empty(C7_REAJUST)
+	@ li,192 PSAY (nQuant_a_Rec * xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)) +;
+		xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(C7_TOTAL,11,aTamVal[2])
+Else
+	@ li,192 PSAY (nQuant_a_Rec * xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)) + ;
+		xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(C7_TOTAL,11,aTamVal[2])
+Endif	
+@ li,212 PSAY If(Empty(C7_RESIDUO),STR0031,STR0032)		//'Nao'###'Sim'
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Impressao da Descricao Adicional do Produto (se houver)      Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+/*
+For j:=29 TO Len(Trim(cDescri)) Step 28
+	If !empty(Subs(cDescri,j,28))
+		Li++
+		If li > 60
+			cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+		Endif
+		@ li,21 PSAY SubStr(cDescri,j,28)
+	Endif
+Next j
+*/
+Return nTotal
+
+/*/
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё Impressao do relatorio na 2a ordem                         Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё D1RPEDCO                                                   Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+STATIC Function ImpOrd2()
+
+Local nQuant_a_Rec
+Local aTam		:= TamSx3("C7_PRECO")
+Local aTamVal	:= TamSx3("C7_VALICM")
+Local nTotal	:= MaFisRet(,'NF_TOTAL')
+Local aValIVA   := MaFisRet(,"NF_VALIMP")
+Local nTxMoeda  := IIF(SC7->C7_TXMOEDA > 0,SC7->C7_TXMOEDA,Nil)
+Local nI
+
+If cPaisLoc <> "BRA" .And. !Empty( aValIVA )
+   For nI := 1 To Len( aValIVA )
+       nItemIVA += aValIVA[nI]
+   Next
+Endif
+
+dbSelectArea("SC7")
+@ li,000 PSAY C7_NUM
+@ li,007 PSAY C7_ITEM
+nFlag++
+@ li,012 PSAY C7_EMISSAO
+@ li,023 PSAY C7_FORNECE
+dbSelectArea("SA2")
+If dbSeek(cFilial+SC7->C7_FORNECE+SC7->C7_LOJA)
+	@li,(30+nDifNome) PSAY Subs(A2_NOME,1,nTamNome)
+	@li,66 PSAY Substr(A2_TEL,1,15)
+Endif
+
+DbSelectArea("SC7")
+@ li,82 PSAY C7_DATPRF
+@ li,93 PSAY C7_QUANT Picture tm(C7_QUANT,15,2)
+If !Empty(C7_REAJUST)
+	@ li,109 PSAY xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,aTam[2],nTxMoeda) Picture tm(Formula(C7_REAJUST),15,aTam[2])
+Else
+	@ li,109 PSAY xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,aTam[2],nTxMoeda) Picture tm(C7_PRECO,15,aTam[2])
+Endif
+nItemIPI := CalcIPI()[1]
+nSalIPI := CalcIPI()[2]
+@ li,124 PSAY xMoeda(C7_VLDESC,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)  Picture tm(C7_VLDESC,12,aTamVal[2])
+If cPaisLoc <> "BRA"
+	@ li,137 PSAY xMoeda(nItemIVA,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)  Picture tm(nItemIVA,15,aTamVal[2])
+Else
+	@ li,137 PSAY xMoeda(nItemIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)  Picture tm(nItemIPI,15,aTamVal[2])
+EndIf
+@ li,153 PSAY xMoeda(nTotal,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(nTotal,15,aTamVal[2])
+@ li,169 PSAY C7_QUJE Picture tm(C7_QUJE,15,2)
+nQuant_a_Rec := If(Empty(C7_RESIDUO),IIF(C7_QUANT-C7_QUJE<0,0,C7_QUANT-C7_QUJE),0)
+@ li,185 PSAY nQuant_a_Rec Picture tm(C7_QUANT-C7_QUJE,10,2)
+
+If Empty(C7_REAJUST)
+	@ li,195 PSAY (nQuant_a_Rec * xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)- ;
+		xMoeda(C7_VLDESC,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda))+ ;
+		xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(C7_TOTAL,15,aTamVal[2])
+Else
+	@ li,195 PSAY (nQuant_a_Rec * xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)) + ;
+		xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(C7_TOTAL,15,aTamVal[2])
+Endif	
+@ li,211 PSAY If(Empty(C7_RESIDUO),STR0031,STR0032)		//'Nao'###'Sim'
+
+Return nTotal
+
+/*/
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©╠╠
+╠╠ЁFun┤┘o    Ё IMPORD3  Ё Autor Ё Claudinei M. Benzi    Ё Data Ё 05.09.91 Ё╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё Impressao do relatorio na 3a ordem                         Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё MATR120                                                    Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+STATIC Function ImpOrd3()
+Local nQuant_a_Rec:=0
+Local aTam		:= TamSx3("C7_PRECO")
+Local aTamVal	:= TamSx3("C7_VALICM")
+Local nTotal	:= MaFisRet(,"NF_TOTAL")
+Local aValIVA   := MaFisRet(,"NF_VALIMP")
+Local nI
+Local cDescri := Alltrim(SC7->C7_DESCRI)
+Local nTxMoeda := IIF(SC7->C7_TXMOEDA > 0,SC7->C7_TXMOEDA,Nil)
+
+If Empty(mv_par14)
+	mv_par14 := "B1_DESC"
+EndIf
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Impressao da descricao generica do Produto.                  Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If AllTrim(mv_par14) == "B1_DESC"
+	dbSelectArea("SB1")
+	dbSetOrder(1)
+	dbSeek( xFilial()+SC7->C7_PRODUTO )
+	cDescri := Alltrim(SB1->B1_DESC)
+	dbSelectArea("SC7")
+EndIf
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Impressao da descricao cientifica do Produto.                Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If AllTrim(mv_par14) == "B5_CEME"
+	dbSelectArea("SB5")
+	dbSetOrder(1)
+	If dbSeek( xFilial()+SC7->C7_PRODUTO )
+		cDescri := Alltrim(B5_CEME)
+	EndIf
+	dbSelectArea("SC7")
+EndIf
+
+dbSelectArea("SC7")
+If AllTrim(mv_par14) == "C7_DESCRI"
+	cDescri := Alltrim(SC7->C7_DESCRI)
+EndIf
+
+dbSelectArea("SC7")
+@ li,000 PSAY C7_NUM
+@ li,007 PSAY C7_ITEM
+nFlag++
+@ li,012 PSAY C7_EMISSAO
+@ li,023 PSAY C7_PRODUTO
+@ li,039 PSAY Subs(cDescri,1,28)
+dbSelectArea("SB1")
+If dbSeek(xFilial()+SC7->C7_PRODUTO)
+	@ li,068 PSAY B1_GRUPO
+Endif
+dbSelectArea("SC7")
+@ li,073 PSAY C7_DATPRF
+@ li,085 PSAY C7_QUANT Picture tm(C7_QUANT,13,2)
+If !Empty(C7_REAJUST)
+	@li,99 PSAY xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,aTam[2],nTxMoeda) Picture tm(Formula(C7_REAJUST),15,aTam[2])
+Else
+	@li,99 PSAY xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,aTam[2],nTxMoeda) Picture tm(C7_PRECO,15,aTam[2])
+Endif
+nItemIPI := CalcIPI()[1]
+nSalIPI := CalcIPI()[2]
+@ li,115 PSAY xMoeda(C7_VLDESC,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(C7_VLDESC,12,2)
+If cPaisLoc <> "BRA"
+	@ li,128 PSAY xMoeda(nItemIVA,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)  Picture tm(nItemIVA,15,aTamVal[2])
+Else
+	@ li,128 PSAY xMoeda(nItemIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)  Picture tm(nItemIPI,15,aTamVal[2])
+EndIf
+@ li,143 PSAY xMoeda(nTotal,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(nTotal,15,aTamVal[2])
+@ li,158 PSAY C7_QUJE	Picture tm(C7_QUJE,15,2)
+nQuant_a_Rec := If(Empty(C7_RESIDUO),IIF(C7_QUANT-C7_QUJE<0,0,C7_QUANT-C7_QUJE),0)
+@ li,174 PSAY nQuant_a_Rec Picture tm(C7_QUANT-C7_QUJE,10,2)
+
+If Empty(C7_REAJUST)
+	@ li,185 PSAY (nQuant_a_Rec * xMoeda(C7_PRECO,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)- ;
+		xMoeda(C7_VLDESC,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda))+ ;
+		xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(C7_TOTAL,15,aTamVal[2])
+Else
+	@ li,185 PSAY (nQuant_a_Rec * xMoeda(Formula(C7_REAJUST),SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)) + ;
+		xMoeda(nSalIPI,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda) Picture tm(C7_TOTAL,15,aTamVal[2])
+Endif	
+@ li,203 PSAY If(Empty(C7_RESIDUO),STR0031,STR0032)		//'Nao'###'Sim'
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Impressao da Descricao Adicional do Produto (se houver)      Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+For j:=29 TO Len(Trim(cDescri)) Step 28
+	If !empty(Subs(cDescri,j,28))
+		li++
+		If li > 60
+			cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+		Endif
+		@ li,39 PSAY SubStr(cDescri,j,28)
+	Endif
+Next j
+
+Return nTotal
+
+/*/
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©╠╠
+╠╠ЁFun┤┘o    Ё IMPTOT   Ё Autor Ё Cristina M. Ogura     Ё Data Ё 03.02.95Ё╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё Impressao dos totais do relatorio                          Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё MATR120                                                    Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+STATIC Function ImpTot(limite)
+
+Local nc1,nc2,nc3,nc4,nc5,nc6      // numeros das colunas para aparecer os
+// totais dependendo do tipo de rela-
+// torio escolhido(1,2,3)
+nc1:=nc2:=nc3:=nc4:=nc5:=nc6:=0
+If nOrdem = 1
+	nc3:= 140
+	nc4:= 153; nc6:= 192
+ElseIf nOrdem = 2
+	nc3:= 137
+	nc4:= 153;nc6:= 195
+Else
+	nc3:= 128
+	nc4:= 143;nc6:= 185
+Endif
+li+=2
+@ li,000 PSAY STR0033	//"Total Geral "
+@ li,nc3 PSAY nT_vl_ipi Picture tm(nT_vl_ipi,15,2)
+@ li,nc4 PSAY nT_vl_total           Picture tm(nT_vl_total,15,2)
+@ li,nc6 PSAY nT_sd_receb - nT_desc Picture tm(nT_sd_receb,15,2)
+Return .T.
+
+/*/
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©╠╠
+╠╠ЁFun┤┘o    Ё IMPITEM  Ё Autor Ё Rodrigo de A. SartorioЁ Data Ё 08.05.95 Ё╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё Impressao dos totais p/ item de acordo com a ordem         Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё MATR120                                                    Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+STATIC Function ImpItem()
+
+Local nc1,nc2,nc3,nc4,nc5,nc6		// numeros das colunas para aparecer os
+Local nTxMoeda := IIF(SC7->C7_TXMOEDA > 0,SC7->C7_TXMOEDA,Nil)
+// totais dependendo do tipo de rela-
+// torio escolhido(1,2,3)
+
+nc1:=nc2:=nc3:=nc4:=nc5:=nc6:=0
+If nOrdem = 1
+	nc3:= 146
+	nc4:= 161; nc6:= 199
+	cTotal:=STR0034	//"Total dos Itens "
+ElseIf nOrdem = 2
+	nc3:= 137
+	nc4:= 153; nc6:= 195
+	cTotal:=STR0035	//"Total do Produto"
+Else
+   nc3:= 128
+	nc4:= 143;nc6:= 185
+	cTotal:=STR0036	//"Total do Fornecedor"
+Endif
+
+li ++
+@ li,000 PSAY cTotal
+@ li,nc3 PSAY nValIpi  Picture tm(nValIpi,15,2)
+@ li,nc4 PSAY nTotal   Picture tm(nTotal,15,2)
+@ li,nc6 PSAY (nSaldo-If(nOrdem<>1,nDesc,0)) Picture tm(nSaldo,15,2)
+li++
+If li > 60
+ 	cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15)
+Endif
+
+nT_desc += xMoeda(nDesc,SC7->C7_MOEDA,mv_par13,SC7->C7_DATPRF,,nTxMoeda)
+nDesc:=0
+Return .T.
+
+/*/
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o Ё Calculo do IPI                                             Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      Ё MATR120                                                    Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+Static Function CalcIPI()
+Local nToTIPI	:= 0,nTotal,nSalIPI:= 0
+Local nValor 	:= (C7_QUANT) * IIf(Empty(C7_REAJUST),C7_PRECO,Formula(C7_REAJUST))
+Local nSaldo 	:= (C7_QUANT-C7_QUJE) * IIf(Empty(C7_REAJUST),C7_PRECO,Formula(C7_REAJUST))
+Local nTotDesc := C7_VLDESC
+
+If nTotDesc == 0
+	nTotDesc := CalcDesc(nValor,SC7->C7_DESC1,SC7->C7_DESC2,SC7->C7_DESC3)
+EndIF
+nTotal := nValor - nTotDesc
+nTotIPI := IIF(SC7->C7_IPIBRUT == "L",nTotal, nValor) * ( SC7->C7_IPI / 100 )
+If Empty(C7_RESIDUO)
+   nTotal := nSaldo - nTotDesc
+   nSalIPI := IIF(SC7->C7_IPIBRUT == "L",nTotal, nSaldo) * ( SC7->C7_IPI / 100 )
+Endif
+
+Return {nTotIPI,nSalIPI} 
+
+/*
+эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠иммммммммммяммммммммммкмммммммяммммммммммммммммммммкммммммяммммммммммммм╩╠╠
+╠╠╨Programa  ЁAjustaSX1 ╨Autor  ЁAlexandre Lemes     ╨ Data Ё 26/09/2002  ╨╠╠
+╠╠лммммммммммьммммммммммймммммммоммммммммммммммммммммйммммммоммммммммммммм╧╠╠
+╠╠╨Desc.     Ё                                                            ╨╠╠
+╠╠╨          Ё                                                            ╨╠╠
+╠╠лммммммммммьмммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╧╠╠
+╠╠╨Uso       Ё MATR120 AP6                                                ╨╠╠
+╠╠хммммммммммомммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╪╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+*/
+Static Function AjustaSX1()
+ 
+U_PUTSX1("MTR120","15","Fornecedor de      ?","De proveedor       ?","From supplier      ?","mv_chf","C", 6,0,2,"G","","SA2","","","mv_par15","","","","","","","","","","","","","","","","","","","","","","","","","","","") 
+U_PUTSX1("MTR120","16","Fornecedor ate     ?","A proveedor        ?","To supplier        ?","mv_chg","C", 6,0,2,"G","","SA2","","","mv_par16","","","","","","","","","","","","","","","","","","","","","","","","","","","") 
+   
+Return

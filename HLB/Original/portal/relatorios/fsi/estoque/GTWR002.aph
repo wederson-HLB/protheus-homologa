@@ -1,0 +1,70 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTRF001   ºAutor  ³Eduardo C. Romanini º Data ³  25/10/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Relatorio de saldo de estoque da FSI                        º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+%>
+
+<!DOCTYPE html>
+<html lang="pt-br" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>Relat&oacute;rio de possi&ccedil;&atilde;o de estoque - FSI</title>
+	
+	<link href='portal_cliente_gt/css/jquery-ui.css' rel='stylesheet' type='text/css'>
+	<link href='portal_cliente_gt/css/relatorios.css' rel='stylesheet' type='text/css'>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('.export').hide();
+			
+			$('#bt_gerar').click(function(){
+				// Esconde e mostra o load
+				$('.export').hide();
+				$('#relatorio').html($('<img src="portal_cliente_gt/Imagens/load.gif" /><span>&nbsp;&nbsp;&nbsp;&nbsp;Carregando. Por Favor aguarde...</span>'));
+				
+				// Faz a requisição
+				$.post('u_wr002html.apw', function(data){
+					$('.export').show();
+					$('#relatorio').html(data);
+				});
+			});
+		});
+	</script> 
+</head>
+
+<body>
+	<% /*Título da Página*/ %>
+	<h1>Relat&oacute;rio de possi&ccedil;&atilde;o de estoque - FSI</h1>
+	<hr/>
+ 	<button type="button" id="bt_gerar" name="bt_gerar">Gerar</button>
+	
+	<br>
+	<a href="U_WR002Excel.apw" class="export">
+		<img class='imgButton' src="portal_cliente_gt/Imagens/excel-icon.jpg" width="36" height="36" border="0"/>
+	</a>
+	
+	<div id="relatorio"></div>
+	
+	<br>
+	<a href="U_WR002Excel.apw" class="export">
+		<img class='imgButton' src="portal_cliente_gt/Imagens/excel-icon.jpg" width="36" height="36" border="0"/>
+	</a>
+</body>
+</html>

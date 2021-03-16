@@ -1,0 +1,367 @@
+#INCLUDE "FIVEWIN.CH"
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Romaneio de Despacho  (Expedicao)                          ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe e ³ MATR790(void)                                              ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ TELLABS                                                    ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ ATUALIZACOES SOFRIDAS DESDE A CONSTRUCAO INICIAL.                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ PROGRAMADOR  ³ DATA   ³ BOPS ³  MOTIVO DA ALTERACAO                   ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/                                                                            
+
+
+/*
+Funcao      : D1RRODES
+Parametros  : Nenhum
+Retorno     : Nenhum   
+Objetivos   : Romaneio de Despacho  (Expedicao)s 
+Autor     	: 
+Data     	:  
+Obs         : 
+TDN         : 
+Revisão     : Tiago Luiz Mendonça 
+Data/Hora   : 15/03/2012
+Módulo      : Compras
+Cliente     : Tellabs
+*/
+
+*-----------------------*
+ User Function D1RRODES
+*-----------------------*
+
+LOCAL wnrel
+LOCAL tamanho:="G"
+LOCAL titulo:=OemToAnsi("Romaneio de Despacho Tellabs  (Expedicao)")	//"Romaneio de Despacho  (Expedicao)"
+LOCAL cDesc1:=OemToAnsi("Emissao do Romaneio de Despacho para a Expedicao, Armazem")	//"Emiss„o do Romaneio de Despacho para a Expedicao, Almoxarifado"
+LOCAL cDesc2:=OemToAnsi("atraves de intervalo de Pedidos informado na op‡„o Parƒmetros.")	//"atraves de intervalo de Pedidos informado na op‡„o Parƒmetros."
+LOCAL cDesc3:=""
+LOCAL CbCont,cabec1,cabec2
+LOCAL cString:="SC9"
+
+Setprvt("strHeader1")
+strHeader1 := "It   Cod. Prod. Tellabs        Desc. Material                 UM   Quantidade  Valor Unitario   IPI   ICM/ISS   Valor Merc.          Entrega     Amz    Endereco       N.F./Serie"
+
+//It   Cod. Prod. Tellabs        Desc. Material                 UM   Quantidade  Valor Unitario   IPI   ICM/ISS   Valor Merc.          Entrega     Amz    Endereco       N.F./Serie
+//0         1         2         3         4         5         6         7         8         9        10        11        12        13        14        15        16        17        18        19        20         21        22
+//01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+cPerg  :="MTR790    "
+PRIVATE aReturn := { "Zebrado", 1,"Administracao", 2, 2, 1, "",0 }			//"Zebrado"###"Administracao"
+PRIVATE nomeprog:="D1RRODES",nLastKey := 0,nBegin:=0,aLinha:={ }
+PRIVATE li:=80,limite:=132,lRodape:=.F.
+PRIVATE nTotQtd:=nTotVal:=0
+wnrel    := "D1RRODES"
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para Impressao do Cabecalho e Rodape    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+cbtxt    := SPACE(10)
+cbcont   := 0
+li       :=80
+m_pag    :=1
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas                          ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+U_PUTHelp("P.MTR79008.",{"Indica se deve imprimir apenas um pedido ","por folha."},{"Indica se deve imprimir apenas um pedido ","por folha."},{"Indica se deve imprimir apenas um pedido ","por folha."},.T.)
+pergunte("MTR790    ",.F.)
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para parametros                        ³
+//³ mv_par01	     	  Do Pedido                                ³
+//³ mv_par02	     	  Ate o Pedido                             ³
+//³ mv_par03	     	  Faturamento de                           ³
+//³ mv_par04	     	  Faturamento ate                          ³
+//³ mv_par05	     	  Mascara                                  ³
+//³ mv_par06	     	  Aglutina Pedidos de Grade                ³
+//³ mv_par07	     	  Qual moeda                               ³
+//³ mv_par08	     	  Um pedido por folha?                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+wnrel:=SetPrint(cString,wnrel,cPerg,@Titulo,cDesc1,cDesc2,cDesc3,.F.,,,Tamanho)
+
+If nLastKey == 27
+	Set Filter to
+	Return
+Endif
+
+SetDefault(aReturn,cString)
+
+If nLastKey == 27
+	Set Filter to
+	Return
+Endif
+
+RptStatus({|lEnd| C790Imp(@lEnd,wnRel,cString)},Titulo)
+
+Return
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Chamada do Relatorio                                       ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ D1RRODES			                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function C790Imp(lEnd,WnRel,cString)
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Define Variaveis                                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+LOCAL tamanho:="G"
+LOCAL titulo:=OemToAnsi("Romaneio de Despacho (Expedicao)")	//"Romaneio de Despacho  (Expedicao)"
+LOCAL cDesc1:=OemToAnsi("Emissao do Romaneio de Despacho para a Expedicao, Armazem")	//"Emiss„o do Romaneio de Despacho para a Expedicao, Almoxarifado"
+LOCAL cDesc2:=OemToAnsi("atraves de intervalo de Pedidos informado na op‡„o Parƒmetros.")	//"atraves de intervalo de Pedidos informado na op‡„o Parƒmetros."
+LOCAL cDesc3:=""
+LOCAL CbCont,cabec1,cabec2
+LOCAL lContinua := .T.,	lFirst := .T.
+LOCAL cPedAnt:="   "
+LOCAL dEmissao := dDatabase        
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para Impressao do Cabecalho e Rodape    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+cbtxt    := SPACE(10)
+cbcont   := 0
+li       :=80
+m_pag    :=1
+nTipo    :=IIF(aReturn[4]==1,15,18)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Definicao dos cabecalhos                                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+titulo := "ROMANEIO DE DESPACHO"+ " - " + GetMv("MV_MOEDA" + STR(mv_par07,1))//"ROMANEIO DE DESPACHO - moeda"
+cabec1 := strHeader1	//"It Codigo          Desc. Material  UM Quantidade  Valor Unitario IPI ICM/ISS Valor Merc. Entrega   Alm Localiz.     N.F./Serie"
+cabec2 := ""
+// BRA               99 999999999999999 XXXXXXXXXXXXXXX XX 9999999.99 9999,999,999.99  99.99  9999,999,999.99 99/99/9999 99 XXXXXXXXXXXX XXXXXXXXXXXX/XXX
+// SPA              "It C¢digo          Desc. Material  UM   Cantidad  Valor Unitario    IVA      Valor Merc. Entrega   Dep Local.       Fact/Serie"
+// SPA               99 999999999999999 XXXXXXXXXXXXXXX XX 9999999.99 9999,999,999.99  99 99  9999,999,999.99 99/99/9999 99 XXXXXXXXXXXX XXXXXXXXXXXX/XXX
+//                             1         2         3         4         5         6         7         8         9        10        11        12        13        
+//                   012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901
+dbSelectArea("SC9")
+dbSetOrder(1)
+dbSeek( xFilial()+mv_par01,.T. )
+
+SetRegua(RecCount())		// Total de Elementos da regua
+
+While !Eof() .And. C9_PEDIDO <= mv_par02 .And. lContinua .and. xFilial() == C9_FILIAL
+	
+	dbSelectArea("SC5")
+	dbSetOrder(1)
+	dbSeek(xFilial()+SC9->C9_PEDIDO)
+	dbSelectArea("SC9")
+	
+	If At(SC5->C5_TIPO,"DB") != 0 .Or. ( !Empty(C9_BLEST) .AND. !Empty(C9_BLCRED) .And. C9_BLEST # "10" .AND. C9_BLCRED # "10")
+		dbSkip()
+		Loop
+	EndIf
+	
+	dbSelectArea("SC6")
+	dbSetOrder(1)
+	dbSeek(xFilial()+SC9->C9_PEDIDO+SC9->C9_ITEM)
+	
+	dbSelectArea("SF2")
+	dbSetOrder(1)
+	MsSeek(xFilial("SF2")+SC9->C9_NFISCAL+SC9->C9_SERIENF+SC9->C9_CLIENTE+SC9->C9_LOJA)
+
+	dEmissao := SF2->F2_EMISSAO
+	
+	dbSelectArea("SC9")
+	If SF2->F2_EMISSAO < MV_PAR03 .OR. SF2->F2_EMISSAO > MV_PAR04
+		dbSkip()
+		Loop
+	Endif
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Valida o produto conforme a mascara         ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	lRet:=ValidMasc(SC9->C9_PRODUTO,MV_PAR05)
+	If !lRet
+		dbSkip()
+		Loop
+	Endif
+	
+	IF lEnd
+		@PROW()+1,001 Psay "CANCELADO PELO OPERADOR"	//"CANCELADO PELO OPERADOR"
+		lContinua := .F.
+		Exit
+	Endif
+	
+	IncRegua()
+	
+	IF li > 55 .Or. lFirst
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,nTipo)
+		lRodape := .T.
+	Endif
+	
+	If C9_PEDIDO # cPedAnt .Or. lFirst
+		cPedAnt:= C9_PEDIDO
+		lFirst := .F.
+		nTotQtd:= 0
+		nTotVal:= 0
+		CPedido:= SC5->C5_NUM
+		dbSelectArea("SA4")
+		dbSeek(xFilial()+SC5->C5_TRANSP)
+		dbSelectArea("SA1")
+		dbSeek(xFilial()+SC5->C5_CLIENTE+SC5->C5_LOJACLI)
+		
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Impressao do Cabecalho do Pedido                             ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		@ li,000 Psay "PEDIDO : "+SC5->C5_NUM				//"PEDIDO : "
+		@ li,020 Psay "EMISSAO : "+DTOC(SC5->C5_EMISSAO)	//"EMISSAO : "
+		li++
+		@ li,000 Psay "CLIENTE : "+SC5->C5_CLIENTE+"/"+SC5->C5_LOJACLI+"-"+SA1->A1_NOME	  //"CLIENTE : "   
+		li++
+		@ li,000 Psay "SITE : "+SC5->C5_P_SITE
+		li++
+		@ li,000 Psay "ENDERECO: "+Alltrim(SA1->A1_END) + " - " + Alltrim(SA1->A1_BAIRRO) + " - " + Alltrim(SA1->A1_MUN) +" - "+SA1->A1_EST   //"ENDERECO: "
+		li++
+		@ li,000 Psay "TRANSPORTADORA : "+SC5->C5_TRANSP+"-"+SA4->A4_NREDUZ+"  "+"VIA : "+SA4->A4_VIA		//"TRANSPORTADORA : "###"VIA : "
+		li++
+		@ li,000 Psay "ENDERECO: "+Alltrim(SA4->A4_END)+ " - " + Alltrim(SA4->A4_MUN)+" - "+SA4->A4_EST   //"ENDERECO: "
+		li++
+		@ li,000 Psay __PrtThinLine()
+		
+	Endif
+	
+	li++
+	ImpItem()
+	
+	dbSelectArea("SC9")
+	dbSkip()
+	
+	If C9_PEDIDO # cPedAnt .or. Eof()
+		
+		li++
+		@ li,000 Psay __PrtThinLine()
+		li++
+		@ li,000 Psay " T O T A I S "	//" T O T A I S "
+		@ li,067 Psay nTotQtd	Picture PESQPICTQT("C6_QTDVEN",10)
+		@ li,112 Psay xMoeda(nTotVal,1,mv_par07,SC5->C5_EMISSAO)	Picture "@E 99,999,999,999.99"
+		
+		Li := Li + 2
+		If MV_PAR08 = 1 .Or. Li + 7 > 55	//1 pedido por folha
+			lFirst := .T.
+			li := 80
+		EndIf
+		
+	Endif
+End
+
+IF lRodape
+	roda(cbcont,cbtxt,"M")
+Endif
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Restaura a Integridade dos dados                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SC9")
+Set Filter To
+dbSetOrder(1)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Se em disco, desvia para Spool                               ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If aReturn[5] = 1    // Se Saida para disco, ativa SPOOL
+	Set Printer TO
+	dbCommitAll()
+	OurSpool(wnrel)
+Endif
+
+MS_FLUSH()
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Impressao de Itens do Romaneio  de Despacho                ³±±
+±±³          ³ Ordem de Impressao : LOCALIZACAO NO ALMOXARIFADO           ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe   ³ ImpItem(void)                                              ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ D1RRODES                                                    ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function ImpItem()
+
+LOCAL cMascara :=GetMv("MV_MASCGRD")
+LOCAL nTamRef  :=Val(Substr(cMascara,1,2))
+LOCAL nTamLin  :=Val(Substr(cMascara,4,2))
+LOCAL nTamCol  :=Val(Substr(cMascara,7,2))
+dbSelectArea("SB2")
+dbSeek(xFilial()+SC9->C9_PRODUTO)
+
+dbSelectArea("SC6")
+dbSeek(xFilial()+SC9->C9_PEDIDO+SC9->C9_ITEM)
+
+dbSelectArea("SB1")
+dbSeek(xFilial()+SC6->C6_PRODUTO+SC6->C6_LOCAL)
+
+IF SC6->C6_GRADE == "S" .And. MV_PAR06 == 1
+	dbSelectArea("SC9")
+	cProdRef:=Substr(C9_PRODUTO,1,nTamRef)
+	cPedido := SC9->C9_PEDIDO
+	nReg    := 0
+	nTotLib := 0
+	
+	While !Eof() .And. xFilial() == C9_FILIAL .And. Substr(C9_PRODUTO,1,nTamRef) == cProdRef;
+		.And. C9_PEDIDO == cPedido
+		nReg:=Recno()
+		If !Empty(C9_BLEST) .AND. !Empty(C9_BLCRED) .And. C9_BLEST # "10" .AND. C9_BLCRED # "10"
+			dbSkip()
+			Loop
+		Endif
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Valida o produto conforme a mascara         ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		lRet:=ValidMasc(SC9->C9_PRODUTO,MV_PAR05)
+		If !lRet
+			dbSkip()
+			Loop
+		Endif
+		nTotLib += SC9->C9_QTDLIB
+		dbSkip()
+	End
+	If nReg > 0
+		dbGoto(nReg)
+		nReg:=0
+	Endif
+Endif
+
+@li,000 Psay SC9->C9_ITEM
+//@li,003 Psay IIF(SC6->C6_GRADE == "S" .And. MV_PAR06 == 1,Substr(SC9->C9_PRODUTO,1,nTamRef),SC9->C9_PRODUTO)
+@li,005 Psay SC6->C6_P_COD
+@li,031 Psay Left(IIF(Empty(SC6->C6_DESCRI),SB1->B1_DESC,SC6->C6_DESCRI), 30)
+@li,062 Psay SC6->C6_UM
+@li,067 Psay IIF(SC6->C6_GRADE=="S" .And. MV_PAR06 ==1,nTotLib,SC9->C9_QTDLIB)	Picture PESQPICTQT("C9_QTDLIB",10)
+@li,079 Psay xMoeda(SC9->C9_PRCVEN,1,mv_par07,SC5->C5_EMISSAO)	Picture "@E 9999,999,999.99"
+If ( cPaisloc=="BRA" )
+	@li,096 Psay SB1->B1_IPI				Picture "99"
+	If !Empty(SB1->B1_PICM)
+		@li,102 Psay SB1->B1_PICM			Picture "99"
+	Else
+		@li,102 Psay SB1->B1_ALIQISS		Picture "99"
+	EndIf
+Else
+	@li,096 Psay SB1->B1_IPI				Picture "99.99"
+EndIf
+@li,112 Psay xMoeda(((IIF(SC6->C6_GRADE=="S" .And. MV_PAR06 ==1,nTotLib,SC9->C9_QTDLIB))*SC9->C9_PRCVEN),1,mv_par07,SC5->C5_EMISSAO)	Picture "@E 9999,999,999.99"
+@li,133 Psay SF2->F2_EMISSAO
+@li,145 Psay SC6->C6_LOCAL
+@li,152 Psay Left(SC6->C6_LOCALIZ,12)
+@li,167 Psay SC9->C9_NFISCAL+"/"+SC9->C9_SERIENF
+nTotQtd += IIF(SC6->C6_GRADE=="S" .And. MV_PAR06 ==1,nTotLib,SC9->C9_QTDLIB)
+nTotVal += IIF(SC6->C6_GRADE=="S" .And. MV_PAR06 ==1,nTotLib,SC9->C9_QTDLIB)*SC9->C9_PRCVEN
+
+Return

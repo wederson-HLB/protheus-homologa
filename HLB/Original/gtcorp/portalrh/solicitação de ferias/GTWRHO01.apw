@@ -1,0 +1,57 @@
+#include "apwebex.ch"
+#include "totvs.ch"  
+#Include "tcfwfun.ch"
+#Include "tcfwdef.ch"
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWRHO01  ºAutor  ³Tiago Luiz Mendonça º Data ³  05/09/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Solicitação de ferias - Formulario                          º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/ 
+                               
+/*
+Funcao      : GTWRHO01
+Parametros  : Nenhum
+Retorno     : Nil
+Objetivos   : Rotina APWBEX para solicitação de ferias - formulario
+Autor       : Tiago Luiz Mendonça
+Data/Hora   : 05/09/12
+*/
+
+
+*-----------------------*
+User Function GTWRHO01()
+*-----------------------*
+
+Local cHtml	:= "" 
+
+conout("teste")	
+WEB EXTENDED INIT cHtml
+
+ 	Z75->(DbGoTop()) 
+	Z75->(DbSetOrder(1))  
+	conout(TCFWGetFil()+TCFWGetMat())  
+	If Z75->(DbSeek(TCFWGetFil()+TCFWGetMat()) )
+	    
+		conout("teste1")	
+		conout(Z75->Z75_STATUS)	
+		If Alltrim(Z75->Z75_STATUS) == "P"  
+			cHtml := ExecInPage("GTWRH003")	
+		Else
+			cHtml := ExecInPage("GTWRHO01")
+		EndIf      
+  
+	EndIf
+
+WEB EXTENDED END
+	 
+Return cHtml

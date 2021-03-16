@@ -1,0 +1,79 @@
+Group LANCPAD
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Modulos
+      FoldersCount=4
+      Folder Faturamento
+         VSSPath=Fontes
+         FilesCount=5
+         File \Rdmake\LANCPAD\LP610_02.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP610_04.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP610_13.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP610_15.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP610_16.PRW
+             Type=T
+         End
+      End
+      Folder Financeiro
+         VSSPath=Nova Pasta2
+         FilesCount=6
+         File \Rdmake\LANCPAD\LP510_01.PRX
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP562_01.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP513_DB.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\lp51001val.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\lp5107val.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\lp5108val.PRW
+             Type=T
+         End
+      End
+      Folder Estoque
+         VSSPath=Nova Pasta3
+         FilesCount=2
+         File \Rdmake\LANCPAD\LP650_03CD.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP650_05CC.PRW
+             Type=T
+         End
+      End
+      Folder GT
+         VSSPath=Nova Pasta4
+         FilesCount=2
+         File \Rdmake\LANCPAD\LP620_02C.PRW
+             Type=T
+         End
+         File \Rdmake\LANCPAD\LP610_2C.PRW
+             Type=T
+         End
+      End
+   End
+End

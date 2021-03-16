@@ -1,0 +1,190 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include "tbiconn.ch"
+#Include "Topconn.ch"
+
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR002 ºAutor  ³Daniel Fonseca Lira  º  Data ³  15/02/2013 º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Relatorio posição de estoque da FSI                         º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal Grant Thornton                                      º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+
+
+*---------------------*
+User Function GTWR002()
+*---------------------*
+	Local cHtml	:= "" 
+	Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+	Local cLoja   := Substr(HttpSession->cEmpresa,3,2)
+	
+	WEB EXTENDED INIT cHtml
+	
+	If cEmp <> "EF"
+		cHtml := "<html><body><h1>Essa empresa não possui acesso a esse relatorio</h1></body></html>" 
+	Else
+		If Select("SX2") == 0
+			U_WFPrepEnv()
+		EndIf
+		cHtml := ExecInPage("GTWR002")
+	EndIf
+	
+	WEB EXTENDED END
+Return cHtml
+
+
+
+User Function WR002Html()
+Return WR002Gerar(.F.)
+
+
+
+User Function WR002Excel()
+	Local cHtml := ''
+	Local cNome := 'fsi_estoque_'
+	Local cDia  := StrZero(Day(Date()), 2)
+	Local cMes  := StrZero(Month(Date()), 2)
+	Local cAno  := AllTrim(Str(Year(Date())))
+	
+	cNome += cAno + cMes + cDia + '_' + AllTrim(Str(Round(Seconds(),0)))
+			
+	HttpCtDisp('attachment; filename="' + cNome + '.xls"')
+	HttpCtType('application/vnd.ms-excel')
+	
+	cHtml += '<!DOCTYPE html>'
+	cHtml += '<html>'
+	cHtml += '	<head>'
+	cHtml += '		<title>Relat&oacute;rio de possi&ccedil;&atilde;o de estoque - FSI</title>'
+	cHtml += '		<style>
+	cHtml += '			thead th {'
+	cHtml += '				border-bottom: thin solid black;'
+	cHtml += '				background-color: #DDDDEE;'
+	cHtml += '			}'
+	cHtml += '			tbody td {'
+	cHtml += '				border-bottom: thin dashed black;'
+	cHtml += '				border-right: thin solid white;'
+	cHtml += '			}'
+	cHtml += '			.odd {'
+	cHtml += '				background-color: #F5F5FA;'
+	cHtml += '			}'
+	cHtml += '		</style>'
+	cHtml += '	</head>'
+	cHtml += '<body>'
+	cHtml += WR002Gerar(.T.)
+	cHtml += '</body>'
+	cHtml += '</html>'
+Return cHtml
+
+
+
+Static Function WR002Gerar(lPlanilha)
+	Local cEmp   := ''
+	Local cFil   := ''
+	Local cBanco := ''
+	Local cIp    := ''
+	Local nCon   := 0
+	Local cHtml  := ''
+	Local aCon   := {}
+	Local lImpar := .T.
+	
+	cEmp := Substr(HttpSession->cEmpresa,1,2)
+	cFil := Substr(HttpSession->cEmpresa,3,2)
+	
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	
+	//Retorna o ambiente da empresa logada
+	aCon  := U_WFRetBanco(cEmp,cLoja)
+	cBanco:= aCon[1]
+	cIp   := aCon[2]
+	
+	nCon := TCLink(cBanco,cIp,aCon[6])
+	
+	BeginSql Alias 'SQL'
+		SELECT
+			A.B2_COD AS CODIGO,
+			B.B1_DESC AS DESCRICAO,
+			A.B2_QATU AS QUANTATU,
+			A.B2_RESERVA AS RESERVA,
+			A.B2_QEMP AS EMPENHADA,
+			A.B2_QATU-A.B2_RESERVA-A.B2_QEMP AS DISPONIVEL 
+		FROM
+			Amb01_P10..SB2EF0 A,
+			Amb01_P10..SB1EF0 B 
+		WHERE(A.B2_COD = B.B1_COD)
+			AND B.%notDel%
+			AND A.%notDel%
+			AND B.B1_TIPO = 'PA'
+			AND (A.B2_FILIAL = %exp:cFil% OR A.B2_FILIAL = '  ')
+		ORDER BY B.B1_DESC
+	EndSql
+	
+	SQL->(DbGoTop())
+	If SQL->(!Bof()) .and. SQL->(!Eof())
+		
+		// Cabecalho
+		cHtml :=	'<table id="tb1">' + CRLF
+		cHtml +=	'	<thead>' + CRLF
+		cHtml +=	'		<tr>' + CRLF
+		cHtml +=	'			<th>C&oacute;digo</th>' + CRLF
+		cHtml +=	'			<th>Descri&ccedil;&atilde;o</th>' + CRLF
+		cHtml +=	'			<th>Quantidade atual</th>' + CRLF
+		cHtml +=	'			<th>Reserva</th>' + CRLF
+		cHtml +=	'			<th>Empenhada</th>' + CRLF
+		cHtml +=	'			<th>Dispon&iacute;vel</th>' + CRLF
+		cHtml +=	'		</tr>' + CRLF
+		cHtml +=	'	</thead>' + CRLF
+		cHtml +=	'	<tbody>' + CRLF
+		
+		// Percorre registros do resultado
+		While ! SQL->(Eof())
+			
+			// Define linhas pares e impares
+			If lImpar
+				cHtml +=	'	<tr class="odd">' + CRLF
+				lImpar := .F.
+			Else
+				cHtml +=	'	<tr class="even">' + CRLF
+				lImpar := .T.
+			EndIf
+			
+			// Caso seja uma planilha muda formatacao do codigo
+			If lPlanilha
+				cHtml +=	'		<td>="'+AllTrim(SQL->Codigo)+'"</td>' + CRLF
+			Else
+				cHtml +=	'		<td>'+AllTrim(SQL->Codigo)+'</td>' + CRLF
+			EndIf
+			
+			cHtml +=	'		<td>'+AllTrim(SQL->Descricao)+'</td>' + CRLF
+			cHtml +=	'		<td>'+AllTrim(Str(SQL->Quantatu))+'</td>' + CRLF
+			cHtml +=	'		<td>'+AllTrim(Str(SQL->Reserva))+'</td>' + CRLF
+			cHtml +=	'		<td>'+AllTrim(Str(SQL->Empenhada))+'</td>' + CRLF
+			cHtml +=	'		<td>'+AllTrim(Str(SQL->Disponivel))+'</td>' + CRLF
+			cHtml +=	'	</tr>' + CRLF
+			
+			SQL->(DbSkip())
+		EndDo
+		
+		// Finaliza a tabela
+		cHtml +=	'	</tbody>' + CRLF
+		cHtml +=	'</table>'
+		
+	Else
+		cHtml += '<div>N&atilde;o foram encontrados registros</div>'
+	EndIf
+	
+	SQL->(DbCloseArea())
+	TcUnlink(nCon)
+Return cHtml

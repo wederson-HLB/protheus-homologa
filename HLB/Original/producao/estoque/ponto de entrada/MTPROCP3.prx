@@ -1,0 +1,109 @@
+#include "topconn.ch"
+
+/*/{Protheus.doc} MTPROCP3
+(Ponto de Entrada para Filtrar registros do retorno Poder 3)
+	
+@author MarceloLauschner
+@since 04/12/2013
+@version 1.0		
+
+@return lógico
+
+@example
+(examples)
+
+@see (links_or_references)
+/*/
+User Function MTPROCP3()
+
+//INICIO - CENTAL XML
+Local	aInParamIxb	:= aClone(ParamIxb)
+Local	lRet		:= .T.
+Local	lRetAux		:= .F.
+Local	cAliasB6	:= ParamIxb[1]
+Local	lQueryB6	:= ParamIxb[2]
+Local	cQry		:= ""
+Local	xT			
+	
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MTPROCP3",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return .T.
+			Endif
+		Endif
+	EndIf
+	
+	// Verifica se existem as variaveis oriundas da Central XML
+	If Type("aChvNfes") <> "U" .And. Type("oMulti") <> "U" .And. Type("l103Auto") == "U"  // Evita que esteja dentro da rotina MATA103 chamado pela Central XML
+		lRet	:= .F.
+	//	If Len(aChvNfes) > 0
+	
+		cQry += "SELECT D2_NUMSEQ "
+		cQry += "  FROM "+RetSqlName("SD2") + " D2," + RetSqlName("SF2") + " F2 "
+		cQry += " WHERE F2.D_E_L_E_T_ = ' ' "
+		For xT := 1 To Len(aChvNfes)
+			If xT == 1
+				cQry += "  AND F2_CHVNFE IN(' "
+			Endif
+			cQry += "','"+aChvNfes[xT]+""
+			If xT == Len(aChvNfes)
+				cQry += "')"
+			Endif
+		Next
+		cQry += "   AND F2_LOJA = D2_LOJA "
+		cQry += "   AND F2_CLIENTE = D2_CLIENTE "
+		cQry += "   AND F2_SERIE = D2_SERIE "
+		cQry += "   AND F2_DOC = D2_DOC "
+		cQry += "   AND F2_FILIAL = '"+xFilial("SF2") + "' "
+		cQry += "   AND D2.D_E_L_E_T_ = ' ' "
+		cQry += "   AND D2_PRCVEN >= "+Alltrim(Str(aCols[n,nPxPrcNfe]))
+		cQry += "   AND D2_IDENTB6 = '"+(cAliasB6)->B6_IDENT+"' "
+		cQry += "   AND D2_EMISSAO <= '"+DTOS(CONDORXML->XML_EMISSA)+"' "
+		cQry += "   AND D2_LOCAL = '"+oMulti:aCols[oMulti:nAt,nPxLocal]+"' "
+		cQry += "   AND D2_COD = '"+oMulti:aCols[oMulti:nAt,nPxProd]+"' "
+		cQry += "   AND D2_FILIAL = '"+xFilial("SD2")+"' "
+	
+		TCQUERY cQry NEW ALIAS "QPODER3"
+	
+		If !Eof()
+			lRetAux	:= .T.
+		Endif
+		QPODER3->(DbCloseArea())
+	//Endif
+	
+		If !lRet
+			If Round((cAliasB6)->B6_PRUNIT,TamSX3("B6_PRUNIT")[2]) == Round(aCols[n,nPxPrcNfe],TamSX3("B6_PRUNIT")[2])
+				lRet	:= .T.
+			ElseIf Round((cAliasB6)->D2_PRCVEN,TamSX3("D2_PRCVEN")[2]) == Round(aCols[n,nPxPrcNfe],TamSX3("D2_PRCVEN")[2])
+				lRet	:= .T.
+			ElseIf Round((cAliasB6)->D2_PRCVEN,TamSX3("D2_PRCVEN")[2]) == Round((aCols[n,nPxTotNfe]/aCols[n,nPxQteNfe]),TamSX3("D2_PRCVEN")[2])
+				lRet	:= .T.			
+			ElseIf Round((cAliasB6)->D2_PRCVEN,TamSX3("D2_PRCVEN")[2]) == Round((aCols[n,nPxTotNfe]-aCols[n,nPxValDesc])/aCols[n,nPxQte],TamSX3("D2_PRCVEN")[2])
+				lRet	:= .T.
+			ElseIf !GetNewPar("XM_POD3ALL",.T.)
+				lRet	:= .T.
+			ElseIf lAllPoder3	// Esta variavel é declarada na rotina XMLDCONDOR
+				lRet	:= .T.
+			ElseIf lRetAux
+				lRet	:= .T.
+			Endif
+		Endif
+	Endif
+// Se o retorno foi tratado como verdadeiro, irá analisar tb o ponto de entrada do cliente 
+// mantendo a compatibilidade do cliente
+	If lRet
+		If ExistBlock("XMTPROCP3")
+			lRet	:= ExecBlock("XMTPROCP3",.F.,.F.,{cAliasB6,lQueryB6})
+			If ValType(lRet) <> "L"
+				lRet	:= .T.
+			Endif
+		Endif
+	Endif
+EndIf
+//FIM - CENTRAL XML
+
+Return lRet

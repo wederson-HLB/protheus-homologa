@@ -1,0 +1,209 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWCM01   ºAutor  ³Eduardo C. Romanini º Data ³  03/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da manutenção do cadastro de usuarios do         º±±
+±±º          ³portal Gt.                                                  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Local cOper  := HttpGet->Oper
+Local cParam := ""
+Local cLogin := "" 
+
+Local nI := 0
+Local nY := 0
+
+Local aCabec  := {}
+Local aLinhas := {} 
+Local aCpos   := {}
+Local aReg    := {}
+Local aNeAlt  := {"ZW0_LOGIN"}
+
+aAdd(aCabec,"") //Adiciona linha em branco para o checkbox
+
+SX3->(DbSetOrder(1))
+If SX3->(DbSeek("ZW1"))
+	While SX3->(!EOF()) .and. SX3->X3_ARQUIVO = "ZW1"
+
+		//Define o cabeçalho da tabela
+		If SX3->X3_BROWSE == "S"
+        	aAdd(aCabec,AllTrim(SX3->X3_TITULO))
+			aAdd(aCpos,SX3->X3_CAMPO)
+		EndIf
+
+		SX3->(DbSkip())
+	EndDo
+EndIf
+
+ZW1->(DbSetOrder(1))
+ZW1->(DbGoTop())
+While ZW1->(!EOF())
+    
+	//Define as linhas da tabela
+	aReg := {""} //Linhas em branco para o botão de visualização e alteração.
+	For nI:=1 To Len(aCpos)
+		aAdd(aReg,ZW1->&(aCpos[nI]))
+	Next
+	
+	aAdd(aLinhas,aReg)		
+		
+	ZW1->(DbSkip())	
+EndDo
+%>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title><%= u_WFTraduzir("Cadastro de Usuários") %></title>
+
+<link href='portal_cliente_gt/css/form.css' rel='stylesheet' type='text/css'>       <% /*CSS de estilo para formularios do portal */ %> 
+<link href='portal_cliente_gt/css/jquery-ui.css' rel='stylesheet' type='text/css'>	<% /*CSS de estilo para as listas suspensas*/ %>
+<link href='portal_cliente_gt/css/DataTable.css' rel='stylesheet' type='text/css'>	<% /*CSS de estilo para as tabelas dinamicas*/ %>
+
+<script type="text/javascript" src="portal_cliente_gt/js/jquery.min.js">  </script> <% /*JavaScript padrão para utilizar JQuery */ %>
+<script type="text/javascript" src="portal_cliente_gt/js/jquery-ui.min.js"> </script> <% /*JavaScript para gerar a lista suspensa */ %>
+<script type="text/javascript" src="portal_cliente_gt/js/jquery.dataTables.min.js"> </script> <% /*JavaScript para gerar tabela dinamica */ %>
+<script type="text/javascript" src="portal_cliente_gt/js/cad_usuario.js">  </script> <% /*JavaScript para validações e efeitos nessa pagina */ %>
+
+<script language='javascript' type='text/javascript'>
+	
+	$(document).ready(function(){
+
+		//Define a tabela dinamica
+		var oTable = $('#tb1').dataTable({
+			"bProcessing": true,
+	        "sAjaxSource": "U_WC001TEmp.apw?cLogin=<%=HttpGet->Login%>&cOper=<%=HttpGet->Oper%>"
+		});
+		
+	});
+
+	function Valida() {
+	
+		<%
+		//Valida o preenchimento dos campos
+		SX3->(DbSetOrder(1))
+		If SX3->(DbSeek("ZW0"))
+			While SX3->(!EOF()) .and. SX3->X3_ARQUIVO == "ZW0"
+				
+				If  X3Usado(SX3->X3_CAMPO) .and. X3Obrigat(SX3->X3_CAMPO)
+		%>
+		
+					if(document.getElementById('<%= AllTrim(SX3->X3_CAMPO) %>').value == '')  {
+						alert("<%= u_WFTraduzir('Campos obrigatórios nao foram preenchidos!') %>");
+						return;          		
+					}
+		<%
+				EndIf	
+				SX3->(DbSkip())
+			EndDo
+		EndIf	
+		%> 
+        
+		//Tratamento para enviar todos os registros marcados da tabela dinamica
+	    var hiddenArea = $("<div></div").hide().appendTo("#form1");
+	     $('#tb1').dataTable().$('input:hidden').detach().appendTo(hiddenArea);
+        
+		//Submit do formulario
+		document.form1.submit();
+	}
+</script>
+
+</head>
+
+<body>
+<table width="100%" border="0">
+	<% //Título da janela
+	%>
+	<tr>
+		<th scope="col">
+			<div align="left" class="titulo" style="height: 15px"><%= u_WFTraduzir("Cadastro de Usuários") %></div>
+		</th>
+	</tr>
+
+	<% //Linha horizontal
+	%>
+	<tr>
+		<td><hr /></td>
+	</tr>
+
+	<% //Botões
+	%>
+	<tr>
+    	<td>
+			<a href="javascript:Valida();" style="display:inline-block;" title="<%= u_WFTraduzir('Salvar') %>" >
+				<img src="portal_cliente_gt/Imagens/disk.png" width="16" height="16" border="0"/>
+			</a>
+			&nbsp;
+			<a href="U_GTWC001.apw" style="display:inline-block;" title="<%= u_WFTraduzir('Cancelar') %>" >
+				<img src="portal_cliente_gt/Imagens/Cancel.png" width="16" height="16" border="0"/>
+			</a>
+		</td>
+	</tr>
+
+	<% //Campos do formulário
+	%>
+	<tr>
+		<td>
+			<form id="form1" name="form1" action="U_WC001Grv.apw?cOper=<%=HttpGet->Oper%>" method="post" target="principal">
+				<table class="painel">
+
+					<% //Monta a tabela com o formulário 
+					%>
+					<%= U_WFForm("ZW0",HttpGet->Oper,HttpGet->Login,,,aNeAlt) %>
+
+  					<tr>
+						<td colspan="4">&nbsp;</td>
+					</tr>
+				</table>
+				<br>
+
+				<% //Monta a tabela para seleção das empresas.
+				%>
+				<table  width="100%" border="0">
+					<tr>
+						<td>
+						<div align="left" class="titulo" style="height: 12px"><%= u_WFTraduzir("Seleção de Empresas") %></div>
+						</td>
+					</tr>
+					<tr>
+						<td><hr /></td>
+					</tr>
+					<tr>
+						<td>
+							<div class="scroll">
+								<table id="tb1" class="TabDin">
+									<thead>
+										<tr>
+											<th width="10px"><input type='checkbox' id='check_all'></th>
+											<th width="15px"><%= u_WFTraduzir("Codigo") %></th>
+											<th width="15px"><%= u_WFTraduzir("Loja") %></th>
+											<th><%= u_WFTraduzir("Nome") %></th>
+											<th width="60px"><%= u_WFTraduzir("CNPJ") %></th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

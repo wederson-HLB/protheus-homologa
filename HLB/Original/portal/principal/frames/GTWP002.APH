@@ -1,0 +1,43 @@
+<% 
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWP002   ºAutor  ³Eduardo C. Romanini º Data ³  30/03/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da pagina principal do portal Gt.                º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title><%= u_WFTraduzir('Portal Main Page') %></title>
+<script type="text/javascript" src="portal_cliente_gt/js/jquery.min.js"></script>
+</head>
+
+<frameset rows="90,*,15" cols="*" frameborder="NO" border="0" framespacing="0">
+	<frame src="U_GTWP003.apw" name="topo" frameborder="no" scrolling="no" noresize id="topo" >
+	<frameset rows="*" cols="230,*" framespacing="0" frameborder="NO" border="0">
+		<frame src="U_GTWP004.apw" name="menu" frameborder="no" scrolling="no" noresize id="menu">
+    	<frame src="U_GTWP005.apw" name="principal" frameborder="no" id="principal">
+  	</frameset>
+	<frame src="U_GTWP006.apw" name="rodape" frameborder="no" scrolling="no" noresize id="rodape" >
+</frameset>
+
+<noframes>
+	<body>
+		<br><br>
+		<b><%= u_WFTraduzir('Seu brower não suporta frames. Por favor atualize-o.') %></b>
+		<br><br>
+		<a href="http://www.microsoft.com/windows/ie_intl/br/">Microsoft - Internet Explorer</a>
+	</body>
+</noframes>
+
+</html>

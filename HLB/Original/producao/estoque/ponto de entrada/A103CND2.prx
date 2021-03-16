@@ -1,0 +1,70 @@
+#include "PROTHEUS.CH"
+
+/*/{Protheus.doc} A103CND2
+(Ponto de entrada para alterar vencimentos e valores das duplicatas da nota fiscal de entrada)
+
+@author MarceloLauschner
+@since 07/04/2012
+@version 1.0
+
+@param ParamIXB, array, (Array com os vencimentos calculados pela condição de pagamento informada)
+
+@example
+(examples)
+
+@see (http://tdn.totvs.com/pages/releaseview.action?pageId=6085258)
+@see (https://sites.google.com/site/microsigacentralxml/home/pontos-de-entrada/a103cnd2)
+/*/
+
+User Function A103CND2()
+
+//INICIO - CENTRAL XML
+Local	aInParamIxb	:= aClone(ParamIxb)
+Local	aBkDupSE2
+Private	aAxParamixb	:= ParamIXB
+Private	aRetDupSE2		
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"A103CND2",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	If Type("lAutoExec") == "U"
+		Private	lAutoExec	:= IsBlind()
+	Endif
+	 
+	
+	// Melhoria 27/05/2016 - Para permitir que a validação de duplicatas seja desativada e que os vencimentos oriundos do XML não sejam considerados
+	If !GetNewPar("XM_CPVLDNF",.T.)
+		aDupSE2 	:= Nil
+	Endif
+	
+	If (ExistBlock("XA103CND2"))
+		aBkDupSE2	:= Iif(Type("aDupSE2") == "A",aDupSE2,Nil)
+		aRetDupSe2	:= ExecBlock("XA103CND2",.F.,.F.,aBkDupSE2 ) //aAxParamixb)
+	Endif
+	
+	If Type("aRetDupSe2") == "A"
+		If Len(aRetDupSe2) > 0
+			Return aRetDupSe2
+		Endif
+	ElseIf Type("aDupSE2") == "A" .And. !lDupSE4
+		If Len(aDupSE2) > 0
+			Return aDupSE2
+		Endif
+	ElseIf Type("aBkDupSE2") == "A"
+		If Len(aBkDupSE2) > 0
+			Return aBkDupSE2
+		Endif
+	Endif
+EndIf
+//FIM - CENTRAL XML
+	
+Return 

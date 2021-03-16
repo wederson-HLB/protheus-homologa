@@ -1,0 +1,1709 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include 'tbiconn.ch'
+#INCLUDE "topconn.ch"
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWS002   ºAutor  ³Jean Victor Rocha   º Data ³  22/11/13   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Solicitação de Faturamento GT.                              º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWS002()
+*---------------------*
+Local cHtml	:= "" 
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Verifica se a sessão expirou.
+If  ValType(HttpSession->cLogin)<> "C" .or. Empty(HttpSession->cLogin);
+.or. ValType(HttpSession->cEmpresa)<> "C" .or. Empty(HttpSession->cEmpresa)
+	cHtml := ExecInPage("GTWP007") //Pagina de sessão expirada.
+Else
+	cHtml := ExecInPage("GTWS002") //Pagina da Solicitação de Faturamento
+EndIf
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : GTWSM02
+Objetivo: Manutenção da solicitação de faturamento.
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*---------------------*
+User Function GTWSM02()
+*---------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Verifica se a sessão expirou.
+If  ValType(HttpSession->cLogin)<> "C" .or. Empty(HttpSession->cLogin);
+.or. ValType(HttpSession->cEmpresa)<> "C" .or. Empty(HttpSession->cEmpresa)
+	cHtml := ExecInPage("GTWP007") //Pagina de sessão expirada.
+Else
+	cHtml := ExecInPage("GTWSM02") //Pagina de manutenção da solicitação
+EndIf
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : WS002TES
+Objetivo: Rotina de busca de TES do produto
+Autor   : Jean Victor Rocha
+Data    : 18/12/13
+*/
+*--------------------------------------*
+User Function WS002TES(cEmp,cLoja,cProd)
+*--------------------------------------*
+Local cRet := ""
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cLoja)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+
+//Realiza a conexão com o banco de dados da empresa
+nCon := 0
+//JVR - 09/08/2016 - Tratamento para utilizar Linked Server para otimizar a performance
+If LEFT(cBanco,12) == "MSSQL7/P1108" .and. aCon[3] <> "GTCORP11"
+	cTab := " SQL717TB_P1108."+ALLTRIM(aCon[3])+".dbo.SB1"+cEmp+"0
+ElseIf LEFT(cBanco,13) == "MSSQL7/GTCORP" .and. aCon[3] == "GTCORP11"
+	cTab := " SQLTB717_P11.GTCORP_P11.dbo.SB1"+cEmp+"0
+Else
+	cTab := " SB1"+cEmp+"0
+	nCon := TCLink(cBanco,cIp,aCon[6])
+EndIf
+
+If Select("QRY") <> 0
+	QRY->(DbCloseArea())
+EndIf
+
+cQuery := "	Select TOP 1 B1_TS
+cQuery += " from "+cTab
+cQuery += " Where D_E_L_E_T_ <> '*'
+cQuery += " 	AND B1_COD = '"+ALLTRIM(cProd)+"'
+
+dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRY",.F.,.T.)
+QRY->(DbGoTop())
+If QRY->(!BOF() .and. !EOF())	
+	cRet := QRY->B1_TS
+EndIf
+QRY->(DbCloseArea())
+
+//Encerra a conexão
+If nCon <> 0
+	TCunLink(nCon)
+EndIf
+
+Return cRet
+
+/*
+Função  : WS002Prod
+Objetivo: Rotina de busca de Produtos
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*-----------------------*
+User Function WS002Prod()
+*-----------------------*
+Local cHtml  := ""
+Local cWhere := ""
+Local cOrder := ""
+Local cTexto := HttpGet->term
+Local cTipo  := HttpGet->cf3
+Local cEmp   := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja  := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco := ""
+Local cIp    := ""
+Local cTab   := ""
+
+Local nCon := 0
+
+Local aCon := {}
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If Len(cTexto) > 0
+
+	//Retorna o ambiente da empresa logada
+	aCon  := U_WFRetBanco(cEmp,cLoja)
+	cBanco:= aCon[1]
+	cIp   := aCon[2]
+    cAmb	:= ALLTRIM(aCon[3])
+    cServer	:= ALLTRIM(aCon[4])
+    nPorta	:= VAL(aCon[5])
+    
+    aArea := GetArea()
+    cProds := "''"
+  	oServ  :=  RpcConnect(cServer,nPorta,cAmb,cEmp,cLoja)
+    If valtype(oServ) == 'O'        
+  		cProds := oServ:CALLPROC("U_GTGEN023")//executa a função
+		RpcDisconnect(oServ)
+    EndIf
+    RestArea(aArea)
+                 
+    If EMPTY(cProds)
+	    cProds := "''"	
+    EndIf
+    
+    //Realiza a conexão com o banco de dados da empresa
+	nCon := 0
+	//JVR - 09/08/2016 - Tratamento para utilizar Linked Server para otimizar a performance
+	If LEFT(cBanco,12) == "MSSQL7/P1108" .and. aCon[3] <> "GTCORP11"
+		cTab := " SQL717TB_P1108."+ALLTRIM(aCon[3])+".dbo.SB1"+cEmp+"0
+	ElseIf LEFT(cBanco,13) == "MSSQL7/GTCORP" .and. aCon[3] == "GTCORP11"
+		cTab := " SQLTB717_P11.GTCORP_P11.dbo.SB1"+cEmp+"0
+	Else
+		cTab := " SB1"+cEmp+"0
+		nCon := TCLink(cBanco,cIp,aCon[6])
+	EndIf
+
+	If Select("QRY") <> 0
+		QRY->(DbCloseArea())
+	EndIf
+	cQuery := "	Select TOP 15 B1_COD,B1_DESC
+	cQuery += " from "+cTab
+	cQuery += " Where D_E_L_E_T_ <> '*'
+	cQuery += " 	AND B1_MSBLQL <> '1'
+	cQuery += " 	AND (B1_FILIAL = '"+cLoja+"' OR B1_FILIAL = '') AND UPPER(B1_COD) IN ("+cProds+")
+	If AllTrim(cTipo) == "cod"
+		cQuery += " AND UPPER(B1_COD) LIKE '%"+Upper(AllTrim(cTexto))+"%' 
+		cQuery += " Order by B1_COD
+	ElseIf AllTrim(cTipo) == "des"
+		cQuery += " AND UPPER(B1_DESC) LIKE '%"+Upper(AllTrim(cTexto))+"%' 
+		cQuery += " Order by B1_DESC
+	EndIf
+	
+	dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRY",.F.,.T.)    
+	QRY->(DbGoTop())
+	If QRY->(!BOF() .and. !EOF())	
+    	cHtml += "["
+	EndIf
+
+	//Monta o retorno no formato JSON.
+	nI := 1	
+	While QRY->(!EOF())
+		If nI > 1 
+    		cHtml += ","
+		EndIf
+	    cHtml += "{"
+		cHtml += '"cod":"'+LimpaStr(Alltrim(QRY->B1_COD))+'","desc":"'+EncodeUTF8(LimpaStr(Alltrim(QRY->B1_DESC)))+'"'
+		cHtml += "}"
+		nI++          
+		QRY->(DbSkip()) 		
+	EndDo	
+
+	If Len(cHtml) > 0
+    	cHtml += "]"
+	EndIf
+
+	QRY->(DbCloseArea())
+
+	//Encerra a conexão
+	If nCon <> 0
+		TCunLink(nCon)
+	EndIf
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml
+
+/*
+Função  : WS002Cli
+Objetivo: Rotina de busca de Clientes
+Autor   : Jean Victor Rocha
+Data    : 28/11/13
+*/
+*-----------------------*
+User Function WS002Cli()
+*-----------------------*
+Local cHtml  := ""
+Local cWhere := ""
+Local cOrder := ""
+Local cTexto := HttpGet->term
+Local cTipo  := HttpGet->cf3
+Local cEmp   := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja  := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco := ""
+Local cIp    := ""
+Local cTab   := ""
+
+Local nCon := 0
+
+Local aCon := {}
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If Len(cTexto) > 0
+	//Retorna o ambiente da empresa logada
+	aCon  := U_WFRetBanco(cEmp,cLoja)
+	cBanco:= aCon[1]
+	cIp   := aCon[2]
+
+	//Realiza a conexão com o banco de dados da empresa
+	nCon := 0
+	//JVR - 09/08/2016 - Tratamento para utilizar Linked Server para otimizar a performance
+	If LEFT(cBanco,12) == "MSSQL7/P1108" .and. aCon[3] <> "GTCORP11"
+		cTab := " SQL717TB_P1108."+ALLTRIM(aCon[3])+".dbo.SA1"+cEmp+"0
+	ElseIf LEFT(cBanco,13) == "MSSQL7/GTCORP" .and. aCon[3] == "GTCORP11"
+		cTab := " SQLTB717_P11.GTCORP_P11.dbo.SA1"+cEmp+"0
+	Else
+		cTab := " SA1"+cEmp+"0
+		nCon := TCLink(cBanco,cIp,aCon[6])
+	EndIf
+
+	If Select("QRY") <> 0
+		QRY->(DbCloseArea())
+	EndIf
+
+	cQuery := "	Select TOP 15 A1_COD,A1_LOJA,A1_NOME
+	cQuery += " from "+cTab
+	cQuery += " Where D_E_L_E_T_ <> '*'
+	cQuery += "		AND (A1_FILIAL = '"+cLoja+"' OR A1_FILIAL = '')
+	If AllTrim(cTipo) == "cod"
+		cQuery += "	AND UPPER(A1_COD) LIKE '%"+Upper(AllTrim(cTexto))+"%'
+		cQuery += " Order By A1_COD
+	ElseIf AllTrim(cTipo) == "nom"
+		cQuery += " AND UPPER(A1_NOME) LIKE '%"+Upper(AllTrim(cTexto))+"%'
+		cQuery += " Order By A1_NOME
+	ElseIf AllTrim(cTipo) == "loj"
+		cQuery += " AND UPPER(A1_LOJA) LIKE '%"+Upper(AllTrim(cTexto))+"%'
+		cQuery += " Order By A1_LOJA
+	EndIf
+
+	dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRY",.F.,.T.)
+	QRY->(DbGoTop())
+	If QRY->(!BOF() .and. !EOF())	
+    	cHtml += "["
+	EndIf
+
+	//Monta o retorno no formato JSON.
+	nI := 1	
+	While QRY->(!EOF())
+		If nI > 1 
+    		cHtml += ","
+		EndIf
+	    cHtml += "{"
+		cHtml += '"cod":"'+LimpaStr(Alltrim(QRY->A1_COD))+'","loja":"'+LimpaStr(Alltrim(QRY->A1_LOJA))+'","desc":"'+EncodeUTF8(LimpaStr(Alltrim(QRY->A1_NOME)))+'"'
+		cHtml += "}"
+		nI++          
+		QRY->(DbSkip()) 		
+	EndDo	
+	
+	If Len(cHtml) > 0
+    	cHtml += "]"
+	EndIf
+	QRY->(DbCloseArea())
+
+	//Encerra a conexão
+	If nCon <> 0
+		TCunLink(nCon)
+	EndIf
+	
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml
+
+
+/*
+Função  : WS002Ges
+Objetivo: Rotina de busca de Gestores
+Autor   : Jean Victor Rocha
+Data    : 28/11/13
+*/
+*----------------------*
+User Function WS002Ges()
+*----------------------*
+Local cHtml  := ""
+Local cWhere := ""
+Local cOrder := ""
+Local cTexto := HttpGet->term
+Local cTipo  := HttpGet->cf3
+Local cEmp   := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja  := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco := ""
+Local cIp    := ""
+Local cTab   := ""
+
+Local nCon := 0
+
+Local aCon := {}
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If Len(cTexto) > 0
+	//JVR - 26/08/2015 - Novo tratamento baseado no GTHD para busca do Banco das empresas.	
+	//Retorna o ambiente da empresa logada
+	//aCon  := U_WFRetBanco("GTHD")
+	//cBanco:= aCon[1]
+	//cIp   := aCon[2]
+	If Select("QRY") <> 0
+		QRY->(DbCloseArea())
+	EndIf
+	//Realiza a conexão com o banco de dados da empresa
+	//nCon := TCLink(cBanco,cIp,aCon[6])
+	cQuery := " Select TOP 15 Z05_EMAIL
+	cQuery += " from GTHD.dbo.Z05010
+	cQuery += " Where D_E_L_E_T_ <> '*'
+	If AllTrim(cTipo) == "mail"
+		cQuery += "	AND UPPER(Z05_EMAIL) LIKE '%"+Upper(AllTrim(cTexto))+"%'
+		cQuery += " Order By Z05_EMAIL
+	EndIf                                                    
+	dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRY",.F.,.T.)
+	QRY->(DbGoTop())
+	If QRY->(!BOF() .and. !EOF())	
+    	cHtml += "["
+	EndIf
+
+	//Monta o retorno no formato JSON.
+	nI := 1	
+	While QRY->(!EOF())
+		If nI > 1 
+    		cHtml += ","
+		EndIf
+	    cHtml += "{"
+		cHtml += '"mail":"'+EncodeUTF8(LimpaStr(Alltrim(QRY->Z05_EMAIL)))+'"'
+		cHtml += "}"
+		nI++          
+		QRY->(DbSkip()) 		
+	EndDo	
+	If Len(cHtml) > 0
+    	cHtml += "]"
+	EndIf
+	
+	QRY->(DbCloseArea())
+	//Encerra a conexão
+	//TCunLink(nCon)
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml
+
+
+/*
+Função  : WS002Itens
+Objetivo: Geração dos campos das linhas do browse de itens
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*-----------------------------------------*
+User Function WS002Itens(cOper,cChave,cLin)
+*-----------------------------------------*
+Local cHtml   := ""
+Local cInput  := ""
+Local cButton := ""
+
+Local nI := ""
+
+Local aCabec := {}
+Local aCpos  := {}
+
+Default cOper  := HttpGet->cOper
+Default cChave := HttpGet->cChave
+Default cLin   := HttpGet->cLin
+
+//Prepara o ambiente se for necessário
+If Select("SX3") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Retorna os campos que serão exibidos na tela
+aCabec := U_WS002CpItens()
+
+cHtml := "<tr>"
+For nI:=1 To Len(aCabec)
+	//Botão de Exclusão
+	If nI == 1
+		If cOper <> "VIS"
+			cButton:= "<a href='javascript:ExcItem("+cLin+");' style='display:inline-block;' title='Remover' >"
+		Else    
+			cButton:= "<a style='display:inline-block;' title='Remover' >"
+		EndIf
+
+		cButton+= "<img src='portal_cliente_gt/imagens/delete.png' width='16' height='16' border='0'/>"
+		cButton+= "</a>"
+
+		cHtml+= "<td class='td'>"
+		cHtml+= cButton
+		cHtml+= "</td>"
+
+	Else
+		SX3->(DbSetOrder(2))
+		If SX3->(DbSeek(aCabec[nI][1]))
+	
+			cInput := "<input 
+			cInput += " id='"+AllTrim(SX3->X3_CAMPO)+cLin+"'"
+			cInput += " name='"+AllTrim(SX3->X3_CAMPO)+cLin+"'"
+
+			If aCabec[nI][1] == "ZF3_PROD"
+				//Para o codigo, adiciona a classe 'codpro' para utilizar o autocomplete.
+				cInput += " class='inputtxt codpro'"
+			ElseIf aCabec[nI][1] == "ZF3_DESC"
+				//Para o codigo, adiciona a classe 'desproo' para utilizar o autocomplete.
+				cInput += " class='inputtxt despro'"
+			
+			//RRP - 19/11/2014 - Qtd*Prc.Unit = Total
+			ElseIf aCabec[nI][1] == "ZF3_VUNIT" .OR. aCabec[nI][1] == "ZF3_VTOTA" .OR. aCabec[nI][1] == "ZF3_QTDE"
+				If aCabec[nI][1] == "ZF3_VUNIT".OR. aCabec[nI][1] == "ZF3_QTDE"
+					cInput += " class='inputtxt cpomoeda' oninput='mult(this)'"
+				Else
+					//Para o total e quantidade adiciona a classe 'cpomoeda' para tratamento de digitação.
+					cInput += " class='inputtxt cpomoeda'"
+				EndIf
+			
+			ElseIf AllTrim(SX3->X3_TIPO) == "N"
+				//Para os campos numericos, adiciona a classe 'cponum' para tratamento de digitação.
+				cInput += " class='inputtxt cponum'"
+
+			Else
+				cInput += " class='inputtxt'"
+
+			EndIf
+	
+			If ValType(aCabec[nI][4]) == "N"
+				cInput += " size='"+AllTrim(Str(aCabec[nI][4]))+"'"
+			Else
+				cInput += " size='"+U_WFTamPx(SX3->X3_TAMANHO)+"'"
+			EndIf
+			
+			cInput += " maxlength='"+Alltrim(Str(SX3->X3_TAMANHO))+"'"
+		
+			If cOper == "VIS"
+            	cInput += "readonly='readonly'"	
+			Else
+				If !aCabec[nI][3]
+					cInput += "disabled='disabled'"	
+				EndIf
+			EndIf
+
+			If cOper <> "INC"
+				cInput += "value='"+VlItem(SX3->X3_CAMPO,cChave,cLin)+"'"
+			EndIf
+			 
+			If cOper <> "VIS"
+				cInput += "autocomplete='off' "
+			EndIf
+						
+			cInput +="/>"
+		EndIf
+	
+		cHtml+= "<td class='td'>"
+		cHtml+= cInput
+		cHtml+= "</td>"
+
+	EndIf
+
+Next
+
+cHtml += "</tr>"
+
+Return cHtml
+
+/*
+Função  : VlItem
+Objetivo: Retorna o conteudo de um campo de item
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*--------------------------------------*
+Static Function VlItem(cCpo,cChave,cLin)
+*--------------------------------------*
+Local cRet := ""
+Local cItem := StrZero(Val(cLin),4)
+
+Local nVal := 0
+
+ZF3->(DbSetOrder(1))
+If ZF3->(DbSeek(xFilial("ZF3")+cChave+cItem))
+	SX3->(DbSetOrder(2))
+	If SX3->(DbSeek(cCpo))
+		If SX3->X3_TIPO == "C"
+			cRet := Alltrim(ZF3->&(AllTrim(cCpo)))
+		ElseIf SX3->X3_TIPO == "N"
+			nVal := ZF3->&(AllTrim(cCpo))
+			If Alltrim(cCpo) == "ZF3_VUNIT" .or. Alltrim(cCpo) == "ZF3_VTOTA"
+				cRet := Alltrim(Transform(nVal,"@E 99,999,999.9999"))
+			Else
+				cRet := Alltrim(Str(nVal))
+			EndIf
+		ElseIf SX3->X3_TIPO == "D"
+			cRet := Alltrim(DtoC(ZF3->&(AllTrim(cCpo))))
+		ElseIf SX3->X3_TIPO == "M"
+			cRet := Alltrim(ZF3->&(AllTrim(cCpo)))
+		EndIf
+	EndIf
+EndIf
+
+Return cRet
+
+/*
+Função  : WS002Grv
+Objetivo: Gravação da solicitação.
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*----------------------*
+User Function WS002Grv()
+*----------------------*
+Local cHtml	  := "" 
+Local cOper   := ""
+Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+Local cFil    := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco  := ""
+Local cIp     := ""
+Local cCliFor := ""
+Local cCondPag:= ""
+
+Local nI     := 0
+Local nX     := 0
+Local nTotIt := 0
+Local nCont  := 0
+Local nValor := 0
+
+Local aPost     := {}
+Local aItDel    := {}
+Local aCpoItens := {}
+Local aCon      := {}
+
+Local aCabOrc := {}
+Local aIteOrc := {}
+Local aIteOrcAux := {}
+
+Local aHeader := {}
+Local aDetail := {}
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf         
+
+//Verifica se a sessão expirou.
+If ValType(HttpSession->cLogin)<> "C" .or. Empty(HttpSession->cLogin) .or. ValType(HttpSession->cEmpresa)<> "C" .or. Empty(HttpSession->cEmpresa)
+	cHtml := ExecInPage("GTWP007") //Pagina de sessão expirada.
+	Return cHtml
+EndIf
+
+//Parametro recebido na chamada da função.
+cOper  := HttpGet->cOper //Operação realizada
+aItDel := StrTokArr(HttpGet->aDel,",")  //Itens deletados//Transforma o parametro em array.
+nTotIt := Val(HttpGet->totalit) //Total de itens incluidos
+
+//Recebe todos os campos passados pelo formulario
+aPost := aClone(HttpPost->aPost)
+
+If Valtype(cOper) <> "U" .and. cOper <> "VIS"
+	//Retorna os campos de itens que serão exibidos
+	aCpoItens := U_WS002CpItens()
+	
+	//Inclusão
+	If cOper == "INC" .or. cOper == "COP"
+		ZF2->(RecLock("ZF2",.T.))
+		ZF2->ZF2_FILIAL := xFilial("ZF2")
+	  /*	If cOper == "COP"
+			ZF2->ZF2_CODIGO := U_GTWS002COD(HttpSession->cEmpresa,.T.)
+		Else
+			ZF2->ZF2_CODIGO := cCodigo//U_GTWS002COD(HttpSession->cEmpresa)
+		EndIf  */
+		ZF2->ZF2_CODIGO := U_GTWS002COD(HttpSession->cEmpresa,.T.)
+		ZF2->ZF2_CODEMP := cEmp
+		ZF2->ZF2_CODFIL := cFil
+		ZF2->ZF2_LOGIN  := HttpSession->cLogin
+		ZF2->ZF2_DTEMIS := dDataBase
+		ZF2->ZF2_STATUS := "A" //Em Atendimento
+		For nI:=1 To Len(aPost)
+			If Left(aPost[nI],3) == "ZF2"
+				SX3->(DbSetOrder(2))
+				If SX3->(DbSeek(aPost[nI]))
+					If SX3->X3_TIPO == "C"
+						ZF2->&(aPost[nI]) := &("HttpPost->"+aPost[nI])
+					
+					ElseIf SX3->X3_TIPO == "N"
+						If At(",",&("HttpPost->"+aPost[nI])) > 0
+							nValor := Val(StrTran(&("HttpPost->"+aPost[nI]),",","."))
+						Else
+							nValor := Val(&("HttpPost->"+aPost[nI]))
+						EndIf
+						ZF2->&(aPost[nI]) := nValor
+
+					ElseIf SX3->X3_TIPO == "D"
+						ZF2->&(aPost[nI]) := CtoD(&("HttpPost->"+aPost[nI]))
+
+					ElseIf SX3->X3_TIPO == "M"
+						ZF2->&(aPost[nI]) := ALLTRIM(&("HttpPost->"+aPost[nI]))
+
+					EndIf
+    			EndIf
+			EndIf
+		Next
+		ZF2->(MsUnlock())      
+
+		ZW0->(DbSetOrder(1))
+		ZW0->(DbSeek(xFilial("ZW0")+HttpSession->cLogin))		
+
+		aadd(aCabOrc,{"CJ_FILIAL"	,ZF2->ZF2_CODFIL})
+		aadd(aCabOrc,{"CJ_NUM"		,ZF2->ZF2_CODIGO})
+		aadd(aCabOrc,{"CJ_EMISSAO"	,ZF2->ZF2_DTEMIS})
+		aadd(aCabOrc,{"CJ_CLIENTE"	,ZF2->ZF2_CODCLI})
+		aadd(aCabOrc,{"CJ_LOJA"		,ZF2->ZF2_LOJCLI})
+		//RRP - 21/11/2014 - Ajuste para pegar a condição de pagamento do cadastro do cliente. Chamado 022506.
+		cCondPag:= GTWS002GCP(ZF2->ZF2_CODCLI,ZF2->ZF2_LOJCLI)
+		If !Empty(Alltrim(cCondPag))
+	   		aadd(aCabOrc,{"CJ_CONDPAG"	,Alltrim(cCondPag)})
+		Else
+			aadd(aCabOrc,{"CJ_CONDPAG"	,"079"})
+		EndIf	
+		aadd(aCabOrc,{"CJ_CLIENT"	,ZF2->ZF2_CODCLI})
+		aadd(aCabOrc,{"CJ_LOJAENT"	,ZF2->ZF2_LOJCLI})
+  		aadd(aCabOrc,{"CJ_MOEDA"	,1})
+		aadd(aCabOrc,{"CJ_TIPLIB"	,"1"})
+		aadd(aCabOrc,{"CJ_TPCARGA"	,"2"})
+		aadd(aCabOrc,{"CJ_STATUS"	,"A"})
+		aadd(aCabOrc,{"CJ_P_DTFAT"	,ZF2->ZF2_DTFATU})
+		aadd(aCabOrc,{"CJ_P_OBSGT"	,ZF2->ZF2_OBSERV})
+		aadd(aCabOrc,{"CJ_P_EMAIL"	,LEFT(ZF2->ZF2_EMAIL,30)				})        
+		aadd(aCabOrc,{"CJ_USERLGI"	,LEFT(ALLTRIM(HttpSession->cLogin),17)	})
+		aadd(aCabOrc,{"CJ_P_EMAIU"	,LEFT(ALLTRIM(ZW0->ZW0_EMAIL),30)		})
+		
+		aHeader := aCabOrc
+
+	    //Gravação dos itens
+		nCont := 0
+ 		For nI:=1 To nTotIt 
+			If aScan(aItDel,AllTrim(Str(nI))) == 0
+				nCont++
+				ZF3->(RecLock("ZF3",.T.))
+
+				ZF3->ZF3_FILIAL := xFilial("ZF2")
+				ZF3->ZF3_CODIGO := ZF2->ZF2_CODIGO
+				ZF3->ZF3_CODEMP := ZF2->ZF2_CODEMP
+				ZF3->ZF3_CODFIL := ZF2->ZF2_CODFIL
+				ZF3->ZF3_ITEM   := StrZero(nCont,4)
+				ZF3->ZF3_MODPAG := ZF2->ZF2_MODPAG
+				
+				For	nX:=1 To Len(aCpoItens)
+					//Verifica se o campo foi informado.
+					If !Empty(aCpoItens[nX][1])
+						SX3->(DbSetOrder(2))
+						If SX3->(DbSeek(aCpoItens[nX][1]))
+							If SX3->X3_TIPO == "C"
+								ZF3->&(aCpoItens[nX][1]) := &("HttpPost->"+aCpoItens[nX][1]+AllTrim(Str(nI)))
+					
+							ElseIf SX3->X3_TIPO == "N"
+								If At(",",&("HttpPost->"+aCpoItens[nX][1]+AllTrim(Str(nI)))) > 0
+									nValor := &("HttpPost->"+aCpoItens[nX][1]+AllTrim(Str(nI)))
+									nValor := StrTran(nValor,".","")
+									nValor := StrTran(nValor,",",".")
+									nValor := Val(nValor)
+								Else
+									nValor := Val(&("HttpPost->"+aCpoItens[nX][1]+AllTrim(Str(nI))))
+								EndIf
+								ZF3->&(aCpoItens[nX][1]) := nValor
+                	
+							ElseIf SX3->X3_TIPO == "D"
+								ZF3->&(aCpoItens[nX][1]) := CtoD(&("HttpPost->"+aCpoItens[nX][1]+AllTrim(Str(nI))))
+
+							EndIf
+						EndIf
+					EndIf
+				Next             
+				aIteOrcAux := {}
+				aadd(aIteOrcAux,{"CK_FILIAL"	,ZF2->ZF2_CODFIL})
+				aadd(aIteOrcAux,{"CK_FILVEN"	,ZF2->ZF2_CODFIL})
+				aadd(aIteOrcAux,{"CK_FILENT"	,ZF2->ZF2_CODFIL})
+				aadd(aIteOrcAux,{"CK_ITEM" 		,StrZero(nCont,2)})
+				aadd(aIteOrcAux,{"CK_PRODUTO"	,ZF3->ZF3_PROD})
+				If ZF3->ZF3_MODPAG == "F"
+					aadd(aIteOrcAux,{"CK_QTDVEN"	,1})
+					aadd(aIteOrcAux,{"CK_PRCVEN"	,ZF3->ZF3_VTOTA})
+					aadd(aIteOrcAux,{"CK_VALOR"		,ZF3->ZF3_VTOTA})
+				Else
+					aadd(aIteOrcAux,{"CK_QTDVEN"	,ZF3->ZF3_QTDE})
+					aadd(aIteOrcAux,{"CK_PRCVEN"	,ZF3->ZF3_VUNIT})
+					aadd(aIteOrcAux,{"CK_VALOR"		,ZF3->ZF3_VTOTA})
+				EndIf
+				aadd(aIteOrcAux,{"CK_CLIENTE"	,ZF2->ZF2_CODCLI})
+				aadd(aIteOrcAux,{"CK_LOJA"		,ZF2->ZF2_LOJCLI})
+				aadd(aIteOrcAux,{"CK_NUM"		,ZF2->ZF2_CODIGO})
+				aadd(aIteOrcAux,{"CK_DESCRI"	,LEFT(ZF3->ZF3_DESC,30)		})
+				aadd(aIteOrcAux,{"CK_TES"		,U_WS002TES(ZF2->ZF2_CODEMP,ZF2->ZF2_CODFIL,ZF3->ZF3_PROD)})
+				aAdd(aIteOrc,aIteOrcAux)
+				aAdd(aDetail,aIteOrcAux)
+				
+				ZF3->(MsUnlock())
+			EndIf
+		Next
+		
+		U_GTWS002EMA(HttpSession->cLogin,ZF2->ZF2_EMAIL)//Busca e/ou grava email do supervisor.
+		
+		GrvOrc(aCabOrc,aIteOrc,cEmp,cFil)//Gravação do Orçamento.
+
+		aAdd(aHeader,{"OBS"	,ZF2->ZF2_OBSERV})		
+		
+		SendWorkFlow(aHeader,aDetail)//Envia email de workFlow
+		
+	EndIf
+EndIf
+
+cHtml := ExecInPage("GTWS002")
+
+WEB EXTENDED END
+
+Return cHtml  
+
+/*
+Função  : GTWS002COD
+Objetivo: Gera um novo código de solicitação de faturamento
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*----------------------------------*
+User Function GTWS002COD(cEmpresa,lGrava)
+*----------------------------------*
+Local cDoc		:= ""
+Local cEmp		:= Substr(HttpSession->cEmpresa,1,2)
+Local cLoja		:= Substr(HttpSession->cEmpresa,3,2)
+Local aArea		:= GetArea()
+
+Default lGrava := .F.
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Retorna o ambiente da empresa logada
+aCon 	:= U_WFRetBanco(cEmp,cLoja)
+cBanco	:= aCon[1]
+cIp   	:= aCon[2]
+cAmb	:= ALLTRIM(aCon[3])
+cServer	:= ALLTRIM(aCon[4])
+nPorta	:= VAL(aCon[5])
+
+oServ  :=  RpcConnect(cServer,nPorta,cAmb,cEmp,cLoja)
+If valtype(oServ) == 'O'  
+	cDoc := oServ:CALLPROC("GetSxeNum","SCJ","CJ_NUM")//executa a função  
+	If lGrava
+		oServ:CALLPROC("ConfirmSX8")
+	EndIf
+	RpcDisconnect(oServ)
+EndIf
+
+RestArea(aArea)
+
+Public cCodigo := cDoc//Cria a varianel para utilização posterior.
+Return cDoc
+
+/*
+Função  : WS002CpItens
+Objetivo: Retorna os campos dos itens que serão exibidos na tela.
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*-------------------------------*
+User Function WS002CpItens()
+*-------------------------------*
+Local aRet := {}
+			//Campo      ,Label                          ,Habilitado,Tamanho
+aRet := { 	{""          ,""                             ,.T.       ,       },; //Posição para o botão de exclusão
+			{"ZF3_PROD"  ,u_WFTraduzir("Produto")		 ,.T.       ,       },;
+			{"ZF3_DESC"  ,u_WFTraduzir("Descrição")      ,.T.       ,60     },;
+			{"ZF3_QTDE"  ,u_WFTraduzir("Qtde.")          ,.T.       ,       },;
+			{"ZF3_VUNIT" ,u_WFTraduzir("Val. Unit.")     ,.T.       ,       },;
+			{"ZF3_VTOTA" ,u_WFTraduzir("Val. Total")     ,.T.       ,       }}
+
+Return aRet
+
+/*
+Função  : WS002LoadIt
+Objetivo: Carrega a exibição de todos os itens
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*-------------------------------------*
+User Function WS002LoadIt(cOper,cChave)
+*-------------------------------------*
+Local cHtml := ""
+
+Local nI := 0
+
+If cOper <> "INC"
+	ZF3->(DbSetOrder(1))
+	If ZF3->(DbSeek(xFilial("ZF3")+cChave))
+		While ZF3->(!EOF()) .and. ZF3->(ZF3_FILIAL+ZF3_CODEMP+ZF3_CODFIL+ZF3_CODIGO) == xFilial("ZF3") + cChave
+			nI++
+            cHtml += U_WS002Itens(cOper,cChave,AllTrim(Str(nI)))
+
+			ZF3->(DbSkip())
+		EndDo
+    EndIf
+EndIf
+
+Return cHtml
+
+/*
+Função  : LimpaStr
+Objetivo: Verifica se existe algum caractere especial na string
+Autor   : Jean Victor Rocha
+Data    : 22/11/13
+*/
+*-------------------------------*
+Static Function LimpaStr(cString)
+*-------------------------------*
+Local cRet := ""
+
+cString := StrTran(cString,'"',"")
+cString := StrTran(cString,"'","")
+
+cRet := cString
+
+Return cRet
+
+/*
+Função  : GetNomeCLi
+Objetivo: Busca o Nome do Cliente.
+Autor   : Jean Victor Rocha
+Data    : 29/11/2013
+*/
+*-----------------------------------------------*
+User Function GetNomeCLi(cCodCli,cEmpCli,cFilCli)
+*-----------------------------------------------*
+Local cRet := ""
+
+aCon  := U_WFRetBanco(cEmpCli,cFilCli)
+cBanco:= aCon[1]
+cIp   := aCon[2]     
+//Realiza a conexão com o banco de dados da empresa       
+nCon := 0
+//JVR - 09/08/2016 - Tratamento para utilizar Linked Server para otimizar a performance
+If LEFT(cBanco,12) == "MSSQL7/P1108" .and. aCon[3] <> "GTCORP11"
+	cTab := " SQL717TB_P1108."+ALLTRIM(aCon[3])+".dbo.SA1"+cEmpCli+"0
+ElseIf LEFT(cBanco,13) == "MSSQL7/GTCORP" .and. aCon[3] == "GTCORP11"
+	cTab := " SQLTB717_P11.GTCORP_P11.dbo.SA1"+cEmpCli+"0
+Else
+	cTab := " SA1"+cEmpCli+"0
+	nCon := TCLink(cBanco,cIp,aCon[6])
+EndIf
+
+If Select("QRYCLI") <> 0
+	QRYCLI->(DbCloseArea())
+EndIf
+cQuery := "	Select TOP 1 A1_NOME
+cQuery += " from "+cTab
+cQuery += " Where D_E_L_E_T_ <> '*'
+cQuery += " 	AND A1_COD = '"+Upper(AllTrim(cCodCli))+"' AND (A1_FILIAL = '"+cFilCli+"' OR A1_FILIAL = '')
+dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRYCLI",.F.,.T.)
+QRYCLI->(DbGoTop())
+If QRYCLI->(!BOF() .and. !EOF())	
+    cRet := ALLTRIM(QRYCLI->A1_NOME)
+Else
+	cRet := "<Não Encontrado>"
+EndIf                             
+QRYCLI->(DbCloseArea())
+
+//Encerra a conexão
+If nCon <> 0
+	TCunLink(nCon)
+EndIf)
+
+Return cRet
+
+/*
+Função  : GetNomePro
+Objetivo: Busca o Nome do Produto.
+Autor   : Jean Victor Rocha
+Data    : 29/11/2013
+*/
+*-----------------------------------------------*
+User Function GetNomePro(cCodPro,cEmpPro,cFilPro)
+*-----------------------------------------------*
+Local cRet := ""
+
+aCon  := U_WFRetBanco(cEmpPro,cFilPro)
+cBanco:= aCon[1]
+cIp   := aCon[2]     
+
+//Realiza a conexão com o banco de dados da empresa
+nCon := 0
+//JVR - 09/08/2016 - Tratamento para utilizar Linked Server para otimizar a performance
+If LEFT(cBanco,12) == "MSSQL7/P1108" .and. aCon[3] <> "GTCORP11"
+	cTab := " SQL717TB_P1108."+ALLTRIM(aCon[3])+".dbo.SB1"+cEmpPro+"0
+ElseIf LEFT(cBanco,13) == "MSSQL7/GTCORP" .and. aCon[3] == "GTCORP11"
+	cTab := " SQLTB717_P11.GTCORP_P11.dbo.SB1"+cEmpPro+"0
+Else
+	cTab := " SB1"+cEmpPro+"0
+	nCon := TCLink(cBanco,cIp,aCon[6])
+EndIf
+
+If Select("QRYPRO") <> 0
+	QRYPRO->(DbCloseArea())
+EndIf
+cQuery := "	Select TOP 1 B1_DESC
+cQuery += " from "+cTab
+cQuery += " Where D_E_L_E_T_ <> '*'
+cQuery += " 	AND B1_COD = '"+Upper(AllTrim(cCodPro))+"' AND (B1_FILIAL = '"+cFilPro+"' OR B1_FILIAL = '')
+
+dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRYPRO",.F.,.T.)
+QRYPRO->(DbGoTop())
+If QRYPRO->(!BOF() .and. !EOF())	
+    cRet := ALLTRIM(QRYPRO->B1_DESC)
+Else
+	cRet := "<Não Encontrado>"
+EndIf                             
+QRYPRO->(DbCloseArea())
+
+//Encerra a conexão
+If nCon <> 0
+	TCunLink(nCon)
+EndIf
+
+Return cRet
+
+/*
+Função  : GrvOrc
+Objetivo: Gravação do Orçamento
+Autor   : Jean Victor Rocha
+Data    : 02/12/13
+*/
+*-------------------------------------------*
+Static Function GrvOrc(aCab,aItens,cEmp,cFil)
+*-------------------------------------------*
+Local i,j
+Local aArea := GetArea()
+Local cInsert := ""
+
+aCon  := U_WFRetBanco(cEmp,cFil)
+cBanco:= aCon[1]
+cIp   := aCon[2]     
+
+//Realiza a conexão com o banco de dados da empresa
+nCon := TCLink(cBanco,cIp,aCon[6])
+
+//Header
+cInsert := " "
+cInsert += " Insert Into SCJ"+cEmp+"0 "
+cInsert += " ( "
+For i := 1 to Len(aCab)
+	cInsert += " "+aCab[i][1]+", "
+Next i
+cInsert += " R_E_C_N_O_ ) "
+cInsert += " Values( "
+For i := 1 to Len(aCab)
+	Do Case
+		Case ALLTRIM(aCab[i][1]) == "CJ_MOEDA"
+			cInsert += " '"+ALLTRIM(STR(aCab[i][2]))+"', "
+		Case ValType(aCab[i][2]) == "N"
+			cInsert += " "+STRTRAN(TRANSFORM(ALLTRIM(aCab[i][2]), "9999999999999.99"),",",".")+", "
+		Case ValType(aCab[i][2]) == "D"
+			If !EMPTY(aCab[i][2])
+				cInsert += " '"+DTOS(aCab[i][2])+"', "
+			Else
+				cInsert += " '"+ALLTRIM(aCab[i][2])+"', "
+			EndIf
+		Case ValType(aCab[i][2]) == "C"
+			cInsert += " '"+ALLTRIM(STRTRAN(aCab[i][2], "'", ""))+"', "	
+	EndCase
+Next i
+cInsert += " (Select ISNULL(MAX(R_E_C_N_O_)+1,0) From SCJ"+cEmp+"0) ) "
+
+TcSqlExec(cInsert)
+
+//Detail
+For j:=1 To Len(aItens)
+	cInsert := " "
+	cInsert += " Insert Into SCK"+cEmp+"0 "
+	cInsert += " ( "
+	For i := 1 to Len(aItens[j])
+		cInsert += " "+aItens[j][i][1]+", "
+	Next i
+	cInsert += " R_E_C_N_O_ ) "
+	cInsert += " Values( "
+	For i := 1 to Len(aItens[j])
+		Do Case
+			Case ValType(aItens[j][i][2]) == "N"
+				cInsert += " "+STRTRAN(TRANSFORM(aItens[j][i][2], "9999999999999.99"),",",".")+", "
+			Case ValType(aItens[j][i][2]) == "D"
+				cInsert += " '"+DTOS(ALLTRIM(aItens[j][i][2]))+"', "
+			Case ValType(aItens[j][i][2]) == "C"
+				cInsert += " '"+ALLTRIM(STRTRAN(aItens[j][i][2], "'", ""))+"', "	
+		EndCase
+	Next i
+	cInsert += " (Select ISNULL(MAX(R_E_C_N_O_)+1,0) From SCK"+cEmp+"0) ) "
+	TcSqlExec(cInsert)
+Next j
+
+//Encerra a conexão
+TCunLink(nCon)
+
+RestArea(aArea)
+
+Return .T.
+
+
+/*
+Função  : GTWS002EMA
+Objetivo: Buscar o Email do Superior do usuario no Portal e/ou gravar o superior
+Autor   : Jean Victor Rocha
+Data    : 02/12/13
+*/
+*---------------------------------------------*
+User Function GTWS002EMA(cUserPortal,cEmailSup)
+*---------------------------------------------*
+local cRet := ""
+Local aArea := GetArea()
+ 
+Default cEmailSup := ""
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+ZW0->(DbSetOrder(1))
+If ZW0->(DbSeek(xFilial("ZW0")+cUserPortal))		
+   	//JVR - 26/08/2015 - Novo tratamento baseado no GTHD para busca do Banco das empresas.	
+	//Retorna o ambiente da empresa logada
+	//aCon  := U_WFRetBanco("GTHD")
+	//cBanco:= aCon[1]
+	//cIp   := aCon[2]
+	//nCon := TCLink(cBanco,cIp,aCon[6])
+	If Select("QRY") <> 0
+		QRY->(DbCloseArea())
+	EndIf
+	cQuery := " Select TOP 1 Z05_SUP
+	cQuery += " from GTHD.dbo.Z05010
+	cQuery += " Where D_E_L_E_T_ <> '*'
+	cQuery += "		AND UPPER(Z05_EMAIL) LIKE '%"+Upper(AllTrim(ZW0->ZW0_EMAIL))+"%'
+	cQuery += " Order By Z05_EMAIL
+	dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"QRY",.F.,.T.)
+	QRY->(DbGoTop())
+	If EMPTY(cEmailSup)
+		If QRY->(!BOF() .and. !EOF())	
+			cRet := ALLTRIM(QRY->Z05_SUP)
+		Else        
+			cInsert := " Insert Into GTHD.dbo.Z05010 
+			cInsert += " (Z05_EMAIL,Z05_NOME,R_E_C_N_O_) 
+			cInsert += " Values('"+UPPER(ALLTRIM(ZW0->ZW0_EMAIL))+"','"+UPPER(ALLTRIM(cUserPortal))+"',(Select ISNULL(MAX(R_E_C_N_O_)+1,0) From Z05010))"
+			TCSQLEXEC(cInsert)
+		EndIf  
+		QRY->(DbCloseArea())
+	Else
+		If QRY->(!BOF() .and. !EOF())	
+			IF UPPER(ALLTRIM(QRY->Z05_SUP)) <> UPPER(ALLTRIM(cEmailSup))
+				cUpdate := " Update GTHD.dbo.Z05010 
+				cUpdate += " Set Z05_SUP = '"+UPPER(ALLTRIM(cEmailSup))+"'
+				cUpdate += " Where D_E_L_E_T_ <> '*' AND Z05_EMAIL = '"+UPPER(ALLTRIM(ZW0->ZW0_EMAIL))+"'
+				TCSQLEXEC(cUpdate)
+			EndIf
+		EndIf  
+		QRY->(DbCloseArea())
+	EndIf
+	//Encerra a conexão
+	//TCunLink(nCon)
+EndIf      
+
+RestArea(aArea)                                    
+
+Return cRet
+
+/*
+Função  : GTWS002VLD
+Objetivo: Validação de dados digitados
+Autor   : Jean Victor Rocha
+Data    : 05/12/13
+*/
+*------------------------*
+User Function GTWS002VLD()
+*------------------------*
+Local cRet := ""
+Local cWhere := ""
+Local cOrder := ""
+Local cTipo  := HttpGet->cTipo
+Local cValor := HttpGet->cValor
+Local cCampo := HttpGet->cCpo
+Local cEmp   := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja  := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco := ""
+Local cIp    := ""
+Local cTab   := ""
+Local nCon := 0
+Local aCon := {}
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Retorna o ambiente da empresa logada
+If UPPER(cCampo) == "PRO"
+	aCon 	:= U_WFRetBanco(cEmp,cLoja)
+	cBanco	:= aCon[1]
+	cIp   	:= aCon[2]
+	cAmb	:= ALLTRIM(aCon[3])
+	cServer	:= ALLTRIM(aCon[4])
+	nPorta	:= VAL(aCon[5])
+Else 
+	aCon 	:= U_WFRetBanco(cEmp,cLoja)
+	cBanco	:= aCon[1]
+	cIp   	:= aCon[2]
+EndIf
+
+If Select("QRY") <> 0
+	QRY->(DbCloseArea())
+EndIf
+
+//Realiza a conexão com o banco de dados da empresa
+nCon := TCLink(cBanco,cIp,aCon[6])
+
+Do Case
+	Case UPPER(cCampo) == "PRO"
+		//Busca informações do parametro que habilita a exibição dos produtos no portal.
+		aArea := GetArea()
+		cProds := "''"
+		oServ  :=  RpcConnect(cServer,nPorta,cAmb,cEmp,cLoja)
+		If valtype(oServ) == 'O'        
+			cProds := oServ:CALLPROC("U_GTGEN023")//executa a função
+			RpcDisconnect(oServ)
+		EndIf
+		RestArea(aArea)
+		If EMPTY(cProds)
+			cProds := "''"	
+		EndIf
+		//Define a tabela
+		cTab := "% SB1"+cEmp+"0 %"
+		If AllTrim(cTipo) == "cod"
+			cWhere := "% UPPER(B1_COD) = '"+Upper(AllTrim(cValor))+"' AND (B1_FILIAL = '"+cLoja+"' OR B1_FILIAL = '') AND UPPER(B1_COD) IN ("+cProds+") %"
+			cOrder := "% B1_COD %"
+		ElseIf AllTrim(cTipo) == "des"
+			cWhere := "% UPPER(B1_DESC) like '%"+Upper(AllTrim(cValor))+"%' AND (B1_FILIAL = '"+cLoja+"' OR B1_FILIAL = '') AND UPPER(B1_COD) IN ("+cProds+") %"
+			cOrder := "% B1_COD %"
+		EndIf
+
+		BeginSql Alias 'QRY'
+			SELECT TOP 1 B1_COD,B1_DESC
+			FROM %exp:cTab%
+			WHERE %notDel%
+				AND %exp:cWhere%
+		  		  AND B1_MSBLQL <> '1'
+			ORDER BY %exp:cOrder%
+		EndSql
+		
+		//Monta o retorno
+		QRY->(DbGoTop())
+		If QRY->(!EOF()) .and. QRY->(!BOF())
+			cRet := ALLTRIM(QRY	->B1_COD)+";"+ALLTRIM(QRY->B1_DESC)
+		EndIf
+		QRY->(DbCloseArea())
+
+	Case UPPER(cCampo) == "CLI"
+		If Select("SX2") == 0
+			U_WFPrepEnv()
+		EndIf
+		//Define a tabela
+		cTab := "% SA1"+cEmp+"0 %"
+		If AllTrim(cTipo) == "cod"
+			cWhere := "% UPPER(A1_COD) = '"+Upper(AllTrim(cValor))+"' AND (A1_FILIAL = '"+cLoja+"' OR A1_FILIAL = '') %"
+			cOrder := "% A1_COD %"
+		ElseIf AllTrim(cTipo) == "nom"
+			cWhere := "% UPPER(A1_NOME) LIKE '%"+Upper(AllTrim(cValor))+"%' AND (A1_FILIAL = '"+cLoja+"' OR A1_FILIAL = '') %"
+			cOrder := "% A1_NOME %"
+		ElseIf AllTrim(cTipo) == "loj"
+			cWhere := "% UPPER(A1_LOJA) = '"+Upper(AllTrim(cValor))+"' AND (A1_FILIAL = '"+cLoja+"' OR A1_FILIAL = '') %"
+			cOrder := "% A1_LOJA %"
+		EndIf
+
+	    BeginSql Alias 'QRY'
+			SELECT TOP 1 A1_COD,A1_LOJA,A1_NOME
+			FROM %exp:cTab%
+			WHERE %notDel%
+			  AND %exp:cWhere%
+			ORDER BY %exp:cOrder%
+	    EndSql
+		QRY->(DbGoTop())
+		If QRY->(!BOF() .and. !EOF())	
+			cRet := QRY->A1_COD+";"+QRY->A1_LOJA+";"+QRY->A1_NOME
+		EndIf
+		QRY->(DbCloseArea())
+
+EndCase
+
+//Encerra a conexão
+TCunLink(nCon)
+
+Return cRet
+
+
+/*
+Função  : GTWS002VLD
+Objetivo: Envia email de worflow
+Autor   : Jean Victor Rocha
+Data    : 09/12/2013
+*/
+*-------------------------------------------*
+Static Function SendWorkFlow(aHeader,aDetail)
+*-------------------------------------------*
+Local cMailUser	:= ""
+Local nPosNum	:= aScan(aHeader, {|x| ALLTRIM(x[1]) == "CJ_NUM" })
+Local nPosMail	:= aScan(aHeader, {|x| ALLTRIM(x[1]) == "CJ_P_EMAIL" })
+Local cEmail	:= Email(aHeader,aDetail)
+
+
+ZW0->(DbSetOrder(1))
+If ZW0->(DbSeek(xFilial("ZW0")+HttpSession->cLogin))
+	cMailUser := AllTrim(ZW0->ZW0_EMAIL)
+EndIf
+
+If !EMPTY(cMailUser)
+	cMailUser += ";"
+EndIf
+
+cParam := ALLTRIM(GTWS002GMV("MV_P_00009"))
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+oEmail          := DEmail():New()
+oEmail:cFrom   	:= "totvs@br.gt.com"
+oEmail:cTo		:= PADR(LOWER(cMailUser+";"+ALLTRIM(aHeader[nPosMail][2])+";"+cParam),400)
+oEmail:cSubject	:= padr("Solicitacao '"+ALLTRIM(aHeader[nPosNum][2])+"' Incluida no Portal do Faturamento.",200)
+oEmail:cBody   	:= cEmail
+oEmail:Envia()
+
+Return .T.  
+
+/*
+Função  : Email
+Objetivo: Monta o email a ser enviado no workflow.
+Autor   : Jean Victor Rocha
+Data    : 09/12/2013
+*/
+*------------------------------------*
+Static Function Email(aHeader,aDetail)
+*------------------------------------*  
+Local cAux := ""
+Local cHtml := ""
+
+Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+Local cFil    := Substr(HttpSession->cEmpresa,3,2)
+
+Local nPosNum	:= aScan(aHeader, {|x| ALLTRIM(x[1]) == "CJ_NUM" })
+Local nPosCol	:= aScan(aHeader, {|x| ALLTRIM(x[1]) == "CJ_USERLGI" })
+Local nPosCli	:= aScan(aHeader, {|x| ALLTRIM(x[1]) == "CJ_CLIENTE" })
+Local nPosGes	:= aScan(aHeader, {|x| ALLTRIM(x[1]) == "CJ_P_EMAIL" })
+Local nPosObs	:= aScan(aHeader, {|x| ALLTRIM(x[1]) == "OBS" })
+
+cHtml+='<html xmlns:v="urn:schemas-microsoft-com:vml"'
+cHtml+='xmlns:o="urn:schemas-microsoft-com:office:office"'
+cHtml+='xmlns:w="urn:schemas-microsoft-com:office:word" '
+cHtml+='xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"'
+cHtml+='xmlns="http://www.w3.org/TR/REC-html40">'
+
+cHtml+='<head>
+cHtml+='	<meta http-equiv=Content-Type content="text/html; charset=windows-1252">'
+cHtml+='	<meta name=ProgId content=Word.Document> '
+cHtml+='	<meta name=Generator content="Microsoft Word 12"> '
+cHtml+='	<meta name=Originator content="Microsoft Word 12">'
+cHtml+='</head>
+cHtml+='<body bgcolor="#FFFFFF" lang=PT-BR link=blue vlink=purple style="tab-interval:35.4pt">'
+cHtml+='<div class=WordSection1>'
+cHtml+="	<p class=MsoNormal  align=center style='text-align:center'> "
+cHtml+='		<a href="http://www.grantthornton.com.br/">'
+cHtml+="			<span style='text-decoration:none; text-underline:none'>"
+cHtml+='				<center><img width=680 border=0 id="_x0000_i1025" src="http://assets.finda.co.nz/images/thumb/zc/9/x/5/4y39x5/790x97/grant-thornton.jpg" nosend=1>'
+cHtml+="			</span>"
+cHtml+="		</a>"  
+cHtml+="    </p>"
+cHtml+="</div>"
+cHtml+="<h1>"
+cHtml+="<div align=center>"
+cHtml+="	<table class=MsoNormalTable border=0 cellpadding=0 width=800 style='width:525.0pt;mso-cellspacing:1.5pt;background:white;mso-yfti-tbllook:1184'>"
+cHtml+="		<tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;mso-yfti-lastrow:yes'>"
+cHtml+="			<td style='padding:.75pt .75pt .75pt .75pt'>"
+cHtml+="				<div align=center>"
+cHtml+="					<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=700 style='width:510.0pt;mso-cellspacing:0cm;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm'>"
+cHtml+="						<tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes'>"
+cHtml+="							<td style='background:#4D1174;padding:0cm 0cm 0cm 0cm'>"
+cHtml+="								<p class=MsoNormal align=center style='text-align:center'><b> "
+cHtml+= TipoString(10.0,2)
+cHtml+="										Solicitação "+ALLTRIM(aHeader[nPosNum][2])+" Incluida no Portal do Faturamento"
+cHtml+="									</span></b>"
+cHtml+="								</p>"
+cHtml+="							</td>"
+cHtml+="						</tr>"
+cHtml+="					</table>"
+cHtml+="				</div>"
+cHtml+="				<div align=center>"
+cHtml+="					<Br>"
+cHtml+="					<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=700 style='width:510.0pt;mso-cellspacing:0cm;mso-yfti-tbllook:1184;mso-padding-alt:0cm 0cm 0cm 0cm'>"
+cHtml+='						<tr bgcolor="#FCFCFC">'
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									Numero:"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"+ALLTRIM(aHeader[nPosNum][2])
+cHtml+="								</span>"
+cHtml+="							</td> " 
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									Colaborador:"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"+ALLTRIM(aHeader[nPosCol][2])
+cHtml+="								</span>"
+cHtml+="							</td>"  
+cHtml+="						</tr>"
+
+cHtml+='						<tr bgcolor="#F3F3F3">'
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									Cliente:"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"+ALLTRIM(aHeader[nPosCli][2])+" - "+ALLTRIM(U_GetNomeCLi(aHeader[nPosCli][2],cEmp,cFil))
+cHtml+="								</span>"
+cHtml+="							</td> " 
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"
+cHtml+="								</span>"
+cHtml+="							</td>"  
+cHtml+="						</tr>"
+
+cHtml+='						<tr bgcolor="#FCFCFC">'
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									Gestor:"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"+ALLTRIM(aHeader[nPosGes][2])
+cHtml+="								</span>"
+cHtml+="							</td> " 
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"
+cHtml+="								</span>"
+cHtml+="							</td>"  
+cHtml+="						</tr>"
+
+cHtml+='						<tr bgcolor="#F3F3F3">'
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									Observações:"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"+ALLTRIM(aHeader[nPosObs][2])
+cHtml+="								</span>"
+cHtml+="							</td> " 
+cHtml+="							<td>" 
+cHtml+= TipoString(8.5,1)
+cHtml+="									"
+cHtml+="								</span>"
+cHtml+="							</td>"
+cHtml+="							<td>"
+cHtml+= TipoString(8.5,1)
+cHtml+="									"
+cHtml+="								</span>"
+cHtml+="							</td>"  
+cHtml+="						</tr>"
+
+cHtml+="					</table>" 
+cHtml+="				</Div>"
+cHtml+="			</td>"  
+cHtml+="		</tr>"						
+cHtml+="   	</table>"
+cHtml+="</div>"	
+cHtml+="<tr style='mso-yfti-irow:2;mso-yfti-lastrow:yes'>"
+cHtml+="	<H1>"
+cHtml+="	<td style='padding:0cm 0cm 0cm 0cm'>"
+cHtml+="		<div align=center>"
+cHtml+="			<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=679 style='width:509.25pt;mso-cellspacing:0cm;border:outset #CCCCCC 1.0pt;"
+cHtml+="			mso-border-alt:outset #CCCCCC .75pt;mso-yfti-tbllook:1184;mso-padding-alt:2.25pt 2.25pt 2.25pt 2.25pt'>"
+cHtml+="				<tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes'>"
+cHtml+="					<td width='4%' style='width:4.0%;order:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;background:#4D1174;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+cHtml+="						<p class=MsoNormal>"
+cHtml+="							<b>"
+cHtml+= TipoString(7.5,2)
+cHtml+="									Produto/Serviço<o:p></o:p>"
+cHtml+="								</span>"
+cHtml+="							</b>"
+cHtml+="						</p>"
+cHtml+="					</td>"
+cHtml+="					<td width='9%' style='width:9.0%;border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;background:#4D1174;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+cHtml+="						<p class=MsoNormal>"
+cHtml+="							<b>"
+cHtml+= TipoString(7.5,2)
+cHtml+="									Descrição<o:p></o:p>"
+cHtml+="								</span>"
+cHtml+="							</b>"
+cHtml+="						</p>"
+cHtml+="					</td>"
+cHtml+="					<td width='7%' style='width:7.0%;border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;background:#4D1174;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+cHtml+="						<p class=MsoNormal>"
+cHtml+="							<b>"
+cHtml+= TipoString(7.5,2)
+cHtml+="									Quantidade<o:p></o:p>"
+cHtml+="								</span>"
+cHtml+="							</b>"
+cHtml+="						</p>"
+cHtml+="					</td>"
+cHtml+="					<td width='49%' style='width:49.0%;border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;background:#4D1174;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+cHtml+="						<p class=MsoNormal>"
+cHtml+="							<b>"
+cHtml+= TipoString(7.5,2)
+cHtml+="									Vlr. Unitário<o:p></o:p>"
+cHtml+="								</span>"
+cHtml+="							</b>"
+cHtml+="						</p>"
+cHtml+="					</td>"
+cHtml+="					<td width='11%' style='width:11.0%;border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;background:#4D1174;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+cHtml+="						<p class=MsoNormal>"
+cHtml+="							<b>"
+cHtml+= TipoString(7.5,2)
+cHtml+="									Vlr. Total<o:p></o:p>"
+cHtml+="								</span>"
+cHtml+="							</b>"
+cHtml+="						</p>"
+cHtml+="					</td>"
+cHtml+="				</tr>"
+
+For i:=1 to Len(aDetail)
+	cHtml+="				<tr style='mso-yfti-irow:1'>"
+	cHtml+="					<td style='border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+	cHtml+="						<p class=MsoNormal>"
+	cHtml+= TipoString(8.5,1)                                             
+	cHtml+="					"+ALLTRIM(aDetail[i][aScan(aDetail[i], {|x| ALLTRIM(x[1]) == "CK_PRODUTO" })][2])+"<o:p></o:p>"	
+	cHtml+="							</span>"
+	cHtml+="						</p>"
+	cHtml+="					</td>"
+	cHtml+="					<td style='border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+	cHtml+="						<p class=MsoNormal>"
+	cHtml+= TipoString(8.5,1)
+ 		cHtml+="				"+ALLTRIM(U_GetNomePro(aDetail[i][aScan(aDetail[i], {|x| ALLTRIM(x[1]) == "CK_PRODUTO" })][2],cEmp,cFil))+"<o:p></o:p>"
+ 	cHtml+="							</span>"
+	cHtml+="						</p>"
+	cHtml+="					</td>"
+	cHtml+="					<td style='border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+	cHtml+="						<p class=MsoNormal>"
+	cHtml+= TipoString(8.5,1)
+	cHtml+="					"+ALLTRIM(STR(aDetail[i][aScan(aDetail[i], {|x| ALLTRIM(x[1]) == "CK_QTDVEN" })][2]))+"<o:p></o:p>"
+	cHtml+="							</span>"
+	cHtml+="						</p>"
+	cHtml+="					</td>"
+	cHtml+="					<td style='border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+	cHtml+="						<p class=MsoNormal>"
+	cHtml+= TipoString(8.5,1)
+	cHtml+="					"+ALLTRIM(Transform(aDetail[i][aScan(aDetail[i], {|x| ALLTRIM(x[1]) == "CK_PRCVEN" })][2],"@E 99,999,999.9999"))+"<o:p></o:p>"
+	cHtml+="							</span>"
+	cHtml+="						</p>"
+	cHtml+="					</td>"
+	cHtml+="					<td style='border:inset #CCCCCC 1.0pt;mso-border-alt:inset #CCCCCC .75pt;padding:2.25pt 2.25pt 2.25pt 2.25pt'>"
+	cHtml+="						<p class=MsoNormal>"
+	cHtml+= TipoString(8.5,1)
+	cHtml+="					"+ALLTRIM(Transform(aDetail[i][aScan(aDetail[i], {|x| ALLTRIM(x[1]) == "CK_VALOR" })][2],"@E 99,999,999.9999"))+"<o:p></o:p>"
+	cHtml+="							</span>"
+	cHtml+="						</p>"
+	cHtml+="					</td>"
+	cHtml+="				</tr>"
+Next i
+
+cHtml+="			</table>"
+cHtml+="		</div>"
+cHtml+="		<p class=MsoNormal>&nbsp;</p>"
+cHtml+="    </td>" 
+cHtml+="</tr>"	
+cHtml+="<tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;mso-yfti-lastrow:yes'>"
+cHtml+="	<td style='padding:.75pt .75pt .75pt .75pt'>"
+cHtml+="		<p class=MsoNormal align=center style='text-align:center'>"
+cHtml+="			<span class=tituloatencao1>"
+cHtml+="				<span style='font-size:9.5pt;mso-fareast-font-family:"
+cHtml+='				"Times New Roman"'
+cHtml+="				;color:red'>"
+cHtml+="						GRANT THORNTON BRASIL - Mensagem automática, favor não responder este e-mail."
+cHtml+="				</span>"
+cHtml+="			</span>"
+cHtml+="		</p>"
+cHtml+="    </td>"
+cHtml+="</tr>"
+cHtml+="</body>"
+cHtml+="</html>"                       
+
+Return cHtml
+
+/*
+Funcao      : TipoString
+Objetivos   : 
+Autor       : 
+Data/Hora   : 
+*/            
+*----------------------------------------*
+ Static Function TipoString(nTam,nColor)
+*-----------------------------------------*
+                               
+Local cAux:=""
+      			     			
+cAux:="<span style='font-size:"+Alltrim(Str(nTam))+"pt;font-family:"
+cAux+='"Verdana","sans-serif"'
+cAux+=";mso-fareast-font-family:"
+cAux+='"Times New Roman"'
+cAux+=";color:"+IIf(nColor==1,"Black","white")+"'>"
+               
+Return cAux
+
+/*
+Funcao      : GTWS002GMV
+Objetivos   : Retornar o conteudo de um MV da empresa do portal.
+Autor       : Jean Victor Rocha
+Data/Hora   : 10/12/2013
+*/
+*-----------------------------*
+Static Function GTWS002GMV(cMv)
+*-----------------------------*
+Local cRet		:= ""
+Local cEmp		:= Substr(HttpSession->cEmpresa,1,2)
+Local cLoja		:= Substr(HttpSession->cEmpresa,3,2)
+Local aArea		:= GetArea()
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Retorna o ambiente da empresa logada
+aCon 	:= U_WFRetBanco(cEmp,cLoja)
+cBanco	:= aCon[1]
+cIp   	:= aCon[2]
+cAmb	:= ALLTRIM(aCon[3])
+cServer	:= ALLTRIM(aCon[4])
+nPorta	:= VAL(aCon[5])
+
+oServ  :=  RpcConnect(cServer,nPorta,cAmb,cEmp,cLoja)
+If valtype(oServ) == 'O'  
+	cRet := oServ:CALLPROC("U_GEN023A",cMv)//executa a função
+	RpcDisconnect(oServ)
+EndIf
+
+RestArea(aArea)
+
+Return cRet
+
+
+/*
+Funcao      : GTWS002GCP
+Objetivos   : Retorna o conteudo da condição de pagamento no cadastro do cliente.
+Autor       : Renato Rezende
+Data/Hora   : 21/11/2014
+*/
+*------------------------------------------*
+ Static Function GTWS002GCP(cCliente,cLoja)
+*------------------------------------------*
+Local cRet		:= ""
+Local cEmp		:= Substr(HttpSession->cEmpresa,1,2)
+Local cFil		:= Substr(HttpSession->cEmpresa,3,2)
+Local cBanco 	:= ""
+Local cIp    	:= ""
+Local cTab		:= ""
+Local nCon 		:= 0
+Local aCon		:= {}
+
+Default cCliente:= ""
+Default cLoja	:= ""
+
+//Retorna o ambiente da empresa logada
+aCon 	:= U_WFRetBanco(cEmp,cFil)
+cBanco	:= aCon[1]
+cIp   	:= aCon[2]
+
+If Select("QRY") <> 0
+	QRY->(DbCloseArea())
+EndIf
+
+//Define a tabela
+cTab := "% SA1"+cEmp + "0%"
+
+//Realiza a conexão com o banco de dados da empresa
+nCon := TCLink(cBanco,cIp,aCon[6])
+
+If nCon > 0
+
+    BeginSql Alias 'QRY'
+		SELECT A1_COND
+		FROM %exp:cTab%
+		WHERE A1_COD = %exp:cCliente%
+		  and A1_LOJA = %exp:cLoja%
+		  and A1_FILIAL = %xFilial:SA1%
+		  and %notDel%
+    EndSql
+	
+	QRY->(DbGoTop())
+	If QRY->(!BOF() .and. !EOF())	
+		cRet := QRY->A1_COND
+	EndIf
+	
+	QRY->(DbCloseArea())
+EndIf
+
+//Encerra a conexão
+TCunLink(nCon)
+
+Return cRet

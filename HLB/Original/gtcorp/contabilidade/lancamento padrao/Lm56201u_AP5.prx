@@ -1,0 +1,85 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 02/07/02
+
+User Function Lm56201u()        // incluido pelo assistente de conversao do AP5 IDE em 02/07/02
+
+SetPrvt("_REC,_CALIAS,_INDEX,_CHIST,_CHIST2,_CDEBITO")
+
+
+_rec    := recno()
+_cAlias := Alias()
+_Index  := Indexord()
+_cHist := " "       
+_cHist2:= " "
+
+_cDebito := " "
+
+DbSelectArea("SED")
+dbSetOrder(1)
+DbSeek(xfilial()+SE5->E5_NATUREZ)        
+
+If !Eof()
+   If SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	      _CDEBITO:="1000"
+   Endif
+   IF cEmpAnt $ "E1"
+	   IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	      _CDEBITO:="4000"
+	   ENDIF
+   ELSEIF cEmpAnt $ "DL"
+	   IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	      _CDEBITO:="1101"
+	   ENDIF
+   ELSEIF cEmpAnt $ "Z4"
+       If cFilAnt $ '01/02/03/04/' 
+	       IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	    	    _CDEBITO:="3210"
+	    	 Endif
+	    Else	                                  
+	       IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	          _CDEBITO:="1100"
+	       Endif   
+	    Endif 
+	ELSEIF cEmpAnt $ "FF/FH" 
+	    IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	    	  _CDEBITO:="11510"
+	    ENDIF 
+	ELSEIF cEmpAnt == "CH"
+  		    IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	    	    _CDEBITO:="3601"
+		    ENDIF 
+	ELSEIF cEmpAnt == "FB"
+  		    IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
+	    	    _CDEBITO:="5000"
+		    ENDIF
+		    
+	ElseIf cEmpAnt $ "71"	    
+	       If SubStr(SED->ED_CONTA,1,1) $ ("6")
+    	       _CDEBITO:="1100"	
+    	    Endif   
+	ElseIf cEmpAnt $ "FA"	    
+	       If SubStr(SED->ED_CONTA,1,1) $ ("6")
+    	       _CDEBITO:="62001"	
+    	    Endif   
+	ElseIf cEmpAnt $ "EB"	    
+	       If SubStr(SED->ED_CONTA,1,1) $ ("6")
+    	       _CDEBITO:="3100"	
+    	    Endif       
+   	ElseIf cEmpAnt $ "MV"	    
+           If SubStr(SED->ED_CONTA,1,1) $ ("6")
+    	       _CDEBITO:="1100"	
+           Endif  
+	ElseIf cEmpAnt $ "HO"	    
+           If SubStr(SED->ED_CONTA,1,1) $ ("6")
+    	       _CDEBITO:="1101"	
+           Endif            
+   ENDIF
+
+
+EndIf
+
+// Volta a posicao anterior
+DbSelectArea(_cAlias)
+DbSetOrder(_Index)
+DbGoto(_rec)
+// Substituido pelo assistente de conversao do AP5 IDE em 02/07/02 ==> __return(_cDebito)
+Return(_cDebito)        // incluido pelo assistente de conversao do AP5 IDE em 02/07/02

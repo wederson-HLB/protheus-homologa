@@ -1,0 +1,199 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWS001   ºAutor  ³Eduardo C. Romanini º Data ³  17/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da solicitação de faturamento.      .            º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Local cChave := ""
+
+Local nI   := 0
+Local nY   := 0
+Local nCod := 0
+
+Local aCabec  := {}
+Local aLinhas := {} 
+Local aCpos   := {}
+Local aReg    := {}
+
+aAdd(aCabec,"") //Adiciona linha em branco para o botão de visualização
+
+SX3->(DbSetOrder(1))
+If SX3->(DbSeek("ZF0"))
+	While SX3->(!EOF()) .and. SX3->X3_ARQUIVO = "ZF0"
+
+		//Define o cabeçalho da tabela
+		If SX3->X3_BROWSE == "S"
+        	
+			If Alltrim(SX3->X3_CAMPO) == "ZF0_STATUS"
+				aAdd(aCabec,"") //Botão Visualizar
+				aAdd(aCabec,"") //Botão Copiar
+			Else
+        		aAdd(aCabec,AllTrim(SX3->X3_TITULO))
+   			EndIf
+   			
+			aAdd(aCpos,{SX3->X3_CAMPO,SX3->X3_CBOX})
+		EndIf
+
+		SX3->(DbSkip())
+	EndDo
+EndIf
+
+ZF0->(DbSetOrder(1))
+If ZF0->(DbSeek(xFilial("ZF0")+HttpSession->cEmpresa))
+	While ZF0->(!EOF()) .and. ZF0->(ZF0_FILIAL+ZF0_CODEMP+ZF0_CODFIL) == xFilial("ZF0")+HttpSession->cEmpresa
+    
+		//Define as linhas da tabela
+		aReg := {"",""} //Linhas em branco para o botão de visualização e copia.
+		For nI:=1 To Len(aCpos)
+						
+			If AllTrim(aCpos[nI][1]) == "ZF0_STATUS"
+				//Exibe imagem para o status.
+				If ZF0->ZF0_STATUS == "A" //Em Atendimento
+					aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Green.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Em Atendimento' title='Em Atendimento'>")
+				ElseIf ZF0->ZF0_STATUS == "C" //Cancelado
+					aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Red.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Cancelado' title='Cancelado'>")
+				ElseIf ZF0->ZF0_STATUS == "S" //Solucionado
+					aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Graphite.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Concluído' title='Concluído'>")
+				ElseIf ZF0->ZF0_STATUS == "P" //Em Processamento'
+					aAdd(aReg,"<img src='portal_cliente_gt/Imagens/Knob_Blue.png' height='16px' width='16px' border='0' style='vertical-align:middle' alt='Em Processamento' title='Em Processamento'>")
+				EndIf
+
+			Else			
+				//Exibe o conteudo do campo.
+				If Empty(aCpos[nI][2])
+					aAdd(aReg,ZF0->&(aCpos[nI][1]))
+				Else
+					//ComboBox                
+					aAdd(aReg,BscXBox(aCpos[nI][1],ZF0->&(aCpos[nI][1])))
+				EndIf
+			EndIf
+			
+		Next
+
+		aAdd(aLinhas,aReg)		
+			
+		ZF0->(DbSkip())	
+	EndDo
+EndIf
+
+//Verifica a posição do codigo no array
+nCod:=aScan(aCpos,{|a| a[1] == "ZF0_CODIGO"})
+nCod:= nCod +2 //Adiciona 2 por conta dos botões de visualizar e copiar.
+
+//Ordena o array de forma decrescente.
+aLinhas := aSort(aLinhas,,,{|x,y| x[nCod] > y[nCod]} )
+
+%>
+
+<html>
+
+<head>
+	<title><%= u_WFTraduzir("Solicitação de Faturamento") %></title>
+	<link href='portal_cliente_gt/css/form.css' rel='stylesheet' type='text/css'> <%/*CSS para formulários*/%>
+	<link href='portal_cliente_gt/css/paging.css' rel='stylesheet' type='text/css'><%/*CSS padrão para paginação*/%>
+	<script type="text/javascript" src="portal_cliente_gt/js/paging.js"></script> <%/*Script padrão para paginação*/%>
+</head>
+		
+<body>
+	<table id="tb" border="0" cellpadding="1" cellspacing="0" width="100%">
+		<tr>
+			<td class="titulo" style="height: 15px">
+				<%= u_WFTraduzir("Solicitação de Faturamento") %>
+			</td>
+		</tr>
+		<tr>
+			<td><hr/></td>
+		</tr>
+		<tr>
+			<td>
+				<table id="tb0" class="browse">
+					<tr>
+						<td width="50%">
+							<a href="U_GTWSM01.apw?oper=INC" title="<%= u_WFTraduzir('Incluir') %>" style="display:inline-block;" target="_self">
+								<img src="portal_cliente_gt/Imagens/inc_usr.png" height="35px" width="35px" border="0" style="vertical-align:middle"/>
+							</a>                                  	
+						</td>
+						<td width="50%">
+							<% /*
+							<input type="text" name="Pesquisa" size="25" nowrap="nowrap">
+							<img border="0" img src="portal_cliente_gt/Imagens/busca.jpg" width="16" height="16">
+							*/
+							%>
+							&nbsp;
+						</td>
+					</tr>	
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>	
+				<table id="tb1" class="browse">
+					<tr>
+						<% For nI:=1 To Len(aCabec) %>
+							<th scope="col" class='th'>
+								<%= u_WFTraduzir(aCabec[nI]) %>
+							</th>
+						<% Next %>
+					</tr>
+					<% For nI:=1 To Len(aLinhas)  %>
+						<tr>
+							<% For nY:=1 To Len(aLinhas[nI]) %>
+								<% //Botão Visualizar 
+
+								//Chave para busca do registro: Empresa e Codigo da Solicitação.								
+								cChave := HttpSession->cEmpresa+aLinhas[nI][nCod]
+
+								If nY == 1 %>
+									<td width="9" class='td'>
+										<a href="U_GTWSM01.apw?oper=VIS&chave=<%=cChave%>" title="<%= u_WFTraduzir('Visualizar') %>">
+											<img src="portal_cliente_gt/Imagens/lupa.png" height="16px" width="16px" border="0" style="vertical-align:middle"/>
+										</a>
+                                 	</td>
+								<% ElseIf nY==2 %>
+									<td class='td'>
+										<a href="U_GTWSM01.apw?oper=COP&chave=<%=cChave%>" title="<%= u_WFTraduzir('Copiar') %>">
+											<img src="portal_cliente_gt/Imagens/page_copy.png" height="16px" width="16px" border="0" style="vertical-align:middle"/>
+										</a>
+                                 	</td>
+								<% Else %>
+									<td class='td'>
+										<%= aLinhas[nI][nY] %>
+									</td>
+								<% EndIf %>
+								</td>
+							<% Next %>
+						</tr>
+					<% Next %>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+	<br>
+
+	<!-- div onde será criados os links da paginação -->
+	<div id="pageNav"></div>
+    <script>
+        var pager = new Pager('tb1', 20); 
+        pager.init(); 
+        pager.showPageNav('pager', 'pageNav'); 
+        pager.showPage(1);
+    </script>
+
+</body>	
+
+</html>	

@@ -1,0 +1,318 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include "tbiconn.ch"
+#Include "Topconn.ch"
+#Include "protheus.ch"
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR008 ºAutor  ³Matheus Massarotto  º  Data ³  17/02/2014  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Relatorio Margem Faturamento/Vendedor - SNF.                º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal Grant Thornton                                      º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWR008()
+*---------------------*
+Local cHtml	:= "" 
+Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja   := Substr(HttpSession->cEmpresa,3,2)
+	
+WEB EXTENDED INIT cHtml
+	
+//Validação de acesso por outra empresa que não a SNF.
+If cEmp <> "BH"
+	cHtml := "<html><body><h1>Essa empresa não possui acesso a esse relatorio</h1></body></html>" 
+Else
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	cHtml := ExecInPage("GTWR008")
+EndIf
+	
+WEB EXTENDED END
+
+Return cHtml
+
+
+/*
+Função  : WR008Vendedor()
+Objetivo: Retorna os vendedores cadastrados.
+Autor   : Eduardo C. Romanini
+Data    : 21/05/13
+*/
+*-------------------------*
+User Function WR008Vendedor()
+*-------------------------*
+Local cHtml  := ""
+Local cWhere := ""
+Local cOrder := ""
+Local cTexto := HttpGet->term
+Local cTipo  := HttpGet->cf3
+Local cEmp   := Substr(HttpSession->cEmpresa,1,2)
+Local cFil  := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco := ""
+Local cIp    := ""
+Local cTab   := ""
+
+Local nCon := 0
+
+Local aCon := {}
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If Len(cTexto) > 0
+
+	//Retorna o ambiente da empresa logada
+	aCon  := U_WFRetBanco(cEmp,cFil)
+	cBanco:= aCon[1]
+	cIp   := aCon[2]
+
+	//Define a tabela
+	cTab := "% SA3"+cEmp+"0 %"
+
+	If AllTrim(cTipo) == "cod"
+		cWhere := "% UPPER(A3_COD) LIKE '%"+Upper(AllTrim(cTexto))+"%' AND (A3_FILIAL = '"+cFil+"' OR A3_FILIAL = '') %"
+		cOrder := "% A3_COD %"
+	EndIf
+
+	//Realiza a conexão com o banco de dados da empresa
+	nCon := TCLink(cBanco,cIp,aCon[6])
+
+	If Select("QRY") <> 0
+		QRY->(DbCloseArea())
+	EndIf
+
+    BeginSql Alias 'QRY'
+		SELECT TOP 15 A3_COD,A3_NOME
+		FROM %exp:cTab%
+		WHERE %notDel%
+		  AND %exp:cWhere%
+		ORDER BY %exp:cOrder%
+    EndSql
+
+	QRY->(DbGoTop())
+	If QRY->(!BOF() .and. !EOF())	
+    	cHtml += "["
+	EndIf
+
+	//Monta o retorno no formato JSON.
+	nI := 1	
+	While QRY->(!EOF())
+		If nI > 1 
+    		cHtml += ","
+		EndIf
+	    cHtml += "{"
+		cHtml += '"cod":"'+LimpaStr(Alltrim(QRY->A3_COD))+'","desc":"'+EncodeUTF8(LimpaStr(Alltrim(QRY->A3_NOME)))+'"'
+		cHtml += "}"
+
+		nI++          
+		
+		QRY->(DbSkip()) 		
+	EndDo	
+	
+	If Len(cHtml) > 0
+    	cHtml += "]"
+	EndIf
+	
+	QRY->(DbCloseArea())
+
+	//Encerra a conexão
+	TCunLink(nCon)
+	
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml
+
+/*
+Função  : GTWR008table
+Objetivo: Função para gerar o excel com os dados
+Autor   : Matheus Massarotto
+Data    : 19/02/2014
+*/
+*------------------------*
+User Function WR008Excel()
+*------------------------*
+Local cHtml		:= "" 
+Local cHtml1	:= "" 
+Local cEmp    	:= Substr(HttpSession->cEmpresa,1,2)
+Local cLoja   	:= Substr(HttpSession->cEmpresa,3,2)
+Local cNome 	:= 'snf_margem_fat_vend_'
+Private cVendDe		:= HttpGet->cVendDe
+Private cVendAte 	:= HttpGet->cVendAte
+Private cDataDe  	:= DtoS(CtoD(HttpGet->cDataDe))
+Private cDataAte 	:= DtoS(CtoD(HttpGet->cDataAte))
+Private LPlanilha	:= .T.
+
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+
+		cNome += AllTrim(Str(Round(Seconds(),0)))
+				
+		HttpCtDisp('attachment; filename="' + cNome + '.xls"')
+		HttpCtType('application/vnd.ms-excel')
+		
+		//RRP - 24/11/2015 - Ajuste para excel com muitos dados.
+		//HttpSetPart(.F.)  //desabilitar temporariamente o envio de HTML simultâneo ao Browser
+		cHtml += ExecInPage("GTWR008A") //chama a pagina com o html da tabela
+		//HttpSetPart(.T.) //habilita temporariamente o envio de HTML simultâneo ao Browser
+
+Return cHtml
+
+
+
+/*
+Função  : LimpaStr
+Objetivo: Verifica se existe algum caractere especial na string
+Autor   : Matheus Massarotto
+Data    : 17/02/2014
+*/
+*-------------------------------*
+Static Function LimpaStr(cString)
+*-------------------------------*
+Local cRet := ""
+
+cString := StrTran(cString,'"',"")
+cString := StrTran(cString,"'","")
+
+cRet := cString
+
+Return cRet
+
+
+/*
+Função  : WR008Vld
+Objetivo: Validação de dados digitados
+Autor   : Matheus Massarotto
+Data    : 17/02/2014
+*/
+*------------------------*
+User Function WR008Vld()
+*------------------------*
+Local cRet := ""
+Local cWhere := ""
+Local cOrder := ""
+Local cTipo  := HttpGet->cTipo
+Local cValor := HttpGet->cValor
+Local cCampo := HttpGet->cCpo
+Local cEmp   := Substr(HttpSession->cEmpresa,1,2)
+Local cFil	 := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco := ""
+Local cIp    := ""
+Local cTab   := ""
+Local nCon := 0
+Local aCon := {}
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Retorna o ambiente da empresa logada
+
+aCon 	:= U_WFRetBanco(cEmp,cFil)
+cBanco	:= aCon[1]
+cIp   	:= aCon[2]
+
+
+If Select("QRY") <> 0
+	QRY->(DbCloseArea())
+EndIf
+
+//Realiza a conexão com o banco de dados da empresa
+nCon := TCLink(cBanco,cIp,aCon[6])
+
+Do Case
+	Case UPPER(cCampo) == "VEN"
+		If Select("SX2") == 0
+			U_WFPrepEnv()
+		EndIf
+		//Define a tabela
+		cTab := "% SA3"+cEmp+"0 %"
+	
+		If AllTrim(cTipo) == "cod"
+			cWhere := "% UPPER(A3_COD) = '"+Upper(AllTrim(cValor))+"' AND (A3_FILIAL = '"+cFil+"' OR A3_FILIAL = '') %"
+			cOrder := "% A3_COD %"
+		EndIf
+	
+		//Realiza a conexão com o banco de dados da empresa
+		nCon := TCLink(cBanco,cIp,aCon[6])
+	
+		If Select("QRY") <> 0
+			QRY->(DbCloseArea())
+		EndIf
+	
+	    BeginSql Alias 'QRY'
+			SELECT TOP 15 A3_COD,A3_NOME
+			FROM %exp:cTab%
+			WHERE %notDel%
+			  AND %exp:cWhere%
+			ORDER BY %exp:cOrder%
+	    EndSql          
+	    
+		QRY->(DbGoTop())
+		
+		If QRY->(!BOF() .and. !EOF())	
+			cRet := alltrim(QRY->A3_COD)
+		EndIf
+		
+		QRY->(DbCloseArea())
+
+EndCase
+
+//Encerra a conexão
+TCunLink(nCon)
+
+Return cRet
+
+/*
+Função  : GTWR008table
+Objetivo: Função para gerar a tabela com os dados
+Autor   : Matheus Massarotto
+Data    : 19/02/2014
+*/
+*---------------------------*
+User Function GTWR008table()
+*---------------------------*
+Local cHtml		:= "" 
+Local cEmp    	:= Substr(HttpSession->cEmpresa,1,2)
+Local cLoja   	:= Substr(HttpSession->cEmpresa,3,2)
+Local cNome 	:= 'snf_margem_fat_vend_'
+Private cVendDe		:= HttpPost->cVendDe
+Private cVendAte 	:= HttpPost->cVendAte
+Private cDataDe  	:= DtoS(CtoD(HttpPost->cDataDe))
+Private cDataAte 	:= DtoS(CtoD(HttpPost->cDataAte))
+Private LPlanilha	:= .F.
+
+//Verifica se a sessão expirou.
+If  ValType(HttpSession->cLogin)<> "C" .or. Empty(HttpSession->cLogin);
+.or. ValType(HttpSession->cEmpresa)<> "C" .or. Empty(HttpSession->cEmpresa)
+	cHtml := ExecInPage("GTWP007") //Pagina de sessão expirada.
+	Return cHtml
+EndIf
+
+WEB EXTENDED INIT cHtml
+	
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+
+	cHtml := ExecInPage("GTWR008A") //chama a pagina com o html da tabela
+	
+	
+WEB EXTENDED END
+
+Return cHtml

@@ -1,0 +1,104 @@
+#include "totvs.ch"
+#include "apwebex.ch"
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWP004 ºAutor  ³Eduardo C. Romanini  º  Data ³  02/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Menu da tela principal do portal.  		                  º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWP004()
+*---------------------*
+Local cHtml	   := "" 
+Local cCodMenu := ""
+Local cSubMenu := ""
+Local cLogin   := HttpSession->cLogin
+
+Local aMenu    := {}
+
+WEB EXTENDED INIT cHtml
+
+/*
+Formato do array aMenu:
+{
+	{"001",
+	 "Administração",
+		{
+			{"Usuarios","U_GTWC001.apw"},
+			{"Empresas","U_GTWC002.apw"},
+			{"Menus","U_GTWC003.apw"},
+			{"SubMenus","U_GTWC005.apw"},
+			{"Rotinas","U_GTWC004.apw"},
+			{"Grupos","U_GTWC006.apw"}
+		}
+	}
+}
+*/
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If ValType(HttpGet->tipo) <> "U"
+	cCodMenu := Alltrim(HttpGet->Tipo)
+EndIf
+
+If !Empty(cCodMenu)
+	//Retorna as rotinas disponiveis para esse usuário.
+	//Posiciona no usuário
+	ZW0->(DbSetOrder(1))
+	If ZW0->(DbSeek(xFilial("ZW0")+AllTrim(cLogin)))
+		If !Empty(ZW0->ZW0_CODGRP)
+	
+		   	//Posiciona na relação Grupos X Rotinas
+		   	ZW7->(DbSetOrder(1))
+	    	If ZW7->(DbSeek(xFilial("ZW7")+ZW0->ZW0_CODGRP))
+	        	While ZW7->(!EOF()) .and. ZW7->(ZW7_FILIAL+ZW7_CODGRP) == xFilial("ZW7")+ZW0->ZW0_CODGRP
+	            	
+					//Posiciona na rotina
+					ZW4->(DbSetOrder(1))
+					If ZW4->(DbSeek(xFilial("ZW4")+ZW7->ZW7_CODROT))
+					
+						//Posiciona no submenu
+						ZW5->(DbSetOrder(1))
+						If ZW5->(DbSeek(xFilial("ZW5")+ZW4->ZW4_CODSUB))
+												
+							//Verifica se a rotina faz parte do menu selecionado
+							If Alltrim(ZW5->ZW5_CODMEN) == cCodMenu
+	
+								nPos := aScan(aMenu,{|a| a[1]== AllTrim(ZW5->ZW5_CODIGO)})
+								If nPos == 0
+									aAdd(aMenu,{AllTrim(ZW5->ZW5_CODIGO),AllTrim(ZW5->ZW5_TITULO),{{AllTrim(ZW4->ZW4_TITULO),AllTrim(ZW4->ZW4_ROTINA)+".apw"}}})
+								Else
+									aAdd(aMenu[nPos][3],{AllTrim(ZW4->ZW4_TITULO),AllTrim(ZW4->ZW4_ROTINA)+".apw"})
+								EndIf
+
+							EndIf
+					
+	                    EndIf
+		 		    EndIf      
+	     
+	           		ZW7->(DbSkip())
+	            EndDo
+			EndIf
+		EndIf
+	EndIf
+EndIf	
+
+HttpSession->aMenu := aMenu
+
+cHtml := ExecInPage("GTWP004")
+
+WEB EXTENDED END
+	 
+Return cHtml	

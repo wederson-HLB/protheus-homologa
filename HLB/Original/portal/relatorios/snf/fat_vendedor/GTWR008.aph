@@ -1,0 +1,214 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR008   ºAutor  ³Matheus Massarotto º Data ³  17/02/14    º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Arquivo html com css e scripts 							  º±±
+±±º          ³do Relatorio Margem Faturamento/Vendedor - SNF.             º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal Grant Thornton                                      º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+%>
+
+<!DOCTYPE html>
+<html lang="pt-br" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>Relat&oacute;rio Margem Faturamento/Vendedor - SNF</title>
+	
+	<link href='portal_cliente_gt/css/jquery-ui.css' rel='stylesheet' type='text/css'>
+	<link href='portal_cliente_gt/css/relatorios.css' rel='stylesheet' type='text/css'>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+    
+
+	<script type="text/javascript">
+
+		$(document).ready(function(){
+			
+			//Esconde os botões de exportação para o Excel.
+			$('.export').hide();
+
+			/*Tratamento para o preenchimento do Vendedor*/
+			$(".vendedor").live('keyup.autocomplete',function(){
+				$(this).autocomplete({
+					source: function(request, response){
+						$.ajax({
+							"url": "u_WR008Vendedor.apw?cf3=cod&term="+request.term,
+							"dataType": "html"
+						}).done(function(data){
+							dest = $.parseJSON(data);
+							response(dest);
+						})
+					},
+					focus: function( event, ui ) {
+						$( this ).val( ui.item.cod );
+						return false;
+					},
+					select: function( event, ui ) {
+						$( this ).val( ui.item.cod );
+						return false;
+					}
+				})
+				.data( "autocomplete" )._renderItem = function( ul, item ) {
+					return $( "<li></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<a>" + item.cod + "-" + item.desc + "</a>" )
+					.appendTo( ul );
+				};
+			});          
+			
+			$(".vendedor").live("focusout", function(e) {
+			if ($(this).val() != ""){
+				$.ajax({
+					url:'U_WR008Vld.apw',
+					async:false,
+					data:{ cTipo:'cod',cValor:$(this).val(),cCpo:'VEN'},
+					success:function(result){
+						cRetVld = result;
+					}
+				})
+				if (cRetVld == ""){
+					alert('Codigo do vendedor informado invalido, favor Verificar!');
+					$( this ).val( "" );
+					$( this ).focus();
+				}else{
+					$( this ).val( cRetVld);
+	 			}
+				return;
+			}
+		    });
+	
+			//Exibe o calendário da Data inicial.
+			$( "#dataDe" ).datepicker({
+	            changeMonth: true,
+    	        changeYear: true,
+				dateFormat: "dd/mm/yy"
+			});	
+			
+			//Exibe o calendário da Data final.
+			$( "#dataAte" ).datepicker({
+	            changeMonth: true,
+    	        changeYear: true,				
+				dateFormat: "dd/mm/yy"
+			});
+			
+			//Ação do botão gerar.
+			$('#bt_gerar').click(function(){
+				
+			
+				$('#relatorio').html(""	);
+				$('.export').hide();
+
+				//Valida o preenchimento do vendedor.
+				if ( $('#VendedorAte').val() == '' ){
+					$('#relatorio').html('<span style="color:red;font-weight:bold">O vendedor ate, devem ser preenchidos.</span>');
+					return;			
+				}			
+				
+				//Valida o preenchimento das datas.
+				if ( $('#dataDe').val() == '' || $('#dataAte').val() == ''){
+						
+					$('#relatorio').html('<span style="color:red;font-weight:bold">As datas devem ser preenchidas.</span>');
+					return;
+				}
+				
+				if ($('#dataAte').val() < $('#dataDe').val()){
+					$('#relatorio').html('<span style="color:red;font-weight:bold">A data final deve ser maior que a data inicial.</span>');
+					return;
+				}
+				
+				
+				// Faz a requisição
+				
+				$("#LoadingImage").show();
+
+				$.ajax({
+					type: 'POST',
+					url: 'u_GTWR008table.apw',
+					data: {cVendDe: $('#VendedorDe').val(), cVendAte: $('#VendedorAte').val(), cDataDe: $('#dataDe').val(), cDataAte: $('#dataAte').val()},
+					dataType: 'html',
+					success: function(data) {
+						$("#LoadingImage").hide();
+						$('.export').show();
+						$('#relatorio').html(data);
+					}
+				});
+				
+			});
+			
+			//Botão para gerar o relatório em excel.
+			$('.export').click(function(){
+				
+				url = 'u_WR008Excel.apw';
+				url += '?cVendDe=' + $('#VendedorDe').val();
+				url += '&cVendAte=' + $('#VendedorAte').val();
+				url += '&cDataDe=' + $('#dataDe').val();
+				url += '&cDataAte=' + $('#dataAte').val();
+				
+				$(this).attr('href', url); 
+			});	
+		
+		})
+	</script>
+</head>
+
+<body>
+	<% /*Título da Página*/ %>
+	<h1>Relat&oacute;rio Margem Faturamento/Vendedor - SNF</h1>
+	<hr/>
+ 	<fieldset>
+		<legend>Par&acirc;mentros do Relat&oacute;rio</legend>
+
+		<label  >Vendedor De:</label>
+		<input type="text" id="VendedorDe" class='inputtxt vendedor'>
+
+		<label >Vendedor At&eacute;:</label>
+		<input type="text" id="VendedorAte" class='inputtxt vendedor'>
+
+		<br>
+
+		<label >Data De: </label>
+		<input type="text" id="dataDe">
+
+		<label >Data At&eacute;:</label>
+		<input type="text" id="dataAte">
+
+		<br>
+		
+		<button type="button" id="bt_gerar" name="bt_gerar">Gerar</button>
+
+	</fieldset>
+	
+	<br>
+	
+	<!-- Botão para exportat para o Excel -->
+	<a href="U_WR008Excel.apw" class="export">
+		<img class='imgButton' src="portal_cliente_gt/Imagens/excel-icon.jpg" width="36" height="36" border="0"/>
+	</a>
+    
+	<!-- Container do Loading -->
+	<div align="center" id="LoadingImage" style="display: none"><img src="portal_cliente_gt/Imagens/ajax-loader.gif" /></div>
+	
+	<!-- Container do Relatório -->
+	<div id="relatorio"></div>
+	
+	<br>
+	
+	<!-- Botão para exportat para o Excel -->	
+	<a href="U_WR008Excel.apw" class="export">
+		<img class='imgButton' src="portal_cliente_gt/Imagens/excel-icon.jpg" width="36" height="36" border="0"/>
+	</a>
+</body>
+</html>

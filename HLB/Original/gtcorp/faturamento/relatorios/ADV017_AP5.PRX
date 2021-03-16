@@ -1,0 +1,517 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 06/12/01
+#IFNDEF WINDOWS
+    #DEFINE PSAY SAY
+#ENDIF
+
+
+/*
+Funcao      : ADV017
+Parametros  : Nenhum
+Retorno     : Nenhum   
+Objetivos   : Emissão do Relatorio NET SELLING PRICE. 
+Autor     	: Anizio Lucio Ferreira 
+Data     	: 01/06/1999
+Obs         : 
+Revisão     : Renato Rezende 
+Data/Hora   : 18/02/2013
+Módulo      : Faturamento
+Cliente     : GTCORP
+*/
+
+*-----------------------*
+User Function ADV017()        // incluido pelo assistente de conversao do AP5 IDE em 06/12/01
+*-----------------------*
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CBTXT,CBCONT,NORDEM,LIMITE,TAMANHO,NTIPO")
+SetPrvt("M_PAG,LIN,TITULO,CDESC1,CDESC2,CDESC3")
+SetPrvt("AORD,NCNTIMPR,CRODATXT,WCABEC,ARETURN,ALINHA")
+SetPrvt("NOMEPROG,NLASTKEY,CPERG,NPAGINA,NIVEL,CSAVSCR1")
+SetPrvt("CSAVCUR1,CSAVROW1,CSAVCOL1,CSAVCOR1,_ACAMPOS,_CNOME")
+SetPrvt("CSTRING,CABEC1,CABEC2,WNREL,TREGS,M_MULT")
+SetPrvt("P_ANT,P_ATU,P_CNT,M_SAV20,M_SAV7,QUALQUER")
+SetPrvt("_CINDF2,_DATAFIM,VALMOEDA,VALCOF_R,VALPIS_R,VALCOF_U")
+SetPrvt("VALPIS_U,NETSELL_R,NETSELL_U,STATNFORI,DIAVORIG,AC_QUANT")
+SetPrvt("AC_MERC_R,AC_FRETE_R,AC_ICMS_R,AC_PIS_R,AC_COFIN_R,AC_NETSE_R")
+SetPrvt("AC_CUSTO_R,AC_MERC_U,AC_FRETE_U,AC_ICMS_U,AC_PIS_U,AC_COFIN_U")
+SetPrvt("AC_NETSE_U,AC_CUSTO_U,")
+
+/*/
+ +-----------+------------------------------------------------------------
+ |Programa   |ADV017      Autor   Anizio Lucio Ferreira   Data   01.06.99
+ |-----------|------------------------------------------------------------
+ | Descri‡…o | Emiss„o do Relatorio NET SELLING PRICE.
+ |-----------|------------------------------------------------------------
+ | Uso       | Advanced (Solicitado por Joao Roberto Lima)                 
+ +-----------+------------------------------------------------------------
+/*/
+// -------------------------------------------------------------- 
+//  Define Variaveis                                              
+// -------------------------------------------------------------- 
+#IFNDEF WINDOWS
+// Movido para o inicio do arquivo pelo assistente de conversao do AP5 IDE em 06/12/01 ==>     #DEFINE PSAY SAY
+#ENDIF
+
+CbTxt  :=""
+CbCont :=""
+nOrdem :=0
+limite :=172
+tamanho:="G"
+nTipo  := 0
+m_pag  := 1
+lin    := 100
+titulo :="Net Selling Price - by Product"
+cDesc1 :="Relatorio de Vendas no per¡odo, detalhando ICMS, COFINS, PIS e  "
+cDesc2 :="Frete, em Reais e Dolares, por Produto.                         "
+cDesc3 :="                                       "
+aOrd   := {}
+nCntImpr := 0
+cRodaTxt := ""
+wcabec := .t.
+
+// -------------------------------------------------------------- 
+//  Variaveis padrao de todos os relatorios                       
+// -------------------------------------------------------------- 
+aReturn:= { "Zebrado", 1,"Administracao", 1, 2, 1, "",1 }
+
+aLinha   := {}
+nomeprog :="ADV017"
+nLastKey := 0
+cPerg    :="ADV012    "
+nPagina  := 1
+nivel    := 1
+
+// -------------------------------------------------------------- 
+//  Salva a Integridade dos dados de Entrada                      
+// -------------------------------------------------------------- 
+#IFNDEF WINDOWS
+   cSavScr1 := SaveScreen(3,0,24,79)
+   cSavCur1 := SetCursor(0)
+   cSavRow1 := ROW()
+   cSavCol1 := COL()
+   cSavCor1 := SetColor("bg+/b,,,")
+#ENDIF
+_aCampos := {  {"CODIGO", "C",15,0 } ,;
+               {"EMISSAO","D",8,0 }  ,;
+               {"QUANT",  "N",08,0 } ,;
+               {"MERC_R", "N",12,2 } ,;
+               {"FRETE_R","N",12,2 } ,;
+               {"ICMS_R" ,"N",12,2 } ,;
+               {"PIS_R"  ,"N",12,2 } ,;
+               {"COFIN_R","N",12,2 } ,;
+               {"NETSE_R","N",12,2 } ,;
+               {"CUSTO_R","N",12,2 } ,;
+               {"MERC_U", "N",12,2 } ,;
+               {"FRETE_U","N",12,2 } ,;
+               {"ICMS_U" ,"N",12,2 } ,;
+               {"PIS_U" , "N",12,2 } ,;
+               {"COFIN_U","N",12,2 } ,;
+               {"CUSTO_U","N",12,2 } ,;
+               {"NETSE_U","N",12,2 } }
+_cNome := CriaTrab(_aCampos,.t.)
+dbUseArea(.T.,, _cNome,"XXX",.F.,.F.)
+
+**-------------------ALTERADO PESQUISA - Ronaldo Manoel - 07/12/01-------------------**
+DbSelectArea("XXX")
+_cIndex:=CriaTrab(Nil,.F.)
+IndRegua("XXX",_cIndex,"CODIGO+DTOS(EMISSAO)",,,"Selecionando Registro...")
+//DbSetIndex(_cIndex+OrdBagExt())
+DbSetOrder(1)
+
+//Index on CODIGO+DTOS(EMISSAO) to &_cNome
+
+// -------------------------------------------------------------- 
+//  Variaveis utilizadas para Impressao do Cabecalho e Rodape     
+// -------------------------------------------------------------- 
+cString  :="XXX"
+cabec1  := "                                ------------------------------- REAIS ----------------------------------------------------   ------------------------------ DOLARES ------------------------------------------------"
+cabec2   := "C¢digo Produto       Quant.     Valor Produto   Valor Fret    Valor ICM  Valor PIS  Vl.COFINS    Valor Net    Valor Custo Valor Produto   Valor Fret    Valor ICM  Valor PIS  Vl.COFINS    Valor Net  Valor Custo"
+*            012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+*                      1         2         3         4         5         6         7         8         9        10         11        12        13        14        15        16        17         18        19        20
+// --------------------------------------------------------------                                                                                                                                    
+//  Verifica as perguntas selecionadas                            
+// -------------------------------------------------------------- 
+pergunte(cPerg,.T.)
+// -------------------------------------------------------------- 
+//  Variaveis utilizadas para parametros                          
+//  mv_par01             // da  data                              
+//  mv_par02             // ate Data                              
+// -------------------------------------------------------------- 
+// -------------------------------------------------------------- 
+//  Envia controle para a funcao SETPRINT                         
+// -------------------------------------------------------------- 
+
+wnrel:="ADV017"   // nome default do relatorio em disco
+wnrel:=SetPrint(cString,wnrel,cPerg,Titulo,cDesc1,cDesc2,cDesc3,.F.)
+
+If LastKey()== 27 .Or. nLastKey==27
+   #IFNDEF WINDOWS
+      RestScreen(3,0,24,79,cSavScr1)
+   #ENDIF
+   dbSelectArea("XXX")
+   DbCloseArea("XXX")
+   Return
+Endif
+
+SetDefault(aReturn,cString)
+
+If LastKey()==27 .or. nLastKey==27
+   #IFNDEF WINDOWS
+      RestScreen(3,0,24,79,cSavScr1)
+   #ENDIF
+   dbSelectArea("XXX")
+   DbCloseArea("XXX")
+   Return
+Endif
+
+#IFDEF WINDOWS
+     RptStatus({|| ADV017Imp()},titulo)// Substituido pelo assistente de conversao do AP5 IDE em 06/12/01 ==>      RptStatus({|| Execute(ADV017Imp)},titulo)
+     Return
+// Substituido pelo assistente de conversao do AP5 IDE em 06/12/01 ==>      Function ADV017Imp
+
+*--------------------------*
+Static Function ADV017Imp()
+*--------------------------*
+
+#ENDIF
+
+titulo := titulo + ", de "+dtoc(mv_par01) + " a "+dtoc(mv_par02)
+// -------------------------------------------------------------- 
+//  Variaveis utilizadas na regua de processamento                
+// -------------------------------------------------------------- 
+tregs 	:= RecCount()
+m_mult 	:= IIf(tregs>0,70/tregs,1)
+p_ant	:= 4
+p_atu	:= 4
+p_cnt	:= 0
+
+qualquer := "t"
+_cIndF2 := CriaTrab(qualquer,.f.)
+
+
+**-------------------ALTERADO PESQUISA - Ronaldo Manoel - 07/12/01-------------------**
+DbSelectArea("SF2")
+_cIndex:=CriaTrab(Nil,.F.)
+IndRegua("SF2",_cIndex,"dtos(F2_EMISSAO)+F2_VEND1+F2_CLIENTE+F2_LOJA",,,"Selecionando Registro...")
+//DbSetIndex(_cIndex+OrdBagExt())
+DbSetOrder(1)
+DbGoTop()
+
+
+//index on dtos(SF2->F2_EMISSAO)+SF2->(F2_VEND1+F2_CLIENTE+F2_LOJA) to &_cIndF2
+
+
+if mv_par03 == 2
+   wcabec := .f.
+   lin := 0
+   @ lin+1,00 PSAY CABEC2
+   lin := 2
+endif
+
+_datafim := mv_par02
+nTXPIS:=getmv("MV_TXPIS")/100
+
+DbSelectArea("SB1")
+SetRegua(lastrec())
+DbSetOrder(1)
+DbGoTop()
+do while !eof()
+   IncRegua()
+   DbSelectArea("SD2")
+   DbSetorder(6)
+   DbSeek(xfilial("SD2")+SB1->B1_COD,.T.)
+   do while SD2->D2_COD==SB1->B1_COD .and. !Eof()
+      if SD2->D2_EMISSAO < mv_par01 .or. SD2->D2_EMISSAO > mv_par02
+         DbSkip()
+         loop
+      endif
+      		l75:=.t.      
+		if subs(SD2->D2_CF,1,1)="7"
+			IF ! subs(SD2->D2_CF,2,1)$"15"		
+				DbSkip()
+				loop    
+			ENDIF			
+			l75:=.f.
+		ENDIF	
+		if !(subs(SD2->D2_CF,2,1)$"1")
+			if l75
+				DbSkip()
+				loop   
+			endif	 
+		endif
+
+
+      ValMoeda     := RecMoeda(SD2->D2_EMISSAO,"2")
+      ValCOF_R     := round(SD2->D2_TOTAL * 0.03,2)
+      ValPIS_R     := round(SD2->D2_TOTAL * nTXPIS,2)
+      ValCOF_U     := round((SD2->D2_TOTAL * 0.03)   / ValMoeda,2)
+      ValPIS_U     := round((SD2->D2_TOTAL * nTXPIS) / ValMoeda,2)
+
+      if SM0->M0_CODIGO=="E1"
+              netsell_r    := SD2->(D2_TOTAL-D2_VALICM-D2_RATFRET)-ValPIS_R-ValCOF_R
+      ELSE
+              netsell_r    := SD2->(D2_TOTAL-D2_VALICM)-ValPIS_R-ValCOF_R
+      ENDIF
+
+      netsell_u    := netsell_r / ValMoeda
+      * Registro selecionado p/impressao
+      DbSelectArea("XXX")
+      DbSeek(SD2->D2_COD,.T.)
+      if found()
+         if RecLock("XXX",.f.)
+            XXX->QUANT   := SD2->D2_QUANT  + XXX->QUANT
+            XXX->MERC_R  := SD2->D2_TOTAL  + XXX->MERC_R
+            XXX->ICMS_R  := SD2->D2_VALICM + XXX->ICMS_R
+            XXX->PIS_R   := ValPIS_R       + XXX->PIS_R
+            XXX->COFIN_R := ValCOF_R       + XXX->COFIN_R
+            if SM0->M0_CODIGO=="E1"
+                    XXX->FRETE_R := SD2->D2_RATFRET+ XXX->FRETE_R
+            endif
+            XXX->NETSE_R := netsell_r + XXX->NETSE_R
+            XXX->CUSTO_R := SD2->D2_CUSTO1 + XXX->CUSTO_R
+            XXX->MERC_U  := (SD2->D2_TOTAL /ValMoeda) + XXX->MERC_U
+            XXX->ICMS_U  := (SD2->D2_VALICM/ValMoeda) + XXX->ICMS_U
+            XXX->PIS_U   := ValPIS_U                  + XXX->PIS_U
+            XXX->COFIN_U := ValCOF_U                  + XXX->COFIN_U
+            if SM0->M0_CODIGO=="E1"
+                XXX->FRETE_U := (SD2->D2_RATFRET/ValMoeda)+ XXX->FRETE_U
+            endif
+            XXX->NETSE_U := netsell_u + XXX->NETSE_U
+            XXX->CUSTO_U := SD2->D2_CUSTO2 + XXX->CUSTO_U
+            MsUnLock()
+         endif
+      else
+         if RecLock("XXX",.T.)
+            XXX->CODIGO  := SD2->D2_COD
+            XXX->EMISSAO := SD2->D2_EMISSAO
+            XXX->QUANT   := SD2->D2_QUANT
+            XXX->MERC_R  := SD2->D2_TOTAL
+            XXX->ICMS_R  := SD2->D2_VALICM
+            XXX->PIS_R   := ValPIS_R
+            XXX->COFIN_R := ValCOF_R
+            if SM0->M0_CODIGO=="E1"
+                    XXX->FRETE_R := SD2->D2_RATFRET
+            endif
+            XXX->NETSE_R := netsell_r
+            XXX->CUSTO_R := SD2->D2_CUSTO1
+            XXX->MERC_U  := (SD2->D2_TOTAL /ValMoeda)
+            XXX->ICMS_U  := (SD2->D2_VALICM/ValMoeda)
+            XXX->PIS_U   := ValPIS_U
+            XXX->COFIN_U := ValCOF_U
+            if SM0->M0_CODIGO=="E1"
+                XXX->FRETE_U := SD2->D2_RATFRET/ValMoeda
+            endif
+            XXX->NETSE_U := netsell_u
+            XXX->CUSTO_U := SD2->D2_CUSTO2
+            MsUnLock()
+         endif
+      endif
+      DbSelectArea("SD2")
+      DbSkip()
+   enddo
+   DbSelectArea("SD1")
+   DbSetorder(7)  // xifilial+d1_cod+d1_local+dtos(d1_dtdigit)
+   DbSeek(xfilial("SD1")+SB1->B1_COD,.T.)
+   do while SD1->D1_COD==SB1->B1_COD .and. !Eof()
+      if subs(dtos(SD1->D1_DTDIGIT),1,6) != subs(dtos(_datafim),1,6)
+         DbSkip()
+         loop
+      endif
+      if subs(SD1->D1_CF,2,2)!="20"
+         DbSkip()
+         loop
+      endif
+
+      if SM0->M0_CODIGO=="E1"
+         if SD1->D1_LOCAL=="10"
+            DbSkip()
+            loop
+          endif
+      endif
+
+      DbSelectArea("SD2")
+      DbSetOrder(3)  // xfilial+d2_doc+d2_serie+d2_cliente+d2_loja+d2_cod
+      DbSeek(xfilial("SD2")+SD1->(D1_NFORI+D1_SERIORI+D1_FORNECE+D1_LOJA+D1_COD),.T.)
+      if found()
+         statnfori := "S"
+         diavorig := SD2->D2_EMISSAO
+      else
+         statnfori := "N"
+         diavorig := SD1->D1_DTDIGIT
+      endif
+
+      ValMoeda     := RecMoeda(diavorig,"2")
+      ValCOF_R     := round(SD1->D1_TOTAL * 0.03,2)
+      ValPIS_R     := round(SD1->D1_TOTAL * nTXPIS,2)
+      ValCOF_U     := round(ValCOF_R / ValMoeda,2)
+      ValPIS_U     := round(ValPIS_R / ValMoeda,2)
+      netsell_r    := SD1->(D1_TOTAL-D1_VALICM)-ValPIS_R-ValCOF_R
+      netsell_u    := netsell_r / ValMoeda
+
+      * Registro selecionado p/impressao
+      DbSelectArea("XXX")
+      DbSeek(SD1->D1_COD,.T.)
+      if found()
+         if RecLock("XXX",.f.)
+            XXX->QUANT   := XXX->QUANT  - SD1->D1_QUANT
+            XXX->MERC_R  := XXX->MERC_R  - SD1->D1_TOTAL
+            XXX->ICMS_R  := XXX->ICMS_R  - SD1->D1_VALICM
+            XXX->PIS_R   := XXX->PIS_R   - ValPIS_R
+            XXX->COFIN_R := XXX->COFIN_R - ValCOF_R
+            XXX->NETSE_R := XXX->NETSE_R - netsell_r
+            if statnfori == "S"
+               XXX->CUSTO_R := XXX->CUSTO_R - SD1->D1_CUSTO
+               XXX->CUSTO_U := XXX->CUSTO_U - SD1->D1_CUSTO2
+            endif
+            XXX->MERC_U  := XXX->MERC_U  - (SD1->D1_TOTAL /ValMoeda)
+            XXX->ICMS_U  := XXX->ICMS_U  - (SD1->D1_VALICM/ValMoeda)
+            XXX->PIS_U   := XXX->PIS_U   - ValPIS_U
+            XXX->COFIN_U := XXX->COFIN_U - ValCOF_U
+            XXX->NETSE_U := XXX->NETSE_U - netsell_u
+            MsUnLock()
+         endif
+      else
+         if RecLock("XXX",.T.)
+            XXX->CODIGO  := SD1->D1_COD
+            XXX->EMISSAO := SD1->D1_EMISSAO
+            //XXX->QUANT   := XXX->QUANT * -1
+			XXX->QUANT   := sd1->d1_quant * -1   // MODIFICADO HAMILTON -> IMPRIME 0 QDO NAO HA SD2
+            XXX->MERC_R  := SD1->D1_TOTAL  * -1
+            XXX->ICMS_R  := SD1->D1_VALICM * -1
+            XXX->PIS_R   := ValPIS_R * -1
+            XXX->COFIN_R := ValCOF_R * -1
+            XXX->NETSE_R := netsell_r  *-1
+            if statnfori == "S"
+               XXX->CUSTO_R := SD1->D1_CUSTO * -1
+               XXX->CUSTO_U := SD1->D1_CUSTO2  * -1
+            endif
+            XXX->MERC_U  := (SD1->D1_TOTAL /ValMoeda) * -1
+            XXX->ICMS_U  := (SD1->D1_VALICM/ValMoeda) * -1
+            XXX->PIS_U   := ValPIS_U * -1
+            XXX->COFIN_U := ValCOF_U * -1
+            XXX->NETSE_U := netsell_u  * -1
+            MsUnLock()
+         endif
+      endif
+      DbSelectArea("SD1")
+      DbSkip()
+   enddo
+   DbSelectArea("SB1")
+   DbSkip()
+enddo
+ac_QUANT   := 0
+ac_MERC_R  := 0
+ac_FRETE_R := 0
+ac_ICMS_R  := 0
+ac_PIS_R   := 0
+ac_COFIN_R := 0
+ac_NETSE_R := 0
+ac_CUSTO_R := 0
+ac_MERC_U  := 0
+ac_FRETE_U := 0
+ac_ICMS_U  := 0
+ac_PIS_U   := 0
+ac_COFIN_U := 0
+ac_NETSE_U := 0
+ac_CUSTO_U := 0
+
+DbSelectArea("XXX")
+DbGoTop()
+do while !Eof()
+   SomaLin()
+   @ lin,000 PSAY XXX->CODIGO
+   @ lin,018 PSAY XXX->QUANT   picture "@E 999,999,999"
+   @ lin,032 PSAY XXX->MERC_R  picture "@E 99,999,999.99"
+   @ lin,046 PSAY XXX->FRETE_R picture  "@E 9,999,999.99"
+   @ lin,059 PSAY XXX->ICMS_R  picture  "@E 9,999,999.99"
+   @ lin,072 PSAY XXX->PIS_R   picture    "@E 999,999.99"
+   @ lin,083 PSAY XXX->COFIN_R picture    "@E 999,999.99"
+   @ lin,094 PSAY XXX->NETSE_R picture "@E 99,999,999.99"
+   @ lin,108 PSAY XXX->CUSTO_R picture "@E 99,999,999.99"
+   @ lin,122 PSAY XXX->MERC_U  picture "@E 99,999,999.99"
+   @ lin,136 PSAY XXX->FRETE_U picture  "@E 9,999,999.99"
+   @ lin,149 PSAY XXX->ICMS_U  picture  "@E 9,999,999.99"
+   @ lin,162 PSAY XXX->PIS_U   picture    "@E 999,999.99"
+   @ lin,173 PSAY XXX->COFIN_U picture    "@E 999,999.99"
+   @ lin,184 PSAY XXX->NETSE_U picture "@E 99,999,999.99"
+   @ lin,198 PSAY XXX->CUSTO_U picture "@E 99,999,999.99"
+   ac_QUANT   := ac_QUANT   + XXX->QUANT 
+   ac_MERC_R  := ac_MERC_R  + XXX->MERC_R
+   ac_FRETE_R := ac_FRETE_R + XXX->FRETE_R
+   ac_ICMS_R  := ac_ICMS_R  + XXX->ICMS_R
+   ac_PIS_R   := ac_PIS_R   + XXX->PIS_R
+   ac_COFIN_R := ac_COFIN_R + XXX->COFIN_R
+   ac_NETSE_R := ac_NETSE_R + XXX->NETSE_R
+   ac_CUSTO_R := ac_CUSTO_R + XXX->CUSTO_R
+   ac_MERC_U  := ac_MERC_U  + XXX->MERC_U
+   ac_FRETE_U := ac_FRETE_U + XXX->FRETE_U
+   ac_ICMS_U  := ac_ICMS_U  + XXX->ICMS_U
+   ac_PIS_U   := ac_PIS_U   + XXX->PIS_U
+   ac_COFIN_U := ac_COFIN_U + XXX->COFIN_U
+   ac_NETSE_U := ac_NETSE_U + XXX->NETSE_U
+   ac_CUSTO_U := ac_CUSTO_U + XXX->CUSTO_U
+   DbSkip()
+enddo
+SomaLin()
+if wcabec
+   @ lin,000 PSAY replicate("-",182)
+   SomaLin()
+endif
+@ lin,000 PSAY "Totais"
+@ lin,018 PSAY ac_QUANT   picture "@E 999,999,999"
+@ lin,032 PSAY ac_MERC_R  picture "@E 99,999,999.99"
+@ lin,046 PSAY ac_FRETE_R picture  "@E 9,999,999.99"
+@ lin,059 PSAY ac_ICMS_R  picture  "@E 9,999,999.99"
+@ lin,072 PSAY ac_PIS_R   picture    "@E 999,999.99"
+@ lin,083 PSAY ac_COFIN_R picture    "@E 999,999.99"
+@ lin,094 PSAY ac_NETSE_R picture "@E 99,999,999.99"
+@ lin,108 PSAY ac_CUSTO_R picture "@E 99,999,999.99"
+@ lin,122 PSAY ac_MERC_U  picture "@E 99,999,999.99"
+@ lin,136 PSAY ac_FRETE_U picture  "@E 9,999,999.99"
+@ lin,149 PSAY ac_ICMS_U  picture  "@E 9,999,999.99"
+@ lin,162 PSAY ac_PIS_U   picture    "@E 999,999.99"
+@ lin,173 PSAY ac_COFIN_U picture    "@E 999,999.99"
+@ lin,184 PSAY ac_NETSE_U picture "@E 99,999,999.99"
+@ lin,198 PSAY ac_CUSTO_U picture "@E 99,999,999.99"
+if wcabec
+   SomaLin()
+   @ lin,000 PSAY replicate("-",185)
+   Roda(nCntImpr,cRodaTxt,Tamanho)
+endif
+
+// -------------------------------------------------------------- 
+//  Restaura Ambiente                                             
+// -------------------------------------------------------------- 
+dbSelectArea("XXX")
+DbCloseArea("XXX")
+Erase &_cNome+".DBF"
+//Erase &_cNome+".NTX"
+Set Device To Screen 
+SetPgEject(.F.)
+#IFNDEF WINDOWS
+   RestScreen(3,0,24,79,cSavScr1)
+#ENDIF
+If aReturn[5] == 1
+     Set Printer TO
+     dbcommitAll()
+     ourspool(wnrel)
+Endif
+Return
+
+// Substituido pelo assistente de conversao do AP5 IDE em 06/12/01 ==> Function Somalin 
+*--------------------------*
+Static Function Somalin()
+*--------------------------*
+
+lin := lin + 1
+if lin > 58 .and. wcabec
+   cabec(titulo,cabec1,cabec2,wnrel,Tamanho,nTipo)
+   lin := 8
+endif
+Return

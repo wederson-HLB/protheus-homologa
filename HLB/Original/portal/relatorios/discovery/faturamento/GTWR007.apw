@@ -1,0 +1,199 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include "tbiconn.ch"
+#Include "Topconn.ch"
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR007 ºAutor  ³Eduardo C. Romanini  º  Data ³  26/07/13   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Relatorio de Faturamento da Discovery.                      º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal Grant Thornton                                      º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/                                          
+*---------------------*
+User Function GTWR007()
+*---------------------*
+Local cHtml	:= "" 
+Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja   := Substr(HttpSession->cEmpresa,3,2)
+
+WEB EXTENDED INIT cHtml
+
+If cEmp <> "49"
+	cHtml := "<html><body><h1>Essa empresa não possui acesso a esse relatorio</h1></body></html>" 
+Else
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	
+	cHtml := ExecInPage("GTWR007")
+	
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml  
+
+/*
+Função  : WR007Gera()
+Objetivo: Gerar o relatório e exibi-lo na tela
+Autor   : Eduardo C. Romanin
+Data    : 26/07/2013 
+*/
+*-----------------------*
+User Function WR007Gera()
+*-----------------------*
+Local cHtml    := ""
+Local cDataDe  := HttpPost->cDataDe 
+Local cDataAte := HttpPost->cDataAte
+Local cEmp     := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja    := Substr(HttpSession->cEmpresa,3,2)
+Local cBanco   := ""
+Local cIp      := ""
+Local cDest    := ""
+Local cWhere   := ""
+
+Local nCon := 0
+
+Local dDataDe 
+Local dDataAte
+
+Local aCon := {}
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If HttpGet->cDataDe != Nil .And. HttpGet->cDataAte != Nil
+	cDataDe := UnEscape(HttpGet->cDataDe)
+	cDataAte := UnEscape(HttpGet->cDataAte)
+EndIf
+
+//Transforma os parametros recebidos em data e em string
+If !Empty(cDataDe)
+	dDataDe  := CtoD(cDataDe)
+	cDataDe  := DtoS(dDataDe)
+EndIf
+
+If !Empty(cDataAte)
+	dDataAte := CtoD(cDataAte)
+	cDataAte := DtoS(dDataAte)
+EndIf
+
+//Carrega a validação da data
+If !Empty(cDataDe) .and. !Empty(cDataAte)
+	cWhere := "% AND A.F2_EMISSAO BETWEEN '"+ cDataDe+ "' and '" + cDataAte + "' %"
+ElseIf !Empty(cDataDe)
+	cWhere := "% AND A.F2_EMISSAO >= '" + cDataDe + "' %"
+ElseIf !Empty(cDataAte)
+	cWhere := "% AND A.F2_EMISSAO <= '" + cDataAte + "' %"
+Else
+	cWhere := "% %"
+EndIf
+
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cLoja)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+	
+//Realiza a conexão com o banco de dados da empresa
+//MSM - 09/06/2015 - Alterado a porta do top para o do novo ambiente
+nCon := TCLink(cBanco,cIp,7891)
+
+//Executa a query para gerar o relatório
+BeginSql Alias 'SQL'
+	SELECT F2_SERIE+F2_DOC AS 'Doc'
+	      ,C5_P_NMAGC
+	      ,C5_CLIENTE + '/' + C5_LOJACLI AS 'Cliente'
+	      ,C5_P_PI
+	      ,F2_VALBRUT+F2_DESCONT AS 'Valor'
+	      ,C5_VEND1
+	      ,F2_DESCONT
+	      ,F2_VALBRUT
+	FROM SF2490 A
+	    ,SC5490 B
+	WHERE A.%notDel%
+	  AND B.%notDel%
+	  AND A.F2_SERIE <> '1'
+	  AND  A.F2_FILIAL+A.F2_DOC+A.F2_SERIE=B.C5_FILIAL+B.C5_NOTA+B.C5_SERIE
+	  %exp:cWhere%
+	ORDER BY F2_SERIE,F2_DOC
+EndSql
+	
+//Imprime os valores na tela
+SQL->(DbGoTop())
+If SQL->(!BOF()) .and. SQL->(!EOF()) 
+	HttpCtType('text/html; charset=iso-8859-1')
+		
+	// Se tiver dados modifica o tipo de retorno
+	If HttpGet->cDataDe != Nil .And. HttpGet->cDataAte != Nil
+		cNome := ''
+		cDia := StrZero(Day(dDataBase), 2)
+		cMes := StrZero(Month(dDataBase), 2)
+		cAno := AllTrim(Str(Year(dDataBase)))
+			
+		cNome += AllTrim(HttpSession->cLogin) + '_'
+		cNome += cAno + cMes + cDia + '_' + AllTrim(Str(Round(Seconds(),0)))
+			
+		HttpCtDisp('attachment; filename="' + cNome + '.xls"')
+		HttpCtType('application/vnd.ms-excel')
+	EndIf
+
+	cHtml :=	"<table id='tb1'>" + CRLF
+	cHtml +=	"	<thead>" + CRLF
+	cHtml +=	"		<tr>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("Documento") + "</th>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("Agencia") + "</th>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("Cod. Cliente") + "</th>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("PI") + "</th>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("Valor Liquido") + "</th>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("Cod. Vendedor") + "</th>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("Comissao") + "</th>" + CRLF
+	cHtml +=	"			<th>"+ u_WFTraduzir("Valor Bruto") + "</th>" + CRLF
+	cHtml +=	"		</tr>" + CRLF
+	cHtml +=	"	</thead>" + CRLF
+	cHtml +=	"	<tbody>" + CRLF
+	
+	While SQl->(!EOF())
+
+		cHtml +=	"	<tr class='odd'>" + CRLF	
+		cHtml +=	"		<td>"+AllTrim(SQL->Doc)+"</td>" + CRLF
+		cHtml +=	"		<td>"+AllTrim(SQL->C5_P_NMAGC)+"</td>" + CRLF
+		cHtml +=	"		<td>"+AllTrim(SQL->Cliente)+"</td>" + CRLF
+		cHtml +=	"		<td>"+AllTrim(SQL->C5_P_PI)+"</td>" + CRLF
+		cHtml +=	"		<td>"+Transform(SQL->Valor,"@E 99,999,999.99")+"</td>" + CRLF
+		cHtml +=	"		<td>"+AllTrim(SQL->C5_VEND1)+"</td>" + CRLF
+		cHtml +=	"		<td>"+Transform(SQL->F2_DESCONT,"@E 99,999,999.99")+"</td>" + CRLF
+		cHtml +=	"		<td>"+Transform(SQL->F2_VALBRUT,"@E 99,999,999.99")+"</td>" + CRLF
+		cHtml +=	"	</tr>" + CRLF
+			
+		SQL->(DbSkip())
+	EndDo
+		
+	cHtml +=	"	</tbody>" + CRLF
+	cHtml +=	"</table>"
+		
+Else
+	cHtml := "<script type='text/javascript'>" + CRLF
+	cHtml += "alert('Nao existe dados para o periodo informado.')" + CRLF
+	cHtml += "</script>" + CRLF
+EndIf
+
+//Fecha o arquivo temporário
+SQL->(DbCloseArea())
+
+//Encerra a conexão
+TCunLink(nCon)
+
+WEB EXTENDED END
+
+Return cHtml

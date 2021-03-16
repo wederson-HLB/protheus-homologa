@@ -1,0 +1,384 @@
+Group Portal
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=8
+   Project Generico
+      FoldersCount=3
+      Folder Funcoes
+         VSSPath=Nova Pasta2
+         FilesCount=5
+         File \Portal\Genericos\Funções\GTWF001.prw
+             Type=T
+         End
+         File \portal\genericos\funções\GTWF002.prw
+             Type=T
+         End
+         File \portal\Fluig\GTFLG003.prw
+             Type=T
+         End
+         File \teste.prw
+             Type=T
+         End
+         File \portal\Fluig\GTFLG002.prw
+             Type=T
+         End
+      End
+      Folder Updates
+         VSSPath=Nova Pasta3
+         FilesCount=2
+         File \Portal\Genericos\Updates\UWEB001.prw
+             Type=T
+         End
+         File \Portal\Genericos\Updates\UWEB002.prw
+             Type=T
+         End
+      End
+      Folder Objetos
+         VSSPath=Nova Pasta3
+         FilesCount=1
+         File \GTHD\GENERICO\DEMAIL.PRW
+             Type=T
+         End
+      End
+   End
+   Project Cadastros
+      FoldersCount=6
+      Folder Usuarios
+         VSSPath=Nova Pasta1
+         FilesCount=3
+         File \Portal\Cadastros\Usuarios\GTWC001.apw
+             Type=T
+         End
+         File \Portal\Cadastros\Usuarios\GTWC001.aph
+             Type=T
+         End
+         File \Portal\Cadastros\Usuarios\GTWCM01.aph
+             Type=T
+         End
+      End
+      Folder Empresas
+         VSSPath=Nova Pasta2
+         FilesCount=3
+         File \Portal\Cadastros\Empresas\GTWC002.apw
+             Type=T
+         End
+         File \Portal\Cadastros\Empresas\GTWC002.aph
+             Type=T
+         End
+         File \Portal\Cadastros\Empresas\GTWCM02.aph
+             Type=T
+         End
+      End
+      Folder Menus
+         VSSPath=Nova Pasta3
+         FilesCount=3
+         File \Portal\Cadastros\Menus\GTWC003.apw
+             Type=T
+         End
+         File \Portal\Cadastros\Menus\GTWC003.aph
+             Type=T
+         End
+         File \Portal\Cadastros\Menus\GTWCM03.aph
+             Type=T
+         End
+      End
+      Folder Rotinas
+         VSSPath=Nova Pasta4
+         FilesCount=3
+         File \Portal\Cadastros\Rotinas\GTWC004.apw
+             Type=T
+         End
+         File \Portal\Cadastros\Rotinas\GTWC004.aph
+             Type=T
+         End
+         File \Portal\Cadastros\Rotinas\GTWCM04.aph
+             Type=T
+         End
+      End
+      Folder SubMenu
+         VSSPath=Nova Pasta5
+         FilesCount=3
+         File \Portal\Cadastros\SubMenus\GTWC005.apw
+             Type=T
+         End
+         File \Portal\Cadastros\SubMenus\GTWC005.aph
+             Type=T
+         End
+         File \Portal\Cadastros\SubMenus\GTWCM05.aph
+             Type=T
+         End
+      End
+      Folder Grupos
+         VSSPath=Nova Pasta6
+         FilesCount=3
+         File \Portal\Cadastros\Grupos\GTWC006.apw
+             Type=T
+         End
+         File \Portal\Cadastros\Grupos\GTWC006.aph
+             Type=T
+         End
+         File \Portal\Cadastros\Grupos\GTWCM06.aph
+             Type=T
+         End
+      End
+   End
+   Project Principal
+      FoldersCount=7
+      Folder Login
+         VSSPath=Nova Pasta1
+         FilesCount=3
+         File \Portal\Principal\Login\GTWP001.APW
+             Type=T
+         End
+         File \Portal\Principal\Login\GTWP001.APH
+             Type=T
+         End
+         File \Portal\Principal\Login\GTWV001.prw
+             Type=T
+         End
+      End
+      Folder Frames
+         VSSPath=Nova Pasta2
+         FilesCount=2
+         File \Portal\Principal\Frames\GTWP002.APW
+             Type=T
+         End
+         File \Portal\Principal\Frames\GTWP002.APH
+             Type=T
+         End
+      End
+      Folder Topo
+         VSSPath=Nova Pasta3
+         FilesCount=2
+         File \Portal\Principal\Topo\GTWP003.APW
+             Type=T
+         End
+         File \Portal\Principal\Topo\GTWP003.APH
+             Type=T
+         End
+      End
+      Folder Menu
+         VSSPath=Nova Pasta4
+         FilesCount=2
+         File \Portal\Principal\Menu\GTWP004.APW
+             Type=T
+         End
+         File \Portal\Principal\Menu\GTWP004.APH
+             Type=T
+         End
+      End
+      Folder Principal
+         VSSPath=Nova Pasta5
+         FilesCount=2
+         File \Portal\Principal\Principal\GTWP005.aph
+             Type=T
+         End
+         File \Portal\Principal\Principal\GTWP005.apw
+             Type=T
+         End
+      End
+      Folder Rodape
+         VSSPath=Nova Pasta6
+         FilesCount=2
+         File \Portal\Principal\Rodape\GTWP006.APW
+             Type=T
+         End
+         File \Portal\Principal\Rodape\GTWP006.APH
+             Type=T
+         End
+      End
+      Folder Sessão
+         VSSPath=Nova Pasta7
+         FilesCount=2
+         File \Portal\Principal\Sessão\GTWP007.apw
+             Type=T
+         End
+         File \Portal\Principal\Sessão\GTWP007.aph
+             Type=T
+         End
+      End
+   End
+   Project Solicitações
+      FoldersCount=2
+      Folder Faturamento
+         VSSPath=Nova Pasta1
+         FilesCount=3
+         File \Portal\Solicitações\Faturamento\GTWS001.aph
+             Type=T
+         End
+         File \Portal\Solicitações\Faturamento\GTWS001.apw
+             Type=T
+         End
+         File \Portal\Solicitações\Faturamento\GTWSM01.aph
+             Type=T
+         End
+      End
+      Folder Faturamento GT
+         VSSPath=Nova Pasta2
+         FilesCount=3
+         File \portal\solicitações\faturamento GT\GTWS002.apw
+             Type=T
+         End
+         File \portal\solicitações\faturamento GT\GTWSM02.aph
+             Type=T
+         End
+         File \portal\solicitações\faturamento GT\GTWS002.aph
+             Type=T
+         End
+      End
+   End
+   Project WebService
+      FoldersCount=1
+      Folder Bizagi
+         VSSPath=Nova Pasta1
+         FilesCount=3
+         File \Portal\WebService\WorkflowEngineSOA.prw
+             Type=T
+         End
+         File \Portal\WebService\GTWW001.prw
+             Type=T
+         End
+         File \Portal\WebService\IntFatBizagi.PRW
+             Type=T
+         End
+      End
+   End
+   Project Dashboard
+      FoldersCount=2
+      Folder Movimentos
+         VSSPath=Nova Pasta1
+         FilesCount=8
+         File \portal\dashboard\movimentos\GTWGM001.prw
+             Type=T
+         End
+         File \portal\dashboard\movimentos\GTWGM002.apw
+             Type=T
+         End
+         File \portal\dashboard\movimentos\GTWGM003.apw
+             Type=T
+         End
+         File \portal\dashboard\movimentos\GTWGM003.aph
+             Type=T
+         End
+         File \portal\dashboard\movimentos\GTWGM004.apw
+             Type=T
+         End
+         File \portal\dashboard\movimentos\GTWGM004.aph
+             Type=T
+         End
+         File \portal\dashboard\movimentos\GTWGM005.apw
+             Type=T
+         End
+         File \PORTAL\DASHBOARD\MOVIMENTOS\GTWGM006.PRW
+             Type=T
+         End
+      End
+      Folder Nova Pasta2
+         VSSPath=Nova Pasta2
+         FilesCount=0
+      End
+   End
+   Project Relatorios
+      FoldersCount=4
+      Folder Discovery
+         VSSPath=Nova Pasta1
+         FilesCount=6
+         File \portal\relatorios\discovery\comissões\GTWR001.apw
+             Type=T
+         End
+         File \portal\relatorios\discovery\comissões\GTWR001.aph
+             Type=T
+         End
+         File \portal\relatorios\discovery\titulos a receber\GTWR006.apw
+             Type=T
+         End
+         File \portal\relatorios\discovery\titulos a receber\GTWR006.aph
+             Type=T
+         End
+         File \portal\relatorios\discovery\titulos a receber\GTWR009.aph
+             Type=T
+         End
+         File \portal\relatorios\discovery\titulos a receber\GTWR009.apw
+             Type=T
+         End
+      End
+      Folder FSI
+         VSSPath=Nova Pasta2
+         FilesCount=4
+         File \portal\relatorios\fsi\estoque\GTWR002.apw
+             Type=T
+         End
+         File \portal\relatorios\fsi\estoque\GTWR002.aph
+             Type=T
+         End
+         File \portal\relatorios\fsi\vendas\GTWR003.apw
+             Type=T
+         End
+         File \portal\relatorios\fsi\vendas\GTWR003.aph
+             Type=T
+         End
+      End
+      Folder GlobalEnglish
+         VSSPath=Nova Pasta3
+         FilesCount=2
+         File \portal\relatorios\globalenglish\contas\GTWR004.apw
+             Type=T
+         End
+         File \portal\relatorios\globalenglish\contas\GTWR004.aph
+             Type=T
+         End
+      End
+      Folder SNF
+         VSSPath=Nova Pasta4
+         FilesCount=3
+         File \portal\relatorios\snf\fat_vendedor\GTWR008.aph
+             Type=T
+         End
+         File \portal\relatorios\snf\fat_vendedor\GTWR008A.aph
+             Type=T
+         End
+         File \portal\relatorios\snf\fat_vendedor\GTWR008.apw
+             Type=T
+         End
+      End
+   End
+   Project FLuig
+      FoldersCount=2
+      Folder Webservice
+         VSSPath=Nova Pasta1
+         FilesCount=3
+         File \portal\Fluig\Webservice\_OKRLOEO.prw
+             Type=T
+         End
+         File \portal\Fluig\Webservice\_VAJCRFN.prw
+             Type=T
+         End
+         File \portal\Fluig\Webservice\_RIQJKFK.prw
+             Type=T
+         End
+      End
+      Folder Integrações
+         VSSPath=Nova Pasta2
+         FilesCount=3
+         File \portal\Fluig\Integrações\GTFLG003.prw
+             Type=T
+         End
+         File \portal\Fluig\Integrações\GTFLG002.prw
+             Type=T
+         End
+         File \portal\Fluig\Integrações\GTFLG004.prw
+             Type=T
+         End
+      End
+   End
+End

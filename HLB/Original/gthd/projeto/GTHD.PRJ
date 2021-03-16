@@ -1,0 +1,146 @@
+Group Helpdesk
+   Version=7.0
+   VSSDB=
+   HasProperties=1
+   Properties
+      BeforeApply=
+      AfterApply=
+      Icon=
+      ID=
+      Version=
+      PalmName=
+      OutPut=
+   End
+   ProjectsCount=1
+   Project Rdmakes
+      FoldersCount=8
+      Folder Atualização
+         VSSPath=Fontes
+         FilesCount=4
+         File \Gthd\Atualização\GTHDA001.prw
+             Type=T
+         End
+         File \Gthd\Atualização\GTHDA002.prw
+             Type=T
+         End
+         File \Gthd\Atualização\GTHDA003.prw
+             Type=T
+         End
+         File \Gthd\Atualização\GTHDA004.prw
+             Type=T
+         End
+      End
+      Folder Cadastro
+         VSSPath=Nova Pasta2
+         FilesCount=11
+         File \Gthd\Cadastro\GTHDC001.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC002.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC003.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC004.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC005.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC006.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC007.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC008.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC009.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC010.prw
+             Type=T
+         End
+         File \Gthd\Cadastro\GTHDC012.prw
+             Type=T
+         End
+      End
+      Folder Generico
+         VSSPath=Nova Pasta3
+         FilesCount=6
+         File \Gthd\Generico\DEMAIL.prw
+             Type=T
+         End
+         File \Gthd\Generico\ESPNOME.prw
+             Type=T
+         End
+         File \Gthd\Generico\GTHDAEMP.prw
+             Type=T
+         End
+         File \Gthd\Generico\GTHDAPSS.prw
+             Type=T
+         End
+         File \Gthd\Generico\GTHDTSH.prw
+             Type=T
+         End
+         File \gthd\generico\update\UPDGTHDV2.PRW
+             Type=T
+         End
+      End
+      Folder Graph
+         VSSPath=Nova Pasta4
+         FilesCount=2
+         File \Gthd\Graph\GTHDGR2.PRW
+             Type=T
+         End
+         File \Gthd\Graph\GTHDGRAPH.prw
+             Type=T
+         End
+      End
+      Folder Noticias
+         VSSPath=Nova Pasta5
+         FilesCount=1
+         File \Gthd\Noticias\GTHDNEWS.prw
+             Type=T
+         End
+      End
+      Folder Relatorios
+         VSSPath=Nova Pasta6
+         FilesCount=4
+         File \Gthd\Relatorios\GTHDR001.prw
+             Type=T
+         End
+         File \Gthd\Relatorios\GTHDR002.prw
+             Type=T
+         End
+         File \Gthd\Relatorios\GTHDR003.prw
+             Type=T
+         End
+         File \Gthd\Relatorios\GTHDR004 .prw
+             Type=T
+         End
+      End
+      Folder Workflow
+         VSSPath=Nova Pasta7
+         FilesCount=3
+         File \Gthd\Workflow\GTHDW001.prw
+             Type=T
+         End
+         File \Gthd\Workflow\GTHDW002.prw
+             Type=T
+         End
+         File \Gthd\Workflow\WSBACEN.prw
+             Type=T
+         End
+      End
+      Folder Updates
+         VSSPath=Nova Pasta8
+         FilesCount=1
+         File \gthd\updates\UGTHD001.prw
+             Type=T
+         End
+      End
+   End
+End

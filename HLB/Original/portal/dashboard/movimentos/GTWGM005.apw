@@ -1,0 +1,436 @@
+#Include "apwebex.ch"
+#include "tbiconn.ch"     
+#include "totvs.ch"
+#Include "topconn.ch"     
+#INCLUDE "rwmake.ch"
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWGM005  ºAutor  ³Tiago Luiz Mendonça º Data ³  08/08/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Movimentação por empresa - Dashboard.                       º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/ 
+                               
+/*
+Funcao      : GTWGM004
+Parametros  : Nenhum
+Retorno     : Nil
+Objetivos   : Rotina APWBEX de grafico de movimentação.
+Autor       : Tiago Luiz Mendonça
+Data/Hora   : 08/08/12 20:00
+*/
+
+*--------------------------*
+  User Function GTWGM005()
+*--------------------------*    
+
+Local cHtml  		:= "" 
+Local cFil     		:= ""
+Local cEmp  	 	:= ""
+Local cBanco 		:= "" 
+Local cAno      	:= "" 
+Local cAux          := ""                           
+Local cNome         := ""   
+Local cCommand   	:= "" 
+Local cArq1      	:= ""
+Local cArq2      	:= ""
+Local cCommand   	:= "" 
+Local cPath      	:= "" 
+Local cRootPath 	:= "" 
+
+Local aStru         := {} 
+                      
+Local lWait 	    := .T.
+
+Private nCon 		:= 0   
+
+WEB EXTENDED INIT  cHtml 
+
+	If Select("SX2") == 0
+		PREPARE ENVIRONMENT EMPRESA '02' FILIAL '01' MODULO 'FIN'
+	EndIf  
+    
+    //Cria variaveis com dados da empresa
+	ZW1->(DbSetOrder(1))
+	If ZW1->(DbSeek(xFilial("ZW1")+HttpSession->cEmpresa))
+		cEmp   := ZW1->ZW1_CODIGO
+		cFil   := ZW1->ZW1_CODFIL
+		cBanco := RetBanco(ZW1->ZW1_AMB) 
+		cNome  := alltrim(ZW1->ZW1_NFANT)
+		cAno   := HttpSession->cAno 
+		cCNPJ  := ZW1->ZW1_CNPJ
+	EndIf 
+
+	//Abre conexão com banco 
+ 	nCon := TCLink("MSSQL7/DbCorporativo","10.0.30.5",7894)  
+    
+    //Retorna a execução dos dados no banco
+   	ExecSQL(cEmp,cFil,cBanco,cAno,HttpSession->lProcessa,cNome,cCNPJ)
+                          
+	Conout("GTWGM005: Excutado ExecSQL")
+
+	If Select("cMovTemp") > 0
+		cMovTemp->(DbCloseArea())	               
+	EndIf  
+	
+	//Monta estrutura do temporario
+	aStru := {     {"TIPO"	,"C", 200,0  } ,;
+	               {"JAN" 	,"C" ,30 ,0  } ,;
+	               {"FEV" 	,"C" ,30 ,0  } ,;
+	               {"MAR" 	,"C" ,30 ,0  } ,;
+	               {"ABR"	,"C" ,30 ,0  } ,;
+	               {"MAI" 	,"C" ,30 ,0  } ,;
+	               {"JUN" 	,"C" ,30 ,0  } ,;
+	               {"JUL" 	,"C" ,30 ,0  } ,; 
+	               {"AGO" 	,"C" ,30 ,0  } ,;
+	               {"SETE"	,"C" ,30 ,0  } ,;
+	               {"OUTU" 	,"C" ,30 ,0  } ,;
+	               {"NOV" 	,"C" ,30 ,0  } ,;
+	               {"DEZ" 	,"C" ,30 ,0  } }
+	         	  
+     
+    //Cria temporario com dados que serão apresentados no grafico.                              
+ 	cQuery:=" SELECT SUBSTRING(TIPO,1,40) AS [TIPO],JAN,FEV,MAR,ABR,MAI,JUN,JUL,AGO,SETE AS [SET],OUTU AS [OUT],NOV,DEZ"
+	cQuery+=" FROM MOV_"+Alltrim(cEmp)+" where ANO='"+cAno+"'"
+    
+	Conout("GTWGM005: "+cQuery)
+
+	TCQuery cQuery ALIAS "cMovTemp" NEW
+
+	For nX := 1 To Len(aStru)
+	    If aStru[nX,2]<>"C"
+		    TcSetField("cMovTemp",aStru[nX,1],aStru[nX,2],aStru[nX,3],aStru[nX,4])
+	    EndIf
+	Next nX
+
+	cTMP := CriaTrab(Nil,.F.)
+	
+	Copy To &(cTMP)	
+
+	dbCloseArea()
+	dbUseArea(.T.,,cTMP,"cMovTemp",.T., .F.)    
+        
+	Conout("GTWGM005: Temporario cMovTemp criado com sucesso... ")	
+	
+	Conout("GTWGM005: Preparando para copiar temporario... ")	     
+	//Copia o temporario para pasta de arquivos  
+	__CopyFile( "\SYSTEM\"+cTMP+".DBF","\Web\pp\portal_cliente_gt\Arquivos\Movimento\" +cEmp+"_"+cAno+".xls")  
+	Conout("GTWGM005: Temporiario copiado... ")	     
+		  
+	//Zipa o arquivo gerado para ser baixo.
+	cRootPath	:=GetSrvProfString("RootPath", "\undefined")
+	cArq1		:=cRootPath+"\Web\pp\portal_cliente_gt\Arquivos\Movimento\" +cEmp+"_"+cAno+".xls"
+	cArq2		:=cRootPath+"\Web\pp\portal_cliente_gt\Arquivos\Movimento\" +cEmp+"_"+cAno+".Zip"
+	cCommand  	:= 'C:\Program Files (x86)\WinRAR\WinRAR.exe m -ep1 -o+ "'+cArq2+'" "'+cArq1+'"'
+	cPath     	:= "C:\Program Files (x86)\WinRAR\"
+
+
+     If !(WaitRunSrv(cCommand,lWait,cPath ))
+     	Conout("GTWGM005: Nao foi possivel zipar o arquivo.")
+     Else
+     	Conout("GTWGM005: Temporario ziapdo com sucesso ")	     
+     EndIf
+		
+	cMovTemp->(DbGoTop())  
+	
+	If !Empty(cMovTemp->Tipo)
+		HttpSession->lDados:="T"
+		Conout("GTWGM005:   cMovTemp com dados...")
+	Else    
+		HttpSession->lDados:="F"
+		Conout("GTWGM005:   cMovTemp sem dados...")
+	EndIf 
+	         		
+		 	
+    //Fecha a conexão do banco
+	TcUnlink(nCon) 
+
+WEB EXTENDED END     
+
+Return cHtml   
+
+/*
+Funcao      : EXECSQL
+Parametros  : cEmp,cFil,cBanco,cAno,lProcessa,cNome
+Retorno     : 
+Objetivos   : Executar as procedures no banco
+Autor       : Tiago Luiz Mendonça
+Data/Hora   : 09/08/12 
+*/
+
+*--------------------------------------------------------------*
+ Static Function EXECSQL(cEmp,cFil,cBanco,cAno,lProcessa,cNome,cCNPJ)
+*--------------------------------------------------------------*     
+
+Local cProcedure := ""
+Local cQuery     := "" 
+Local cTable     := "" 
+Local cLog       := ""  
+Local cServidor  := ""
+
+Local aStru      := {}  
+
+Local nRet       := 0        
+
+	 
+	//Processa as procedures
+	If alltrim(lProcessa) == "T"   
+	
+		conout("Processando...") 
+	
+		//Monta select
+		cQuery:="use dbCorporativo"+CHR(13)+CHR(10) 
+		cQuery+="select *  from MOV_"+Alltrim(cEmp)+"_TEMP"        
+		
+		//Verifica se a tabela de movimentos existe 
+		If (TCSQLExec(cQuery) < 0)   
+			
+			Conout(" select * from MOV_"+Alltrim(cEmp)+"_TEMP não encontrado:"+ TCSQLError()) 
+			
+			//Se não existir cria a tabela
+			cQuery:="use dbCorporativo"+CHR(13)+CHR(10) 
+			cQuery+="CREATE TABLE MOV_"+Alltrim(cEmp)+"_TEMP "+CHR(13)+CHR(10)
+		    cQuery+=" ("+CHR(13)+CHR(10) 
+		    cQuery+="    TIPO           VARCHAR(200)      NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    JAN            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    FEV            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)          
+		    cQuery+="    MAR			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    ABR			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)   
+		    cQuery+="    MAI            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    JUN            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    JUL		    VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    AGO			VARCHAR(20)       NULL	  ,"+CHR(13)+CHR(10)
+			cQuery+="	 SETE			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)
+			cQuery+="	 OUTU			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)
+			cQuery+="	 NOV			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)
+			cQuery+="    DEZ			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 		
+		 	cQuery+=")"+CHR(13)+CHR(10)
+		
+		    //Executa o create da tabela 
+		    If (TCSQLExec(cQuery) < 0) 
+		    	Conout(" Tabela  MOV_"+Alltrim(cEmp)+"_TEMP  não pode ser criada:"+ TCSQLError())
+		    Else
+		    	Conout(" Tabela MOV_"+Alltrim(cEmp)+"_TEMP criada com sucesso") 	 
+		    EndIf
+		
+		EndIf                                      
+		
+		//Monta select
+		cQuery:="use dbCorporativo"+CHR(13)+CHR(10) 
+		cQuery+="select * from MOV_"+Alltrim(cEmp)        
+		
+		//Verifica se a tabela de movimentação existe
+		If (TCSQLExec(cQuery) < 0)   
+			
+			Conout(" select * from MOV_"+Alltrim(cEmp)+" não encontrado:"+ TCSQLError()) 
+			
+			//Se não existir cria a tabela
+			cQuery:="use dbCorporativo"+CHR(13)+CHR(10) 
+			cQuery+="CREATE TABLE MOV_"+Alltrim(cEmp)+CHR(13)+CHR(10)
+		    cQuery+=" ("+CHR(13)+CHR(10) 
+		 	cQuery+="    TIPO           VARCHAR(200)      NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    JAN            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    FEV            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)          
+		    cQuery+="    MAR			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    ABR			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)   
+		    cQuery+="    MAI            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    JUN            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    JUL		    VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    AGO			VARCHAR(20)       NULL	  ,"+CHR(13)+CHR(10)
+			cQuery+="	 SETE			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)
+			cQuery+="	 OUTU			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)
+			cQuery+="	 NOV			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)
+			cQuery+="    DEZ			VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 		
+		    cQuery+="    EMISSAO        VARCHAR(8)     	  NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    HORA           VARCHAR(8)        NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    USR            VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    ANO            VARCHAR(4)        NULL    ,"+CHR(13)+CHR(10)          
+		    cQuery+="    EMP	   	    VARCHAR(2)        NULL    ,"+CHR(13)+CHR(10) 
+		    cQuery+="    BANCO	        VARCHAR(20)       NULL    ,"+CHR(13)+CHR(10)   		
+		 	cQuery+=")"+CHR(13)+CHR(10)
+		                                                    '
+		    //Executa o create da tabela 
+		    If (TCSQLExec(cQuery) < 0) 
+		    	Conout(" Tabela  MOV_"+Alltrim(cEmp)+" não pode ser criada:"+ TCSQLError())
+		    Else
+		    	Conout(" Tabela MOV_"+Alltrim(cEmp)+" criada com sucesso") 	 
+		    EndIf
+		
+		EndIf         
+		
+		//Monta select para limpar o temporario
+		cQuery:="use dbCorporativo"+CHR(13)+CHR(10) 
+		cQuery+="truncate table MOV_"+Alltrim(cEmp)+"_TEMP  
+		     
+		//Limpa a tabela temporaria de movimentos da empresa 
+		If (TCSQLExec(cQuery) < 0)   
+			Conout(" truncate table MOV_"+Alltrim(cEmp)+"_TEMP : TCSQLError() " + TCSQLError())  
+		EndIf   
+				
+		//Monta select para limpar os dados reprocessados
+		cQuery:="use dbCorporativo"+CHR(13)+CHR(10) 
+		cQuery+="delete from MOV_"+Alltrim(cEmp)+" where ANO='"+Alltrim(cAno)+"' and  EMP='"+Alltrim(cEmp)+"'"
+		     
+		//Limpa a tabela temporaria de movimentos da empresa 
+		If (TCSQLExec(cQuery) < 0)   
+			Conout(" Delete from ano "+cAno+" table MOV_"+Alltrim(cEmp)+"  : TCSQLError() " + TCSQLError())  
+		EndIf 
+		
+		//ECR - Define o servidor
+		If Alltrim(cBanco) == "GTCORP"
+			cServidor := "SQLTB717_P11."	
+			cBanco    := "GTCORP_P11"
+		ElseIf Alltrim(substr(cBanco,1,3)) <> "AMB"
+		    cServidor := "SQL717TB_P1108."
+		EndIf
+		
+		
+		//Cria as variavies para executar a procedure     
+		cProcedure:="use dbCorporativo"+CHR(13)+CHR(10)
+		cProcedure+="declare @BANCO as varchar(25)"+CHR(13)+CHR(10)
+		cProcedure+="declare @CODIGOMS as char(02)"+CHR(13)+CHR(10)
+		cProcedure+="declare @ANO as varchar(04)"+CHR(13)+CHR(10)
+		cProcedure+="declare @CNPJ as varchar(14)"+CHR(13)+CHR(10)
+		cProcedure+="set @BANCO = '"+cServidor+Alltrim(cBanco)+"' set @CODIGOMS = '"+Alltrim(cEmp)+"' set @ANO = '"+alltrim(cAno)+"' set @CNPJ = '"+alltrim(cCNPJ) +"'"+CHR(13)+CHR(10)		
+		
+		//Monta as procedures 
+		
+		//Contabilidade
+			//Verifica se a tabela existe no banco do cliente para não dar erro na procedure
+		cProcedure+="if (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='CT2"+Alltrim(cEmp)+"0')>0"+CHR(13)+CHR(10)
+		cProcedure+="	begin"+CHR(13)+CHR(10)
+		cProcedure+="		Insert into MOV_"+Alltrim(cEmp)+"_TEMP  exec cor_Rel_Movimento_Contabilidade_sp_s @BANCO,@CODIGOMS,@ANO"+CHR(13)+CHR(10)
+		cProcedure+="	end"+CHR(13)+CHR(10)
+		
+		//Notas Fiscais de Entrada		
+			//Verifica se a tabela existe no banco do cliente para não dar erro na procedure
+		cProcedure+="if (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SF1"+Alltrim(cEmp)+"0')>0 AND (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SD1"+Alltrim(cEmp)+"0')>0"+CHR(13)+CHR(10)
+		cProcedure+="	begin"+CHR(13)+CHR(10)
+		cProcedure+="		Insert into MOV_"+Alltrim(cEmp)+"_TEMP  exec cor_Rel_Movimento_Estoque_sp_s @BANCO,@CODIGOMS,@ANO"+CHR(13)+CHR(10)
+		cProcedure+="	end"+CHR(13)+CHR(10)
+
+		//Notas Fiscais de Saida		
+			//Verifica se a tabela existe no banco do cliente para não dar erro na procedure
+		cProcedure+="if (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SF2"+Alltrim(cEmp)+"0')>0 AND (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SD2"+Alltrim(cEmp)+"0')>0"+CHR(13)+CHR(10)
+		cProcedure+="	begin"+CHR(13)+CHR(10)
+		cProcedure+="		Insert into MOV_"+Alltrim(cEmp)+"_TEMP  exec cor_Rel_Movimento_Faturamento_sp_s @BANCO,@CODIGOMS,@ANO"+CHR(13)+CHR(10)  
+		cProcedure+="	end"+CHR(13)+CHR(10)
+
+		//Notas Fiscais de Saida		
+			//Verifica se a tabela existe no banco do cliente para não dar erro na procedure				
+		cProcedure+="if (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SE1"+Alltrim(cEmp)+"0')>0 AND (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SE2"+Alltrim(cEmp)+"0')>0"+CHR(13)+CHR(10)
+		cProcedure+="	begin"+CHR(13)+CHR(10)
+		cProcedure+="		Insert into MOV_"+Alltrim(cEmp)+"_TEMP  exec cor_Rel_Movimento_Financeiro_sp_s @BANCO,@CODIGOMS,@ANO"+CHR(13)+CHR(10)
+		cProcedure+="	end"+CHR(13)+CHR(10)
+				
+		//Gestão de pessoal - Folha
+			//Verifica se a tabela existe no banco do cliente para não dar erro na procedure
+		cProcedure+="if (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SRD"+Alltrim(cEmp)+"0')>0"+CHR(13)+CHR(10)
+		cProcedure+="	begin"+CHR(13)+CHR(10)
+		cProcedure+="		Insert into MOV_"+Alltrim(cEmp)+"_TEMP  exec cor_Rel_Movimento_Gestao_Pessoal_sp_s @BANCO,@CODIGOMS,@ANO"+CHR(13)+CHR(10)
+		cProcedure+="	end"+CHR(13)+CHR(10)
+
+		//Livros Fiscais
+			//Verifica se a tabela existe no banco do cliente para não dar erro na procedure		
+		cProcedure+="if (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SF3"+Alltrim(cEmp)+"0')>0"+CHR(13)+CHR(10)
+		cProcedure+="	begin"+CHR(13)+CHR(10)
+		cProcedure+="		Insert into MOV_"+Alltrim(cEmp)+"_TEMP  exec cor_Rel_Movimento_Livros_sp_s @BANCO,@CODIGOMS,@ANO"+CHR(13)+CHR(10)
+		cProcedure+="	end"+CHR(13)+CHR(10)
+	
+		//Quantidade de funcionários
+			//Verifica se a tabela existe no banco do cliente para não dar erro na procedure				
+		cProcedure+="if (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SRA"+Alltrim(cEmp)+"0')>0 AND (SELECT COUNT(*) FROM "+cServidor+Alltrim(cBanco)+".sys.sysobjects WHERE name='SRD"+Alltrim(cEmp)+"0')>0"+CHR(13)+CHR(10)
+		cProcedure+="	begin"+CHR(13)+CHR(10)
+		cProcedure+="		Insert into MOV_"+Alltrim(cEmp)+"_TEMP  exec cor_Rel_Quantidade_Funcionarios_sp_s @BANCO,@CODIGOMS,@ANO"+CHR(13)+CHR(10) 
+		cProcedure+="	end"+CHR(13)+CHR(10)
+	
+		
+		If AllTrim(cBanco) <> "GTCORP"
+			//Gestão de pessoal - Para funcionar os honorários
+			cProcedure+=" if (SELECT count(*) FROM sys.sysobjects WHERE name='TAB_HONOR_AUXILIAR')>0"+CHR(13)+CHR(10) 
+			cProcedure+="			begin"+CHR(13)+CHR(10) 
+			cProcedure+="				DROP TABLE TAB_HONOR_AUXILIAR"+CHR(13)+CHR(10) 
+			cProcedure+="			end"+CHR(13)+CHR(10)    
+			 
+			//TLM - 20150602 - GTCORP não foi migrado para nova instacia P1108
+			cProcedure+="set @BANCO = 'SQLTB717_P11."+alltrim(cBanco)+"'
+			
+			cProcedure+="exec cor_Rel_Movimento_Honorarios_GT @BANCO,@CODIGOMS,@ANO,@CNPJ"+CHR(13)+CHR(10)		
+			cProcedure+="Insert into MOV_"+Alltrim(cEmp)+"_TEMP  SELECT * FROM TAB_HONOR_AUXILIAR"+CHR(13)+CHR(10)
+			cProcedure+="DROP TABLE TAB_HONOR_AUXILIAR"+CHR(13)+CHR(10) 
+		EndIf		
+			
+		//Executa as procedures 
+		If (TCSQLExec(cProcedure) < 0)   
+			Conout(" Procedure : TCSQLError() " + TCSQLError())  
+		Else  
+			conout("Processado com sucesso.") 
+			//Grava o log da execução
+			cLog:="use dbCorporativo"+CHR(13)+CHR(10)  
+			cLog+="Insert into MOV_"+Alltrim(cEmp)+"(TIPO,JAN,FEV,MAR,ABR, MAI,JUN,JUL ,AGO,SETE,OUTU,NOV,DEZ)"					
+	        cLog+="select TIPO,JAN,FEV,MAR,ABR,MAI,JUN,JUL ,AGO,SETE,OUTU,NOV,DEZ from MOV_"+Alltrim(cEmp)+"_TEMP"  
+			
+			If (TCSQLExec(cLog) < 0)   
+		   		Conout(" Erro na gravação da tabela de movimentação: TCSQLError() " + TCSQLError())
+		    Else
+		    	Conout(" Tabela de movimentação carregada com sucesso..." + TCSQLError())
+		    EndIf   
+		    
+			cLog:="use dbCorporativo"+CHR(13)+CHR(10)  
+			cLog+="Update  MOV_"+Alltrim(cEmp)+" SET EMISSAO='"+DTOS(dDataBase)+"',HORA='"+Time()+"',USR='"+HttpSession->cLogin+"'"
+			cLog+=",ANO='"+cAno+"',EMP='"+cEmp+"',BANCO='"+cBanco+"' where Emp is NULL "
+			
+			Conout(cLog)
+			
+			If (TCSQLExec(cLog) < 0)   
+		   		Conout(" Erro na gravação do log : TCSQLError() " + TCSQLError())
+		    Else
+		    	Conout(" Campos de log gravados com sucesso... ")
+		    EndIf 
+
+		EndIf 
+	
+	Else
+		conout("Executado sem reprocessamento.")
+	
+	EndIf
+	
+	
+Return  
+
+/*
+Funcao      : RETBANCO
+Parametros  : cAmb
+Retorno     : cNome
+Objetivos   : Retornar o banco utilizado pela conexão
+Autor       : Tiago Luiz Mendonça
+Data/Hora   : 09/08/12 
+*/
+
+*------------------------------*
+ Static Function RETBANCO(cAmb)
+*------------------------------*  
+
+Local cNome := ""
+	            
+	If Alltrim(cAmb) == "AMB01"
+		cNome:="AMB01_P10"
+	ElseIf Alltrim(cAmb) == "AMB02"	
+		cNome:="AMB02_P10"	
+	ElseIf Alltrim(cAmb) == "AMB03"	
+		cNome:="AMB03_P10"	
+	Else
+		cNome:=cAmb
+	EndIf	
+	
+Return cNome   
+

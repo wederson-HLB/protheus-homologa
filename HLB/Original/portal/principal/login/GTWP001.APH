@@ -1,0 +1,254 @@
+<% 
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWP001   ºAutor  ³Eduardo C. Romanini º Data ³  26/03/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da pagina de login do portal Gt.                 º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+#include "ApWebEx.ch"
+#Include "TbiConn.ch"
+#Include "TopConn.ch"
+#include "Protheus.ch"
+
+//Declara o combo padrão
+If Empty(HttpSession->cCombo)
+	HttpSession->cCombo	:= "<option value=''>" + u_WFTraduzir('-- Selecione--') + "</option>"
+EndIf
+%>
+
+<html>
+
+<head>
+	<title>Grant Thornton</title>
+
+	<link href='portal_cliente_gt/css/jquery-ui.css' rel='stylesheet' type='text/css'>	<% /*CSS de estilo para as listas suspensas*/ %>
+	<link href='portal_cliente_gt/css/login.css' rel='stylesheet' type='text/css'> <% /*CSS de estilo para a tela de login do portal */ %>
+    
+	<% /*CSS de estilo para a tela de reenvio de senha */ %>	
+	<style class='modal'>
+		body { font-size: 62.5%; }
+		label, input { display:block; }
+		input.text { margin-bottom:12px; width:95%; padding: .4em; }
+		fieldset { padding:0; border:0; margin-top:25px; }
+		.ui-dialog .ui-state-error { padding: .3em; }
+		.validateTips { border: 1px solid transparent; padding: 0.3em; }
+	</style>
+
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery.min.js"></script> <% /*JavaScript padrão para utilizar JQuery */ %>
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery-ui.min.js"> </script> <% /*JavaScript para gerar a lista suspensa */ %>
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery.validate.js"></script>  <% /*JavaScript para o plugin de validação */ %>
+	<script type="text/javascript" src="portal_cliente_gt/js/login.js"> </script> <% /*JavaScript para validações e efeitos nessa pagina */ %>
+</head>
+		
+<body background='portal_cliente_gt/Imagens/login_body_fundo_GT.jpg'>
+	<table width='100%' height='100%' border='0' cellpadding='0' cellspacing='0'>
+		<tr>	
+			<td>
+				<table width='100%' border='0' cellpadding='0' cellspacing='0'>	
+					<tr>	
+						<td>&nbsp;</td>
+					</tr>	
+					<tr>	
+						<td height='327' valign='top' >
+							<table width='616' border='0' align='center' cellpadding='0' cellspacing='0'>	
+								<tr>	
+									<td>&nbsp;</td>
+								</tr>	
+								<tr>	
+									<td height='298' valign='top' background='portal_cliente_gt/Imagens/login_tab_fundo.jpg'>
+										<table width='610' height='100%' border='0' align='center' cellpadding='0' cellspacing='0'>	
+											<tr>	
+												<td width='305'>
+													<table width='87%' border='0' align='center' cellpadding='0' cellspacing='8'>	
+														<tr>	
+															<td width='50%'>
+																<table width='98%' border='0' cellspacing='3' cellpadding='0'>	
+																	<tr>	
+																		<td width='100%'>
+																			<!-- <img src='portal_cliente_gt/Imagens/tit_seja-bemvindo_por.jpg' width='189' height='32' /> -->
+																			<div class="titulo"><%= u_WFTraduzir('Seja bem-vindo') %></div>
+																		</td>	
+																	</tr>	
+																	<tr>		
+																		<td height='12'></td>	
+																	</tr>	
+																	<tr>	
+																		<td>	
+																			<span class='texto' id='spTxtPortal'>
+																				Grant Thornton.
+																				<br>
+																				<br>
+																				<%= u_WFTraduzir('Digite seu usuário e senha para entrar no portal.') %>
+																				<br>
+																				<div id="MsgAviso">
+																					<br>
+																					<%= u_WFTraduzir(HttpSession->cMsgValid) %>			
+																					<br>
+																				</div>	
+																				<br>
+																			</span>	
+																		</td>	
+																	</tr>	
+																	<tr>	
+																		<td height='12'></td>	
+																	</tr>	
+																	<tr>	
+																		<td height='100%'>	
+																			<table width='98%' border='0' cellspacing='3' cellpadding='0'>	
+																				<form name='f1' method='post' target='_self'>	
+																				<tr>	
+																					<td width='27%' class='textoPeq'>
+																						<span class='textoPeq' id='spLogin' style='display:'';'>
+																							<%= u_WFTraduzir('Login:') %>
+																						</span>
+																					</td>	
+																					<td width='73%'>
+																						<input name='cLogin' id='cLogin' type='text' class='combo-login' value='<%=httpSession->cLogin%>' maxlength='22'>	
+																					</td>	
+																				</tr>	
+																				<tr>	
+																					<td class='textoPeq'>
+																						<span class='textoPeq'>
+																							<%= u_WFTraduzir('Senha:') %>
+																						</span>
+																					</td>
+																					<td>	
+																						<input name='cPassword' id='cPassword' type='password' class='combo-login' value='' maxlength='22'>	
+																					</td>	
+																				</tr>	  
+																				<tr>	
+																					<td class='textoPeq'>
+																						<span class='textoPeq'>
+																							<%= u_WFTraduzir('Empresa:') %>
+																						</span>
+																					</td>
+																					<td>	  
+																						<% /* Combo de seleção da empresa */ %> 
+																						<select name='cEmpresa' id='cEmpresa' class='comboselect-login'>
+																							<option value=''><%= u_WFTraduzir('--Selecione--') %></option>
+																						</select>
+																					</td>	
+																				</tr>	      
+																				<tr>	
+																					<td class='textoPeq'>&nbsp;</td>	
+																					<td align='right'>
+																						<a href='#' id='lembrete' class='textobold'>
+																							<div><%= u_WFTraduzir('esqueci minha senha') %></div>
+																						</a>
+																					</td>
+																					<td>&nbsp;</td>	
+																					<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>	
+																				</tr>	
+																				<tr>
+																					<td colspan='3' height='2'></td>
+																				</tr>	
+																				<tr>	
+																					<td class='textoPeq'>&nbsp;</td>	
+																					<td align='right'>
+																						<input id='Submit' name='Submit' type='button' class='Botoes' value='<%= u_WFTraduzir("enviar") %>'> 
+																						<input id='Limpa' name='Submit2' type='reset' class='Botoes' value='<%= u_WFTraduzir("limpar") %>'>
+																					</td>	
+																					<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>	
+																				</tr>	
+																				</form>
+																			</table>	
+																		</td>	
+																	</tr>	
+																</table>	
+															</td>	
+														</tr>	
+													</table>
+												</td>	
+												<td width='4' background='portal_cliente_gt/Imagens/login_tab_div.gif'>&nbsp;</td>	
+												<td>
+													<table width='79%' border='0' align='center' cellpadding='0' cellspacing='0'>	
+														<tr>	
+															<td>
+																<div  style="position: relative;">
+																	<div id="box-idioma">
+																		<style>
+																			#box-idioma {position: absolute; top: -40px; right: -25px; display: inline-block}
+																			#box-idioma img {margin: 3px; cursor: pointer;}
+																		</style>
+																		<script>
+																			function mudarIdioma(idioma) {
+																				$.post('U_GTWF002.apw', {cIdioma: idioma}, function(retorno){
+																				if(retorno == 'ok')
+																					document.location.reload();
+																				});
+																			}
+																		</script>
+																		<img src="portal_cliente_gt/Imagens/bra.png" width="20px" onclick="javascript: mudarIdioma('Portugues')">
+																		<img src="portal_cliente_gt/Imagens/eua.png" width="20px" onclick="javascript: mudarIdioma('English')">
+																	</div>
+																	<img src='portal_cliente_gt/Imagens/grant_thornton_logo_ini.png' width='239' height='178' />
+																</div>
+															</td>	
+														</tr>	
+														<tr>	
+															<td height='32'></td>	
+														</tr>	
+													</table>
+												</td>	
+											</tr>	
+										</table>
+									</td>	
+								</tr>	
+								<tr>	
+									<td>
+										<img src='portal_cliente_gt/Imagens/login_tab_bottom.jpg' width='616' height='14' />
+									</td>	
+								</tr>	
+							</table>
+						</td>	
+					</tr>	
+					<tr>	
+						<td>&nbsp;</td>
+					</tr>	
+				</table>
+			</td>	
+		</tr>	
+	</table>
+	
+	<%/* Div para exibição da tela de exibição do formulario de reenvio de senha*/ %>
+	<div class="modal">
+		<div id='form_senha' title="<%= u_WFTraduzir('Reenvio de Senha') %>">
+	 
+			<p class="validateTips"><%= u_WFTraduzir('Informe o seu login!') %></p>	
+	
+			<form>
+				<fieldset>
+					<label for="form_login"><%= u_WFTraduzir('Login') %></label>
+					<input type="text" name="form_login" id="form_login" class="text ui-widget-content ui-corner-all" />
+				</fieldset>
+	    	</form>
+		</div>	
+	</div>		
+	
+	<%/* Div para exibição da tela de alteração de senha */%>
+	<div class="modal">
+		<div id='form_altera' title="<% u_WFTraduzir('Alteração de Senha') %>">
+	 
+			<p class="validateTips"><%= u_WFTraduzir('Digita a nova senha') %></p>
+	
+			<form>
+				<fieldset>
+					<label for="form_senha1"><%= u_WFTraduzir('Nova Senha:') %></label>
+					<input type="password" name="form_senha1" id="form_senha1" class="text ui-widget-content ui-corner-all" />
+					
+					<label for="form_senha2"><%= u_WFTraduzir('Confirme a senha:') %></label>
+					<input type="password" name="form_senha2" id="form_senha2" class="text ui-widget-content ui-corner-all" />
+				</fieldset>
+	    	</form>
+		</div>	
+	</div>		
+</body>	
+</html>	

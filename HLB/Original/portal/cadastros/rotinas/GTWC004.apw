@@ -1,0 +1,225 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWC004 ºAutor  ³Eduardo C. Romanini  º  Data ³  28/05/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Cadastro de rotinas do portal.                              º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWC004()
+*---------------------*
+Local cHtml	:= "" 
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cHtml := ExecInPage("GTWC004")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : GTWCM04
+Objetivo: Manutenção do cadastro de rotinas
+Autor   : Eduardo C. Romanini
+Data    : 28/05/2012
+*/
+*---------------------*
+User Function GTWCM04()
+*---------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cHtml := ExecInPage("GTWCM04")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : WC004Grv()
+Objetivo: Gravação dos dados
+Autor   : Eduardo C. Romanini
+Data    : 28/05/2012
+*/
+*----------------------*
+User Function WC004Grv()
+*----------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+Local aPost := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Parametro recebido na chamada da função.
+cOper := HttpGet->cOper
+
+If Valtype(cOper) <> "U" .and. cOper <> "VIS"
+
+	//Inclusão
+	If cOper == "INC"
+	    ZW4->(RecLock("ZW4",.T.))
+		    
+		ZW4->ZW4_CODIGO := GeraCodigo()	
+		
+	//Alteração
+	ElseIf cOper == "ALT"
+		ZW4->(RecLock("ZW4",.F.))
+	EndIf
+		
+	SX3->(DbSetOrder(1))
+	If SX3->(DbSeek("ZW4"))
+		While SX3->(!EOF())
+			If  X3Usado(SX3->X3_CAMPO)
+				ZW4->&(SX3->X3_CAMPO) := &("HttpPost->"+AllTrim(SX3->X3_CAMPO))
+			EndIf
+			SX3->(DbSkip())
+		EndDo
+	EndIf
+			
+	ZW4->(MsUnlock())
+EndIf
+
+cHtml := ExecInPage("GTWC004")
+
+WEB EXTENDED END
+	 
+Return cHtml  
+
+/*
+Função  : GeraCodigo
+Objetivo: Gera um novo código para o cadastro de menu 
+Autor   : Eduardo C. Romanini
+Data    : 28/05/2012
+*/
+*--------------------------*
+Static Function GeraCodigo()
+*--------------------------*
+Local cRet := ""
+
+Local nCod := 0
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+BeginSql Alias 'QRY'
+	SELECT MAX(ZW4_CODIGO) as 'ULTCOD'
+	FROM %table:ZW4%
+	WHERE %notDel%
+EndSql
+
+QRY->(DbGoTop())
+If QRY->(!BOF()) .and. QRY->(!EOF())
+    
+	//Verifica o ultimo codigo utilizado pela empresa
+	nCod := Val(Right(QRY->ULTCOD,5))
+	//Soma 1 ao codigo
+	nCod++
+
+	//Tranforma o numero para gravação
+	cRet := "R"+StrZero(nCod,5)
+
+
+Else
+	//Primeiro numero de solicitação
+	nCod := "R00001"
+EndIf
+
+QRY->(DbCloseArea())
+
+Return cRet
+
+/*
+Função  : WC004Menu
+Objetivo: Rotina de busca dos Menus	
+Autor   : Eduardo C. Romanini
+Data    : 28/05/2012
+*/
+*-----------------------*
+User Function WC004Menu()
+*-----------------------*
+Local cHtml  := ""
+Local cWhere := ""
+Local cTexto := HttpGet->term
+Local cBanco := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+If Len(cTexto) > 0
+    
+	cWhere := "% UPPER(ZW5_CODIGO) LIKE '%"+Upper(AllTrim(cTexto))+"%' %"
+
+    BeginSql Alias 'QRY'
+		SELECT TOP 5 ZW5_CODIGO, ZW5_TITULO
+		FROM %table:ZW5%
+		WHERE %notDel%
+		  AND %exp:cWhere%
+		ORDER BY ZW5_CODIGO
+    EndSql
+
+	QRY->(DbGoTop())
+	If QRY->(!BOF() .and. !EOF())	
+    	
+    	cHtml += "["
+	EndIf
+
+	//Monta o retorno no formato JSON.
+	nI := 1	
+	While QRY->(!EOF())
+
+		If nI > 1 
+    		cHtml += ","
+		EndIf
+	
+	    cHtml += "{"
+		cHtml += '"cod":"'+Alltrim(QRY->ZW5_CODIGO)+'","desc":"'+EncodeUTF8(Alltrim(QRY->ZW5_TITULO))+'"'
+		cHtml += "}"
+
+		nI++          
+		
+		QRY->(DbSkip()) 		
+	EndDo	
+	
+	If Len(cHtml) > 0
+    	cHtml += "]"
+	EndIf
+	
+	QRY->(DbCloseArea())
+	
+EndIf
+
+WEB EXTENDED END
+
+Return cHtml
+

@@ -1,0 +1,90 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch' 
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWRH001   ºAutor  ³Tiago Luiz Mendonça º Data ³  10/09/12  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da solicitação de ferias - confirmação           º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+%>
+
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		<script type="text/javascript" src="scripts/jquery.js">  </script> <% /*JavaScript padrão para utilizar JQuery */ %>
+		<script type="text/javascript" src="scripts/jquery-ui-1.8.21.custom.min.js"></script>    
+		<script type="text/javascript" src="scripts/date.js"></script>  <% /*JavaScript para tratamento de data */ %> 
+		<link rel="stylesheet" type=text/css href="css/jquery-ui.css" />
+		<link rel="stylesheet" type=text/css href="css/rhonline.css" /> 
+		<script language="JavaScript">
+   			function cancelar(){
+				document.solicita.action="W_TCFW000.APW";
+				document.forms.solicita.submit();  	
+  			 }
+  		</script>
+  		<script language="JavaScript">
+   			function confirmar(){ 
+      			document.solicita.action="U_GTWRH003.APW";
+				document.forms.solicita.submit();       			
+     			
+  			 }
+     
+		</script>	
+	</head>  	
+ 	<Body>
+ 		<form method=post name="solicita">	
+	 		<div>        
+			 	<span class="dados">  
+			 		<table border="0">
+			 			<tr>
+							<td>
+								<img border="0" src="imagens/icon_solicitacoes.png" width="42" height="42">
+							</td> 
+							<td>
+								<b>Por favor confira as informações abaixo antes da confirmação </b> 
+							</td>									
+						</tr>
+					</table>	
+				</span>
+				<hr>
+			</div> 
+			<br> 
+			<div> 			
+				<label for="Combo"><span class="dados"> Adiantamento do 13º Salário:&nbsp;&nbsp;<font color="BLUE"><b><%=Alltrim( HttpSession->cDecimo)%></b></font></span></label>  
+			 </div> 
+			 <div> 
+		   		<label for="Combo"><span class="dados"> Abono Pecuniario:&nbsp;&nbsp;<font color="BLUE"><b><%=Alltrim(HttpSession->cAbono)%></b></font></span></label>
+			 </div>
+	 		 <br>  
+	 		 
+	 		 <div> 
+		   		<label for="Combo"><span class="dados"> Superior:&nbsp;&nbsp;<font color="BLUE"><b><%=Alltrim(HttpSession->cNomeSup)%></b></font></span></label>
+			 </div> 
+			 <br> 
+			<div>				
+		   		<label for="calendario"><span class="dados"> Data Inicio:&nbsp;&nbsp;<font color="BLUE"><b><%=Alltrim(HttpSession->cDtIni)%></b></font></span></label>
+				<label for="calendario"><span class="dados"> &nbsp;&nbsp;&nbsp;&nbsp;Data Final:&nbsp;&nbsp;<font color="BLUE"><b><%=Alltrim(HttpSession->cDtFim)%></b></span></font></label>
+	 		</div>
+	 		<br>
+			<hr> 
+			<div align="center" >  
+				<button onclick="cancelar()" type="button" ><span class="dados"> <font color="RED"><b>Cancelar</b></font></span></button>   	  	
+		  		<button onclick="confirmar()" type="button"><span class="dados"> <b>Confirma</b></span></button>     
+			</Div>	
+		</form>
+		<hr>  
+	</body>	
+</html>

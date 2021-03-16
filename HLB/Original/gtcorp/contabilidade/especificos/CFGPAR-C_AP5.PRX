@@ -1,0 +1,146 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP5 IDE em 03/07/01
+#include "colors.ch"
+
+
+/*
+Funcao      : CFGPARC
+Parametros  : Nenhum
+Retorno     : Nenhum   
+Objetivos   : Programa utilizado para Bloquear/Liberar Data Contabeis  
+Autor	    :  
+Data        : 03/07/01
+Obs         : 
+TDN         : 
+Revisão     : Renato Rezende
+Data/Hora   : 17/12/2012
+Módulo      : Contabilidade Gerencial
+Cliente     : Todos 
+*/
+
+*-------------------------*
+User Function CFGPARC()        // incluido pelo assistente de conversao do AP5 IDE em 03/07/01
+*-------------------------*
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("OK2,WFIL,WDATA1,WDATA2,WDATA5,WDATA6")
+SetPrvt("WDATA3,WDATA4,")
+
+//Programa utilizado para Bloquear/Liberar Data Contabeis -
+
+//HFP DbSelectArea("SX6")
+//HFP DbSetOrder(1)
+//HFP ok2 := "N"
+//HFP wfil := xfilial()
+
+//HFP SX6->(dbseek(wfil+"MV_DATADE",.f.))
+//HFP wdata1 := CTOD(SX6->X6_CONTEUD)
+WDATA1 :=GETMV("MV_DATADE")
+
+//HFP SX6->(dbseek(wfil+"MV_DATAATE",.f.))
+//HFP wdata2 := CTOD(SX6->X6_CONTEUD)
+WDATA2 :=GETMV("MV_DATAATE")
+
+//HFP SX6->(dbseek(wfil+"MV_DATAFIN",.f.))
+//HFP wdata5 := CTOD(SX6->X6_CONTEUD)
+WDATA5 :=GETMV("MV_DATAFIN")
+
+//HFP SX6->(dbseek(wfil+"MV_DATAFIS",.f.))
+//HFP wdata6 := CTOD(SX6->X6_CONTEUD)
+WDATA6 :=GETMV("MV_DATAFIS")
+
+//HFP SX6->(dbseek(wfil+"MV_EXERC1",.f.))
+//HFP wdata3 := SX6->X6_CONTEUD
+WDATA3 :=GETMV("MV_EXERC1")
+
+//HFP SX6->(dbseek(wfil+"MV_EXERC4",.f.))
+//HFP wdata4 := SX6->X6_CONTEUD
+WDATA4 :=GETMV("MV_EXERC2")
+
+IF GetMv("MV_MCONTAB") $ "CON"
+	@ 0,0 TO 270,500 DIALOG oDlg TITLE "Acerto de Parametros"
+	@ 10,10 TO 100,230
+	@ 15,15 SAY "Data Contabil Inicial.:"
+	@ 30,15 SAY "Data Contabil Final...:"
+	@ 45,15 SAY "Ano do Exercicio - R$ :"
+	@ 60,15 SAY "Ano do Exercicio - U$ :"
+	@ 75,15 SAY "Data Limite Financeiro:"
+	@ 90,15 SAY "Data Limite fiscal....:"
+	@ 15,69 GET wdata1 size 50,80
+	@ 30,69 GET wdata2 size 50,80
+	@ 45,78 SAY trim(wdata3)
+	@ 60,78 SAY trim(wdata4)
+	@ 75,69 GET wdata5 size 50,80      //mv_data fin
+	@ 85,160 BMPBUTTON TYPE 01 ACTION atualiza()   //85// Substituido pelo assistente de conversao do AP5 IDE em 03/07/01 ==>    @ 85,160 BMPBUTTON TYPE 01 ACTION Execute(atualiza)   //85
+	@ 85,190 BMPBUTTON TYPE 02 ACTION Close(oDlg)          //125
+	@ 90,069 SAY dtoc(wdata6)  size 50,80
+	ACTIVATE DIALOG oDlg  CENTERED
+ELSE
+//jose.
+	@ 0,0 TO 270,500 DIALOG oDlg TITLE "Acerto de Parametros"
+	@ 10,10 TO 100,230
+	@ 15,15 SAY "A Data Contabil é feita pelo calendario no modulo de CTB!!!" COLOR CLR_HRED, CLR_WHITE
+	@ 30,15 SAY "Data Limite Financeiro:" COLOR CLR_HBLUE, CLR_WHITE
+	@ 45,15 SAY "Data Limite fiscal....:" COLOR CLR_HBLUE, CLR_WHITE
+	@ 30,069 GET wdata5 size 50,80      //mv_data fin
+	@ 45,069 SAY dtoc(wdata6)  size 50,80
+	@ 85,160 BMPBUTTON TYPE 01 ACTION atualiza()   //85// Substituido pelo assistente de conversao do AP5 IDE em 03/07/01 ==>    @ 85,160 BMPBUTTON TYPE 01 ACTION Execute(atualiza)   //85
+	@ 85,190 BMPBUTTON TYPE 02 ACTION Close(oDlg)          //125
+
+	ACTIVATE DIALOG oDlg  CENTERED
+ENDIF
+
+RETURN
+
+*-------------------------*
+Static Function Atualiza()
+*-------------------------*
+
+//PutMv("MV_IMPFIS",cModImp)   // ALTERADO POR FRANCISCO/HAMILTON (GRAVAR ANO COM 2 DIGITOS)
+IF GetMv("MV_MCONTAB") $ "CON"
+	PUTMV("MV_DATADE" ,CTOD(U_DATAPRY(WDATA1,.T.,1)))
+	PUTMV("MV_DATAATE",CTOD(U_DATAPRY(WDATA2,.T.,1)))
+ENDIF
+	///PUTMV("MV_EXERC1" ,WDATA3)
+	///PUTMV("MV_EXERC2" ,WDATA4)
+	PUTMV("MV_DATAFIN",CTOD(U_DATAPRY(WDATA5,.T.,1)))
+	///PUTMV("MV_DATAFIS",WDATA6)
+	
+Close(oDlg)
+RETURN
+
+
+
+//MODIFICADO POR HAMILTON     - havia erros em empresas com mais de uma filial
+/*
+SX6->(dbseek(wfil+"MV_DATADE",.f.))
+if RecLock("SX6",.f.)
+SX6->X6_CONTEUD := dtoc(wdata1)
+endif
+SX6->(dbseek(wfil+"MV_DATAATE",.f.))
+if RecLock("SX6",.f.)
+SX6->X6_CONTEUD := dtoc(wdata2)
+endif
+SX6->(dbseek(wfil+"MV_EXERC1",.f.))
+if RecLock("SX6",.f.)
+SX6->X6_CONTEUD := wdata3
+endif
+SX6->(dbseek(wfil+"MV_EXERC2",.f.))
+if RecLock("SX6",.f.)
+SX6->X6_CONTEUD := wdata4
+endif
+SX6->(dbseek(wfil+"MV_DATAFIN",.f.))
+if RecLock("SX6",.f.)
+SX6->X6_CONTEUD := dtoc(wdata5)
+endif
+SX6->(dbseek(wfil+"MV_DATAFIS",.f.))
+if RecLock("SX6",.f.)
+SX6->X6_CONTEUD := dtoc(wdata6)
+endif
+return
+*/

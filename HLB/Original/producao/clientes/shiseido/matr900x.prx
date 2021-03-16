@@ -1,0 +1,2257 @@
+//#INCLUDE "MATR900.CH"
+#INCLUDE "PROTHEUS.CH"
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³MATR900R3 ³ Autor ³ FSW       ³ Data ³ 06.10.92 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Kardex fisico - financeiro (Antigo)                        ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ Generico                                                   ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³         ATUALIZACOES SOFRIDAS DESDE A CONSTRU€AO INICIAL.             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Programador ³ Data   ³ BOPS ³  Motivo da Alteracao                     ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Rodrigo     ³24/06/98³XXXXXX³Acerto no tamanho do documento para 12    ³±±
+±±³            ³        ³      ³posicoes                                  ³±±
+±±³Rodrigo     ³17/07/98³13742A³Acerto na impressao de devolucoes conforme³±±
+±±³            ³        ³      ³MATR910                                   ³±±
+±±³Rodrigo Sart³05/11/98³XXXXXX³ Acerto p/ Bug Ano 2000                   ³±±
+±±³Bruno Sobies³18/12/98³Melhor³Exclucao impressao do CF nas localizacoes ³±±
+±±³Cesar       ³25/03/99³20051A³Alteracao do Lay-Out p/ Sair #OP Completa ³±±
+±±³Patricia Sal³26/11/99³25253A³Acerto da Coluna do TES(ano c/ 4 digitos).³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Marcos Hirak³11/05/05³XXXXXX³Imprimir B1_CODITE quando for gestao de   ³±±
+±±³            ³        ³      ³Concessionarias ( MV_VEICULO = "S").      ³±±
+±±³            ³        ³      ³foi retirado a variavel "cProdant"        ³±±
+±±³            ³        ³      ³                                          ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+/* {Protheus.doc} MATR900X.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  planilha Kardex fisico
+*/
+
+User Function MATR900X()
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Define Variaveis                                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local titulo   := "Kardex Fisico"
+Local cDesc1   := "Este programa emitir  uma rela‡„o com as movimenta‡”es"
+Local cDesc2   := "dos produtos selecionados, ordenados sequencialmente."
+Local cDesc3   := ""
+Local cString  := "SB1"
+Local lRet     := .T.
+Local nTamSX1  := Len(SX1->X1_GRUPO)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis tipo Local para SIGAVEI, SIGAPEC e SIGAOFI         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local aArea1	:= Getarea()
+Local lEnd		:= .F.
+
+Local cDirDocs  :=  GetMV("FS_MATR46X",.F.,"")	//MsDocPath()
+Local cArquivo  := "X.CSV"        				// arquivo
+
+Local uPar01	:= nil
+Local uPar02	:= nil
+Local uPar05	:= nil
+Local uPar06	:= nil
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis tipo Private para SIGAVEI, SIGAPEC e SIGAOFI       ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Private aSB1Cod := {}
+Private aSB1Ite := {}
+Private nCOL1	:= 0
+Private Tamanho := "G"
+Private wnrel   := "MATR900X"
+Private aOrd    := {OemToAnsi(" Codigo Produto "),OemToAnsi(" Tipo do Produto")}						//" Codigo Produto "###" Tipo do Produto"
+Private aReturn := {OemToAnsi("Zebrado"), 1,OemToAnsi("Administracao"), 1, 2, 1, "",1 }					//"Zebrado"###"Administracao"
+Private aLinha  := { },nLastKey := 0
+Private cPerg   :="MTR900"
+Private bBloco  := { |nV,nX| Trim(nV)+IIf(Valtype(nX)='C',"",Str(nX,1)) }
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³MV_CUSFIL - Parametro utilizado para verificar se o sistema   |
+//|utiliza custo unificado por:                                  |
+//|      F = Custo Unificado por Filial                          |
+//|      E = Custo Unificado por Empresa                         |
+//|      A = Custo Unificado por Armazem                         |
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Private lCusFil    := AllTrim(SuperGetMV('MV_CUSFIL' ,.F.,"A")) == "F"
+Private lCusEmp    := AllTrim(SuperGetMv('MV_CUSFIL' ,.F.,"A")) == "E"
+
+Private cArqTMP		:= ''	// Arquivo contendo resultado da CAT17 - U_R461Imp()
+
+Private aMovimentos	:= {}
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³MV_CUSREP - Parametro utilizado para habilitar o calculo do   ³
+//³            Custo de Reposicao.                               ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Private lCusRep  := SuperGetMv("MV_CUSREP",.F.,.F.) .And. (FindFunction("MA330AvRep") .And. MA330AvRep())
+
+//RRP - 20/03/2015 - Validando se Ea empresa Shiseido.
+If !(cEmpAnt) $ "R7"
+     MsgInfo("Rotina não implementada para essa empresa!","HLB BRASIL")
+     Return
+EndIf
+
+//cPath		:= AllTrim(GetTempPath())
+//FClose(nHandle)
+//CpyS2T(cDirDocs + "\" + cArquivo, cPath, .T.)
+
+// Verificando se tem permissão para criar arquivo no diretorio.
+If Empty(cDirDocs)
+	MSGInfo(" No parametro FS_MATR46X, deve-se colocar o diretório a ser gravado a planilha EXCEL ex. \PLANILHAS  ")
+	Return
+Endif
+/*
+If !(FCreate(cDirDocs + "\"+cArquivo)) > 0
+MsgStop("Erro na criação do arquivo na estação local (usuário sem autorização para criar). Contate o administrador do sistema") //"Erro na criacao do arquivo na estacao local. Contate o administrador do sistema"
+Return
+Endif
+*/
+
+dbSelectArea("SF4")
+dbSetOrder(1)
+
+dbSelectArea("SD3")
+dbSetOrder(1)
+
+dbSelectArea("SD2")
+dbSetOrder(1)
+
+dbSelectArea("SF2")
+dbSetOrder(1)
+
+dbSelectArea("SD1")
+dbSetOrder(1)
+
+dbSelectArea("SF1")
+dbSetOrder(1)
+
+dbSelectArea("SB2")
+dbSetOrder(1)
+
+dbSelectArea("SB1")
+dbSetOrder(1)
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Ajusta perguntas no SX1 a fim de preparar o relatorio p/     ³
+//³ custo unificado por empresa/Filial                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If lCusfil .Or. lCusEmp
+	U_MTR900xCUnf(lCusFil,lCusEmp)
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Ajusta perguntas no SX1 									 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+AjustaSX1()
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Ajustar o SX1 para SIGAVEI, SIGAPEC e SIGAOFI                ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+aSB1Cod	:= TAMSX3("B1_COD")
+aSB1Ite	:= TAMSX3("B1_CODITE")
+
+dbSelectArea("SX1")
+dbSetOrder(1)
+dbSeek(PADR(cPerg,nTamSX1))
+Do While SX1->X1_GRUPO == PADR(cPerg,nTamSX1) .And. !SX1->(Eof())
+	If "PRODU" $ Upper(SX1->X1_PERGUNT) .And. Upper(SX1->X1_TIPO) == "C" .And. ;
+		(SX1->X1_TAMANHO <> aSB1Cod[1] .Or. Upper(SX1->X1_F3) <> "SB1")
+		RecLock("SX1",.F.)
+		SX1->X1_TAMANHO := aSB1Cod[1]
+		SX1->X1_F3 := "SB1"
+		dbCommit()
+		MsUnlock()
+	EndIf
+	dbSkip()
+EndDo
+dbCommitAll()
+RestArea(aArea1)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para parametros                     ³
+//³ mv_par01         // Do produto                           ³
+//³ mv_par02         // Ate o produto                        ³
+//³ mv_par03         // Do tipo                              ³
+//³ mv_par04         // Ate o tipo                           ³
+//³ mv_par05         // Da data                              ³
+//³ mv_par06         // Ate a data                           ³
+//³ mv_par07         // Lista produtos s/movimento           ³
+//³ mv_par08         // Qual Local (almoxarifado)            ³
+//³ MV_par09         // (d)OCUMENTO/(s)EQUENCIA              ³
+//³ mv_par10         // moeda selecionada ( 1 a 5 )          ³
+//³ mv_par11         // Seq.de Digitacao /Calculo            ³
+//³ mv_par12         // Pagina Inicial                       ³
+//³ mv_par13         // Lista Transf Locali (Sim/Nao)        ³
+//³ mv_par14         // Do  Grupo                            ³
+//³ mv_par15         // Ate o Grupo                          ³
+//³ mv_par16         // Seleciona Filial?                    ³
+//³ mv_par17         // Qual Custo ? ( Medio / Reposicao )   ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If Pergunte("MTR900",.T.)
+	SaveInter()	// Salva variáveis públicas (Entre elas os parâmetros MV_PAR**).
+	uPar01	:= MV_PAR01
+	uPar02	:= MV_PAR02
+	uPar05	:= MV_PAR05
+	uPar06	:= MV_PAR06
+	
+	//* Carrega as Perguntas (MTR461) da rotina MATR46BX.
+	Pergunte('MTR461',.F.)
+	//* mv_par01	MES APURACAO
+	//* mv_par02	ANO APURACAO
+	//* mv_par03	DO PRODUTO    '
+	//* mv_par04	ATE O PRODUTO
+	//* mv_par05	MODELO
+	//* mv_par06	IMPRIME APURACAO
+	//* mv_par07	PROCESSA CDM
+	//* mv_par08	OPERACOES COM PAUTA
+	//* mv_par09	SEPARADOR DE MILHARES
+	// Substitue apenas as posições correspondentes ao perúŒdo e a faixa de produtos.
+	MV_PAR03 := uPAR01
+	MV_PAR04 := uPAR02
+	MV_PAR01 := uPAR05
+	MV_PAR02 := uPAR06
+	
+	// Executa o CAT17 para gerar apenas o arquivo temporario alias RCA
+	U_R461Imp(.F./*Imprime Apuracao*/,MV_PAR01,MV_PAR02,@cArqTmp)
+	// Restaura o array aMovimentos
+	aMovimentos := {}
+	
+	RestInter()	// Restaura as variáveis públicas (Entre elas os parâmetros MV_PAR**).
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Envia controle para a funcao SETPRINT                        ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//wnrel:=SetPrint(cString,wnrel,/*cPerg*/,titulo,cDesc1,cDesc2,cDesc3,.F.,aOrd,.F.,Tamanho)
+	
+	If nLastKey = 27
+		dbClearFilter()
+		lRet := .F.
+	EndIf
+	
+	If lRet
+		//SetDefault(aReturn,cString)
+		If nLastKey = 27
+			dbClearFilter()
+			lRet := .F.
+		EndIf
+		
+		If lRet
+			Processa( { |lEnd| R900Imp( @lEnd, wnRel, tamanho, titulo ) }, titulo )
+		EndIf
+	EndIf
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Apaga arquivos temporarios               ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	U_xFsCatFim(cArqTMP)		//FsCat17Fim
+	
+EndIf
+
+Return NIL
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ R900IMP  ³ Autor ³ Rodrigo de A. Sartorio³ Data ³ 16.11.95 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Chamada do Relatorio                                       ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe   ³ R900Imp(ExpL1,ExpC1,ExpC2,ExpC3)		                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ ExpL1 = var. p/ controle de interrupcao pelo usuario 	  ³±±
+±±³          ³ ExpC1 = codigo do relatorio                                ³±±
+±±³          ³ ExpC2 = codigo ref. ao tamanho do relatorio (P/M/G)        ³±±
+±±³          ³ ExpC3 = titulo do relatorio                                ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ MATR900			                                          ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+
+/* {Protheus.doc} R900Imp.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  rotina para impressao
+*/
+
+
+Static Function R900Imp(lEnd,WnRel,tamanho,titulo)
+
+Static lIxbConTes  := NIL
+
+Local aDadosTran:= {}
+Local aAreaSD2  := {}
+Local lContinua := .F.
+Local nTam      := 18
+Local CbTxt,CbCont,Cabec1,Cabec2
+Local cSeqIni   := Replicate("z",6)
+Local cAlias    := ""
+Local cProdAnt  := ""
+Local cLocalAnt := ""
+Local cCampo1   := ""
+Local cCampo2   := ""
+Local cCampo3   := ""
+Local cCampo4   := ""
+Local cNumSeqTr := ""
+Local cCusto    := ""
+Local cTipoNf   := ""
+Local nTotRegs  := 0
+Local nRegTr    := 0
+Local lFirst    := .T.
+Local lFirst1   := .T.
+Local lTransEnd := .T.
+Local aSalAtu   := { 0,0,0,0,0,0,0,0 } , nTipo
+Local nEntrada  := nSaida :=0
+Local nCEntrada := nCSaida:=0
+Local nInd      := 0
+Local cPicB2Tot := PesqPictQt("B2_VATU1"  ,nTam)
+Local cPicB2Qt  := PesqPictQt("B2_QATU"   ,nTam)
+Local cPicB2Qt2 := PesqPictQt("B2_QTSEGUM",nTam)
+Local cPicD1Qt  := PesqPictQt("D1_QUANT"  ,nTam)
+Local cPicD2Qt  := PesqPictQt("D2_QUANT"  ,nTam)
+Local cPicD3Qt  := PesqPictQt("D3_QUANT"  ,nTam)
+Local cPicB2Cust:= PesqPict("SB2","B2_CM"+Str(mv_par10,1),nTam,mv_par10)
+Local cPicD1Cust:= PesqPict("SD1","D1_CUSTO"+IIf(mv_par10 == 1 ,"",Str(mv_par10,1)),nTam,mv_par10)
+Local cPicD2Cust:= PesqPict("SD2","D2_CUSTO"+Str(mv_par10,1),nTam,mv_par10)
+Local cPicD3Cust:= PesqPict("SD3","D3_CUSTO"+Str(mv_par10,1),nTam,mv_par10)
+Local cTRBSD1   := CriaTrab(,.F.)
+Local cTRBSD2   := Subs(cTrbSD1,1,7)+"A"
+Local cTRBSD3   := Subs(cTrbSD1,1,7)+"B"
+Local lDev  // Flag que indica se nota Edevolu‡ao (.T.) ou nao (.F.)
+// Indica se esta listando relatorio do almox. de processo
+Local lLocProc  := alltrim(mv_par08) == SuperGetMv("MV_LOCPROC")
+// Indica se deve imprimir movimento invertido (almox. de processo)
+Local lInverteMov:= .F.
+Local lPriApropri:= .T.
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica se existe ponto de entrada                          ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local lTesNEst := .F.
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Codigo do produto importado - NAO DEVE SER LISTADO           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local cProdImp := GetMV("MV_PRODIMP")
+
+Local cAliasTop:="KARDEXSQL"
+Local cQuery   := ""
+Local cQuery2  := ""
+Local cQueryD1 := ""
+Local cQueryD2 := ""
+Local cQueryD3 := ""
+Local cQueryD1P:= ""
+Local cQueryD2P:= ""
+Local cQueryD3P:= ""
+Local cQuerySub:= ""
+Local cQueryB1A:= ""
+Local cQueryB1B:= ""
+Local cQueryB1C:= ""
+Local cQueryB1D:= ""
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis tipo Local para SIGAVEI, SIGAPEC e SIGAOFI         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local cArq1     := ""
+Local nInd1     := 0
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para processamento por Filial           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local aFilsCalc := MatFilCalc( Iif (!IsBlind(), mv_par16 == 1, .F.) )
+
+Local cFilBack  := cFilAnt
+Local nForFilial:= 0
+Local cProdMNT := GetMv("MV_PRODMNT")
+Local cProdTER := GetMv("MV_PRODTER")
+Local aProdsMNT := {}
+Local nX
+
+
+// Contagem do aMovimentos
+Local nQtdeaMov		:= 0
+Local cDescCusto	:= ""
+Local aAreax		:= {}
+Local nAlq			:= 0
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Alerta o usuario que o custo de reposicao esta desativado.   ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If mv_par17==2 .And. !lCusRep
+	Help(" ",1,"A910CUSRP")
+	mv_par17 := 1
+EndIf
+
+cProdMNT := cProdMNT + Space(15-Len(cProdMNT))
+cProdTER := cProdTER + Space(15-Len(cProdTER))
+
+If !Empty(aFilsCalc)
+	
+	For nForFilial := 1 To Len( aFilsCalc )
+		
+		If aFilsCalc[ nForFilial, 1 ]
+			
+			cFilAnt := aFilsCalc[ nForFilial, 2 ]
+			
+			cQueryB1A:= " AND SB1.B1_COD >= '" + mv_par01 + "'"
+			cQueryB1A+= " AND SB1.B1_COD <= '" + mv_par02 + "'"
+			
+			cQueryB1B:= " AND SB1.B1_COD = SB1EXS.B1_COD"
+			
+			If !lCusEmp
+				cQueryB1C:= " AND SB1.B1_FILIAL = '" + xFilial("SB1") + "'"
+			EndIf
+			
+			cQueryB1C+= " AND SB1.B1_TIPO >= '"		+ mv_par03	+ "'"
+			cQueryB1C+= " AND SB1.B1_TIPO <= '"		+ mv_par04	+ "'"
+			cQueryB1C+= " AND SB1.B1_GRUPO >= '"	+ mv_par14	+ "'"
+			cQueryB1C+= " AND SB1.B1_GRUPO <= '"	+ mv_par15	+ "'"
+			cQueryB1C+= " AND SB1.B1_COD <> '"		+ cProdimp	+ "'"
+			cQueryB1C+= " AND SB1.D_E_L_E_T_<>'*'"
+			
+			If !lCusEmp
+				cQueryB1D:= " SB1EXS.B1_FILIAL = '" + xFilial("SB1")+"'"
+				cQueryB1D+= " AND"
+			EndIf
+			
+			If lCusEmp
+				cQueryB1D+= " SB1EXS.B1_COD >= '" + mv_par01 + "'"
+			Else
+				cQueryB1D+= " SB1EXS.B1_COD >= '" + mv_par01 + "'"
+			EndIf
+			cQueryB1D+= " AND SB1EXS.B1_COD <= '" + mv_par02 + "'"
+			
+			cQueryB1D+= " AND SB1EXS.B1_TIPO >= '"	+ mv_par03 + "'"
+			cQueryB1D+= " AND SB1EXS.B1_TIPO <= '"	+ mv_par04 + "'"
+			cQueryB1D+= " AND SB1EXS.B1_GRUPO >= '" + mv_par14 + "'"
+			cQueryB1D+= " AND SB1EXS.B1_GRUPO <= '" + mv_par15 + "'"
+			cQueryB1D+= " AND SB1EXS.B1_COD <> '"	+ cProdimp + "'"
+			
+			cQueryB1D+= " AND SB1EXS.D_E_L_E_T_<> '*'"
+			
+			lIxbConTes := IF(lIxbConTes == NIL,ExistBlock("MTAAVLTES"),lIxbConTes)
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Verifica se utiliza custo unificado por Filial/Empresa       ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			lCusFil:=lCusFil .And. mv_par08 == Repl("*",TamSX3("B2_LOCAL")[1])
+			lCusEmp:=lCusEmp .And. mv_par08 == Repl("#",TamSX3("B2_LOCAL")[1])
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Variaveis utilizadas para Impressao do Cabecalho e Rodape    ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			cbtxt := Space(10)
+			cbcont:= 0
+			m_pag := mv_par12
+			
+			titulo := OemToAnsi("KARDEX FISICO-FINANCEIRO ")+IIf(mv_par11==1,IIf(lCusRep .And. mv_par17==2,"(SEQUENCIA)","(CALCULO)"),IIf(lCusRep .And. mv_par17==2,"STR0066","L O C A L :") ) + " " + IIf(lCusFil,"",OemToAnsi("STR0011")+" "+mv_par08)		// "KARDEX FISICO-FINANCEIRO "###"(SEQUENCIA)"###"(CALCULO)"###"L O C A L :"
+			cabec1 := OemToAnsi("    OPERACAO      ")+IIf(mv_par09 $ "Dd", "   DOCUMENTO   " , "   SEQUENCIA   " ) +" |               E  N  T  R  A  D  A  S             |         CUSTO MEDIO   |                  S  A  I  D  A  S                |                   S   A   L   D   O              |CLI,FOR,"			//"    OPERACAO      "###"   DOCUMENTO   "###"   SEQUENCIA   "###" |               E  N  T  R  A  D  A  S             |         CUSTO MEDIO   |                  S  A  I  D  A  S                |                   S   A   L   D   O              |CLI,FOR,"
+			cabec2 := OemToAnsi("    DATA    TES C.F    NUMERO     |            QUANTIDADE             CUSTO TOTAL    |        DO MOVIMENTO   |            QUANTIDADE             CUSTO TOTAL    |            QUANTIDADE               VALOR TOTAL  |CC , PJ ou OP")															//"    DATA    TES C.F    NUMERO     |            QUANTIDADE             CUSTO TOTAL    |        DO MOVIMENTO   |            QUANTIDADE             CUSTO TOTAL    |            QUANTIDADE               VALOR TOTAL  |CC , PJ ou OP"
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Inicializa os codigos de caracter Comprimido/Normal da impressora ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			nTipo  := IIf(aReturn[4]==1,15,nTam)
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Adiciona a ordem escolhida ao titulo do relatorio          ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If Type("NewHead")#"U"
+				NewHead += " (Por "+AllTrim(aOrd[aReturn[8]])+" ,em "+AllTrim(GetMv("MV_SIMB"+Ltrim(Str(mv_par10))))+")" + " - " + aFilsCalc[ nForFilial, 3 ]	//" (Por "###" ,em "
+			Else
+				Titulo  += " (Por "+AllTrim(aOrd[aReturn[8]])+" ,em "+AllTrim(GetMv("MV_SIMB"+Ltrim(Str(mv_par10))))+")" + " - " + aFilsCalc[ nForFilial, 3 ]	//" (Por "###" ,em "
+			EndIf
+			
+			dbSelectArea("SD1")           // Itens de Entrada
+			nTotRegs += LastRec()
+			
+			dbSelectArea("SD2")           // Itens de Saida
+			nTotRegs += LastRec()
+			
+			dbSelectArea("SD3")           // movimentacoes internas (producao/requisicao/devolucao)
+			nTotRegs += LastRec()
+			
+			dbSelectArea("SB2")			  // Saldos em estoque
+			dbSetOrder(1)
+			nTotRegs += LastRec()
+			
+			// **** ATENCAO - O ORDER BY UTILIZA AS POSICOES DO SELECT, SE ALGUM CAMPO
+			// **** FOR INCLUIDO NA QUERY OU ALTERADO DE LUGAR DEVE SER REVISTA A SINTAXE
+			// **** DO ORDER BY
+			// Query do produto
+			// 1 ARQ
+			// 2 PRODUTO
+			// 3 TIPO
+			// 4 UM
+			// 5 GRUPO
+			// 6 DESC
+			// 7 POSIPI
+			// 8 SEQCALC
+			// 9 DATA
+			// 10 TES
+			// 11 CF
+			// 12 SEQUENCIA
+			// 13 DOCUMENTO
+			// 14 SERIE
+			// 15 QUANTIDADE
+			// 16 QUANT2UM
+			// 17 ARMAZEM
+			// 18 PROJETO
+			// 19 OP
+			// 20 CC
+			// 21 FORNECEDOR
+			// 22 LOJA
+			// 23 PEDIDO
+			// 24 TIPO NF
+			// 25 CUSTO
+			// 26 TRT
+			// 27 LOTE
+			// 28 B1_CODITE  - GESTAO DE CONCESSIONÁRIAS
+			// 29 RECNO
+			// Query completa
+			
+			// **** ATENCAO - O ORDER BY UTILIZA AS POSICOES DO SELECT, SE ALGUM CAMPO
+			// **** FOR INCLUIDO NA QUERY OU ALTERADO DE LUGAR DEVE SER REVISTA A SINTAXE
+			// **** DO ORDER BY
+			
+			cQueryD1P:= ""
+			cQuerySub:= "SELECT 1 "
+			
+			cQueryD1P+= "SELECT 'SD1' ARQ"		  		// 01
+			cQueryD1P+= ", SB1.B1_COD PRODUTO"	  		// 02
+			cQueryD1P+= ", SB1.B1_TIPO TIPO"	  		// 03
+			cQueryD1P+= ", SB1.B1_UM"			  		// 04
+			cQueryD1P+= ", SB1.B1_GRUPO"		  		// 05
+			cQueryD1P+= ", SB1.B1_DESC"			   		// 06
+			cQueryD1P+= ", SB1.B1_POSIPI"		   		// 07
+			cQueryD1P+= ", D1_SEQCALC SEQCALC"	   		// 08
+			cQueryD1P+= ", D1_DTDIGIT DATA"		   		// 09
+			cQueryD1P+= ", D1_TES TES"			   		// 10
+			cQueryD1P+= ", D1_CF CF"			   		// 11
+			cQueryD1P+= ", D1_NUMSEQ SEQUENCIA"	  		// 12
+			cQueryD1P+= ", D1_DOC DOCUMENTO"	  		// 13
+			cQueryD1P+= ", D1_SERIE SERIE"		   		// 14
+			cQueryD1P+= ", D1_QUANT QUANTIDADE"	   		// 15
+			cQueryD1P+= ", D1_QTSEGUM QUANT2UM"	   		// 16
+			cQueryD1P+= ", D1_LOCAL ARMAZEM"	   		// 17
+			cQueryD1P+= ", '' PROJETO"			   		// 18
+			cQueryD1P+= ", '' OP"				  		// 19
+			cQueryD1P+= ", '' CC"				  		// 20
+			cQueryD1P+= ", D1_FORNECE FORNECEDOR"  		// 21
+			cQueryD1P+= ", D1_LOJA LOJA"		   		// 22
+			cQueryD1P+= ", '' PEDIDO"			  		// 23
+			cQueryD1P+= ", D1_TIPO TIPONF"		 		// 24
+			If lCusRep .And. mv_par17 == 2
+				cQueryD1P+= ", D1_CUSRP"		 		// 25
+				// COLOCA A MOEDA DO CUSTO
+				cQueryD1P += Str(mv_par10,1,0)
+				cQueryD1P += " CUSTO"
+			Else
+				cQueryD1P+= ", D1_CUSTO"		  		// 25
+				// COLOCA A MOEDA DO CUSTO
+				If mv_par10 > 1
+					cQueryD1P+= Str(mv_par10,1,0)
+				EndIf
+				cQueryD1P += " CUSTO"
+			EndIf
+			cQueryD1P += ", '' TRT"						// 26
+			cQueryD1P += ", D1_LOTECTL LOTE"	 		// 27
+			cQueryD1P += ", SD1.R_E_C_N_O_ NRECNO"		// 29
+			
+			cQueryD1 := " FROM "
+			
+			cQueryD1 += RetSqlName("SB1") + " SB1"
+			cQueryD1 += ", " + RetSqlName("SD1") + " SD1"
+			cQueryD1 += ", " + RetSqlName("SF4") + " SF4"
+			
+			cQueryD1 += " WHERE"
+			
+			cQueryD1 += " SB1.B1_COD = D1_COD"
+			If lCusEmp
+				If !Empty(xFilial("SD1")) .And. !Empty(xFilial("SF4"))
+					cQueryD1 += " AND F4_FILIAL = D1_FILIAL "
+				EndIf
+			Else
+				cQueryD1 += " AND D1_FILIAL = '" + xFilial("SD1") + "'"
+				cQueryD1 += " AND F4_FILIAL = '" + xFilial("SF4") + "'"
+			EndIf
+			cQueryD1 += " AND SD1.D1_TES = F4_CODIGO"
+			cQueryD1 += " AND F4_ESTOQUE = 'S'"
+			cQueryD1 += " AND D1_DTDIGIT >= '" + DTOS(mv_par05) + "'"
+			cQueryD1 += " AND D1_DTDIGIT <= '" + DTOS(mv_par06) + "'"
+			cQueryD1 += " AND D1_ORIGLAN <> 'LF'"
+			If !(lCusFil .Or. lCusEmp)
+				cQueryD1 += " AND D1_LOCAL = '" + mv_par08 + "'"
+			EndIf
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Nao imprimir o produto MANUTENCAO (MV_PRDMNT) qdo integrado com MNT. ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If MTR900IsMNT()
+				If FindFunction("NGProdMNT")
+					aProdsMNT := aClone(NGProdMNT())
+					For nX := 1 To Len(aProdsMNT)
+						cQueryD1 += " AND SB1.B1_COD <> '" + aProdsMNT[nX] + "'"
+					Next nX
+				Else
+					cQueryD1 += " AND SB1.B1_COD <> '" + cProdMNT + "'"
+					cQueryD1 += " AND SB1.B1_COD <> '" + cProdTER + "'"
+				EndIf
+			EndIf
+			cQueryD1 += " AND SD1.D_E_L_E_T_<>'*'"
+			cQueryD1 += " AND SF4.D_E_L_E_T_<>'*'"
+			
+			cQueryD2P := " SELECT 'SD2'"	  			// 01
+			cQueryD2P += ", SB1.B1_COD"		  			// 02
+			cQueryD2P += ", SB1.B1_TIPO"	  			// 03
+			cQueryD2P += ", SB1.B1_UM"		 			// 04
+			cQueryD2P += ", SB1.B1_GRUPO"	 			// 05
+			cQueryD2P += ", SB1.B1_DESC"	 			// 06
+			cQueryD2P += ", SB1.B1_POSIPI"	 			// 07
+			cQueryD2P += ", D2_SEQCALC"		 			// 08
+			cQueryD2P += ", D2_EMISSAO"		 			// 09
+			cQueryD2P += ", D2_TES"		  				// 10
+			cQueryD2P += ", D2_CF"		   				// 11
+			cQueryD2P += ", D2_NUMSEQ"	  				// 12
+			cQueryD2P += ", D2_DOC"			 			// 13
+			cQueryD2P += ", D2_SERIE"		 			// 14
+			cQueryD2P += ", D2_QUANT"		 			// 15
+			cQueryD2P += ", D2_QTSEGUM"					// 16
+			cQueryD2P += ", D2_LOCAL"	   				// 17
+			cQueryD2P += ", ''"			   				// 18
+			cQueryD2P += ", ''"			  				// 19
+			cQueryD2P += ", ''"			   				// 20
+			cQueryD2P += ", D2_CLIENTE"	   				// 21
+			cQueryD2P += ", D2_LOJA"	   				// 22
+			cQueryD2P += ", D2_PEDIDO"					// 23
+			cQueryD2P += ", D2_TIPO"		  			// 24
+			If lCusRep .And. mv_par17 == 2
+				cQueryD2P+= ", D2_CUSRP"	   			// 25
+				// COLOCA A MOEDA DO CUSTO
+				cQueryD2P += Str(mv_par10,1,0)
+			Else
+				cQueryD2P += ", D2_CUSTO"				// 25
+				// COLOCA A MOEDA DO CUSTO
+				cQueryD2P += Str(mv_par10,1,0)
+			EndIf
+			cQueryD2P += ", ''"							// 26
+			cQueryD2P += ", D2_LOTECTL"					// 27
+			
+			cQueryD2P += ", SD2.R_E_C_N_O_ SD2RECNO"	// 29
+			
+			cQueryD2 := " FROM "
+			
+			cQueryD2 += RetSqlName("SB1") + " SB1"
+			cQueryD2 += ", " + RetSqlName("SD2") + " SD2"
+			cQueryD2 += ", " + RetSqlName("SF4") + " SF4"
+			
+			cQueryD2 += " WHERE"
+			
+			cQueryD2 += " SB1.B1_COD = D2_COD"
+			If lCusEmp
+				If !Empty(xFilial("SD2")) .And. !Empty(xFilial("SF4"))
+					cQueryD2 += " AND F4_FILIAL = D2_FILIAL "
+				EndIf
+			Else
+				cQueryD2 += " AND D2_FILIAL = '" + xFilial("SD2") + "'"
+				cQueryD2 += " AND F4_FILIAL = '" + xFilial("SF4") + "'"
+			EndIf
+			cQueryD2 += " AND SD2.D2_TES = F4_CODIGO"
+			cQueryD2 += " AND F4_ESTOQUE = 'S'"
+			cQueryD2 += " AND D2_EMISSAO >= '" + DTOS(mv_par05) + "'"
+			cQueryD2 += " AND D2_EMISSAO <= '" + DTOS(mv_par06) + "'"
+			cQueryD2 += " AND D2_ORIGLAN <> 'LF'"
+			If !(lCusFil .Or. lCusEmp)
+				cQueryD2 += " AND D2_LOCAL = '" + mv_par08 + "'"
+			EndIf
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Nao imprimir o produto MANUTENCAO (MV_PRDMNT) qdo integrado com MNT. ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If MTR900IsMNT()
+				If FindFunction("NGProdMNT")
+					aProdsMNT := aClone(NGProdMNT())
+					For nX := 1 To Len(aProdsMNT)
+						cQueryD2 += " AND SB1.B1_COD <> '" + aProdsMNT[nX] + "'"
+					Next nX
+				Else
+					cQueryD2 += " AND SB1.B1_COD <> '" + cProdMNT + "'"
+					cQueryD2 += " AND SB1.B1_COD <> '" + cProdTER + "'"
+				EndIf
+			EndIf
+			cQueryD2 += " AND SD2.D_E_L_E_T_<>'*'"
+			cQueryD2 += " AND SF4.D_E_L_E_T_<>'*'"
+			
+			cQueryD3P := " SELECT 'SD3'"   				// 01
+			cQueryD3P += ", SB1.B1_COD"	   				// 02
+			cQueryD3P += ", SB1.B1_TIPO"   				// 03
+			cQueryD3P += ", SB1.B1_UM"					// 04
+			cQueryD3P += ", SB1.B1_GRUPO"  				// 05
+			cQueryD3P += ", SB1.B1_DESC"   				// 06
+			cQueryD3P += ", SB1.B1_POSIPI" 				// 07
+			cQueryD3P += ", D3_SEQCALC"	   				// 08
+			cQueryD3P += ", D3_EMISSAO"	   				// 09
+			cQueryD3P += ", D3_TM"		   				// 10
+			cQueryD3P += ", D3_CF"						// 11
+			cQueryD3P += ", D3_NUMSEQ"	   				// 12
+			cQueryD3P += ", D3_DOC"						// 13
+			cQueryD3P += ", ''"			   				// 14
+			cQueryD3P += ", D3_QUANT"	   				// 15
+			cQueryD3P += ", D3_QTSEGUM"					// 16
+			cQueryD3P += ", D3_LOCAL"	  				// 17
+			cQueryD3P += ", D3_PROJPMS"	  				// 18
+			cQueryD3P += ", D3_OP"		  				// 19
+			cQueryD3P += ", D3_CC"		  				// 20
+			cQueryD3P += ", ''"			 				// 21
+			cQueryD3P += ", ''"							// 22
+			cQueryD3P += ", ''"			  				// 23
+			cQueryD3P += ", ''"			  				// 24
+			If lCusRep .And. mv_par17 == 2
+				cQueryD3P+= ", D3_CUSRP"  				// 25
+				// COLOCA A MOEDA DO CUSTO
+				cQueryD3P += Str(mv_par10,1,0)
+			Else
+				cQueryD3P += ", D3_CUSTO"  				// 25
+				// COLOCA A MOEDA DO CUSTO
+				cQueryD3P += Str(mv_par10,1,0)
+			EndIF
+			cQueryD3P += ", D3_TRT"		  				// 26
+			cQueryD3P += ", D3_LOTECTL"	   				// 27
+			
+			cQueryD3P += ", SD3.R_E_C_N_O_ SD3RECNO"	// 29
+			
+			cQueryD3 := " FROM "
+			
+			cQueryD3 += RetSqlName("SB1") + " SB1"
+			cQueryD3 += ", " + RetSqlName("SD3") + " SD3"
+			
+			cQueryD3 += " WHERE"
+			
+			cQueryD3 += " SB1.B1_COD = D3_COD"
+			If !lCusEmp
+				cQueryD3 += " AND D3_FILIAL = '"	+ xFilial("SD3") + "'"
+			EndIf
+			cQueryD3 += " AND D3_EMISSAO >= '"	+ DTOS(mv_par05) + "'"
+			cQueryD3 += " AND D3_EMISSAO <= '"	+ DTOS(mv_par06) + "'"
+			If SuperGetMV('MV_D3ESTOR', .F., 'N') == 'N'
+				cQueryD3 += " AND D3_ESTORNO <> 'S'"
+			EndIf
+			If SuperGetMV('MV_D3SERVI', .F., 'N') == 'N' .And. IntDL()
+				cQueryD3 += " AND ( (D3_SERVIC = '   ') OR (D3_SERVIC <> '   ' AND D3_TM <= '500')  "
+				cQueryD3 += " OR  (D3_SERVIC <> '   ' AND D3_TM > '500' AND D3_LOCAL ='"+SuperGetMV('MV_CQ', .F., '98')+"') )"
+			EndIf
+			If !(lCusFil .Or. lCusEmp) .And. !lLocProc
+				cQueryD3 += " AND D3_LOCAL = '" + mv_par08 + "'"
+			EndIf
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Não imprimir o produto MANUTENCAO (MV_PRDMNT) qdo integrado com MNT. ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If MTR900IsMNT()
+				If FindFunction("NGProdMNT")
+					aProdsMNT := aClone(NGProdMNT())
+					For nX := 1 To Len(aProdsMNT)
+						cQueryD3 += " AND SB1.B1_COD <> '" + aProdsMNT[nX] + "'"
+					Next nX
+				Else
+					cQueryD3 += " AND SB1.B1_COD <> '" + cProdMNT + "'"
+					cQueryD3 += " AND SB1.B1_COD <> '" + cProdTER + "'"
+				EndIf
+			EndIf
+			cQueryD3 += " AND SD3.D_E_L_E_T_<>'*'"
+			
+			cQuery := cQueryD1P + cQueryD1 + cQueryB1A + cQueryB1C
+			cQuery += " UNION "
+			cQuery += cQueryD2P + cQueryD2 + cQueryB1A + cQueryB1C
+			cQuery += " UNION "
+			cQuery += cQueryD3P + cQueryD3 + cQueryB1A + cQueryB1C
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ So inclui as condicoes a seguir qdo lista produtos sem ³
+			//³ movimento                                              ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If mv_par07 == 1
+				
+				cQuery2:= " AND NOT EXISTS " + "(" + cQuerySub + cQueryD1 + cQueryB1B + cQueryB1C + ")"
+				cQuery2+= " AND NOT EXISTS " + "(" + cQuerySub + cQueryD2 + cQueryB1B + cQueryB1C + ")"
+				cQuery2+= " AND NOT EXISTS " + "(" + cQuerySub + cQueryD3 + cQueryB1B + cQueryB1C + ")"
+				
+				cQuery += " UNION"
+				
+				cQuery += " SELECT 'SB1'"			// 01
+				cQuery += ", SB1EXS.B1_COD"	   		// 02
+				cQuery += ", SB1EXS.B1_TIPO"	   		// 03
+				cQuery += ", SB1EXS.B1_UM"	   		// 04
+				cQuery += ", SB1EXS.B1_GRUPO"   		// 05
+				cQuery += ", SB1EXS.B1_DESC"			// 06
+				cQuery += ", SB1EXS.B1_POSIPI"		// 07
+				cQuery += ", ''"						// 08
+				cQuery += ", ''"				   		// 09
+				cQuery += ", ''"				   		// 10
+				cQuery += ", ''"						// 11
+				cQuery += ", ''"						// 12
+				cQuery += ", ''"						// 13
+				cQuery += ", ''"						// 14
+				cQuery += ", 0"						// 15
+				cQuery += ", 0"						// 16
+				cQuery += ", ''"						// 17
+				cQuery += ", ''"				   		// 18
+				cQuery += ", ''"				   		// 19
+				cQuery += ", ''"				  		// 20
+				cQuery += ", ''"				  		// 21
+				cQuery += ", ''"				  		// 22
+				cQuery += ", ''"				  		// 23
+				cQuery += ", ''"				  		// 24
+				cQuery += ", 0"				   		// 25
+				cQuery += ", ''"				   		// 26
+				cQuery += ", ''"				   		// 27
+				cQuery += ", 0"				   		// 29
+				
+				cQuery += " FROM "
+				
+				cQuery += RetSqlName("SB1") + " SB1EXS"
+				
+				cQuery += " WHERE "
+				
+				cQuery += cQueryB1D
+				cQuery += cQuery2
+			EndIf
+			
+			If aReturn[8]==1 //" Codigo Produto "###" Tipo do Produto"
+				cQuery += " ORDER BY 2,"
+			ElseIf aReturn[8] == 2
+				cQUery += " ORDER BY 3,2,"
+			EndIf
+			
+			If mv_par11 == 1
+				cQuery += "12,28"
+			Else
+				If lCusFil .Or. lCusEmp
+					cQuery+="8,12,28"
+				Else
+					cQuery += "8,28"
+				EndIf
+			EndIf
+
+			cQuery:=ChangeQuery(cQuery)
+			MsAguarde({|| dbUseArea(.T.,"TOPCONN",TCGenQry(,,cQuery),cAliasTOP,.F.,.T.)},"STR0019")
+
+			ProcRegua(nTotRegs)
+			dbSelectArea(cAliasTop)
+			dbgotop()
+
+			While !(cAliasTop)->(Eof())
+				IncProc()
+				
+				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+				//³ Filtra Registros de Acordo com a Pasta  Filtro da Janela de Impressao  ³
+				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+				If !Empty(aReturn[7])
+					dbSelectArea("SB1")
+					dbSetOrder(1)
+					If dbSeek(xFilial("SB1") + (cAliasTop)->PRODUTO)
+						If !&(aReturn[7])
+							dbSelectArea(cAliasTop)
+							dbSkip()
+							Loop
+						EndIf
+					Else
+						dbSelectArea(cAliasTop)
+						dbSkip()
+						Loop
+					EndIf
+					dbSelectArea(cAliasTop)
+				EndIf
+				
+				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+				//³ Se nao encontrar no arquivo de saldos nao lista  ³
+				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+				If !lCusEmp
+					dbSelectArea("SB2")
+					If !dbSeek( xFilial("SB2") + (cAliasTop)->PRODUTO + If( lCusFil .Or. lCusEmp, "", mv_par08 ) )
+						dbSelectArea(cAliasTop)
+						dbSkip()
+						Loop
+					EndIf
+				EndIf
+				
+				dbSelectArea(cAliasTop)
+				cProdAnt  := (cAliasTop)->PRODUTO
+				cLocalAnt := alltrim(SB2->B2_LOCAL)
+				
+				nEntrada :=nSaida  :=0
+				nCEntrada:=nCSaida :=0
+				lFirst   :=.F.
+				
+				While !Eof() .And. (cAliasTop)->PRODUTO = cProdAnt .And. If(lCusFil .Or. lCusEmp .Or. lLocProc,.T.,IIf(alltrim((cAliasTop)->ARQ) <> 'SB1',alltrim((cAliasTop)->ARMAZEM)==cLocalAnt,.T.))
+					
+					MTR900CAB(@aSalAtu,Alias(),cPicB2Cust,nTam,.T.,cAliasTop,cPicB2Tot)
+					nQtdeaMov	:= Len(aMovimentos)
+					
+					/*NORBERTO >>>>>> */
+					aDadosTran:={(cAliasTOP)->TES,(cAliasTOP)->QUANTIDADE,(cAliasTOP)->CUSTO,(cAliasTOP)->QUANT2UM,(cAliasTOP)->TIPO,;
+					(cAliasTOP)->DATA,(cAliasTOP)->CF,(cAliasTOP)->SEQUENCIA,(cAliasTOP)->DOCUMENTO,(cAliasTOP)->PRODUTO,;
+					(cAliasTOP)->OP,(cAliasTOP)->PROJETO,(cAliasTOP)->CC,alltrim((cAliasTOP)->ARQ)}
+					/*NORBERTO <<<<<< */
+					
+					IncProc()
+					lContinua := .F.
+					If Alltrim((cAliasTop)->ARQ) $ "SD1/SD2"
+						lFirst:=.T.
+						SF4->( dbSeek( xFilial("SF4") + (cAliasTop)->TES ) )
+						//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+						//³ Despreza Notas Fiscais Lancadas Pelo Modulo do Livro Fiscal  ³
+						//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+						//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+						//³ Executa ponto de entrada para verificar se considera TES que ³
+						//³ NAO ATUALIZA saldos em estoque.                              ³
+						//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+						If lIxbConTes .And. SF4->F4_ESTOQUE != "S"
+							lTesNEst := ExecBlock("MTAAVLTES",.F.,.F.)
+							lTesNEst := If(ValType(lTesNEst) # "L",.F.,lTesNEst)
+						EndIf
+						If SF4->F4_ESTOQUE != "S" .And. !lTesNEst
+							dbSkip()
+							Loop
+						EndIf
+					ElseIf Alltrim((cAliasTop)->ARQ) == "SD3"
+						lFirst:=.T.
+						//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+						//³ Quando movimento ref apropr. indireta, so considera os         ³
+						//³ movimentos com destino ao almoxarifado de apropriacao indireta.³
+						//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+						lInverteMov:=.F.
+						If alltrim((cAliasTop)->ARMAZEM) != cLocalAnt .Or. (lCusFil .Or. lCusEmp)
+							If !(Substr((cAliasTop)->CF,3,1) == "3")
+								If !(lCusFil .Or. lCusEmp)
+									dbSkip()
+									Loop
+								EndIf
+							ElseIf lPriApropri
+								lInverteMov:=.T.
+							EndIf
+						EndIf
+						//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+						//³ Caso seja uma transferencia de localizacao verifica se lista   ³
+						//³ o movimento ou nao                                             ³
+						//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+						If mv_par13 == 2 .And. Substr((cAliasTop)->CF,3,1) == "4"
+							cNumSeqTr := (cAliasTOP)->(PRODUTO+SEQUENCIA+ARMAZEM)
+							/* NORBERTO
+							aDadosTran:={(cAliasTOP)->TES,(cAliasTOP)->QUANTIDADE,(cAliasTOP)->CUSTO,(cAliasTOP)->QUANT2UM,(cAliasTOP)->TIPO,;
+							(cAliasTOP)->DATA,(cAliasTOP)->CF,(cAliasTOP)->SEQUENCIA,(cAliasTOP)->DOCUMENTO,(cAliasTOP)->PRODUTO,;
+							(cAliasTOP)->OP,(cAliasTOP)->PROJETO,(cAliasTOP)->CC,alltrim((cAliasTOP)->ARQ)}
+							*/
+							dbSkip()
+							If (cAliasTOP)->(PRODUTO+SEQUENCIA+ARMAZEM) == cNumSeqTr
+								dbSkip()
+								Loop
+							Else
+								lContinua := .T.
+								If !Localiza(aDadosTran[10]) //Verifica se Utiliza localizacao
+									If lFirst
+										// data  +  TES
+										aMovimentos[nQtdeaMov][12]	:= STOD(aDadosTran[6])
+										aMovimentos[nQtdeaMov][13]  := aDadosTran[1]
+										// C.F.  +   DOCUMENTO NUMERO
+										aMovimentos[nQtdeaMov][14]  	:= aDadosTran[7]  	// C.F.
+										aMovimentos[nQtdeaMov][15]    	:= PadR(IIf(mv_par09 $ "Ss",aDadosTran[8],aDadosTran[9]),12)	// Numero Documento
+									EndIf
+									If aDadosTran[1] <= "500"        //ENTRADA
+										nEntrada   += aDadosTran[2]
+										aSalAtu[1] += aDadosTran[2]
+										nCEntrada  +=  aDadosTran[3]
+										aSalAtu[mv_par10+1] += aDadosTran[3]
+										aSalAtu[7] += aDadosTran[4]
+										// Documento ENTRADA   +  ENTRADA CUSTO TOTAL
+										aMovimentos[nQtdeaMov][08]  	+= aDadosTran[2]					//Acrescenta ao Saldo Atual
+										aMovimentos[nQtdeaMov][16]  	:= aDadosTran[2]    				//Entradas Quantidade
+										aMovimentos[nQtdeaMov][17]    	:= aDadosTran[3]					// Entradas Custo Total
+										aMovimentos[nQtdeaMov][18]    	:= Round(aDadosTran[3] / aDadosTran[2],6)  	// custo medio
+									Else                                 // SAIDA
+										nSaida	   += aDadosTran[2]
+										aSalAtu[1] -= aDadosTran[2]
+										nCSaida	   += aDadosTran[3]
+										aSalAtu[mv_par10+1] -= aDadosTran[3]
+										aSalAtu[7] -= aDadosTran[4]
+										// Documento SAIDA   +  ENTRADA CUSTO TOTAL
+										aMovimentos[nQtdeaMov][08]  	-= aDadosTran[2]    //Atualiza Saldo Atual
+										aMovimentos[nQtdeaMov][18]    	:= Round(aDadosTran[3] / aDadosTran[2],6)  	// custo medio
+										aMovimentos[nQtdeaMov][19]  	:= aDadosTran[2]    //Saidas Quantidade
+										aMovimentos[nQtdeaMov][20]    	:= aDadosTran[3]	// Saidas Custo Total
+									EndIf
+								Else
+									lTransEnd := .F.
+								EndIf
+							EndIf
+						EndIf
+					EndIf
+					If lFirst .And. !lContinua
+						// Data de Movimentação  + TES
+						aMovimentos[nQtdeaMov][12]	:= STOD(DATA)
+						aMovimentos[nQtdeaMov][13]	:= TES
+						// C.F.  +   DOCUMENTO NUMERO
+						aMovimentos[nQtdeaMov][14]  := aDadosTran[7]  	// C.F.
+						aMovimentos[nQtdeaMov][15]  := PadR(IIf(mv_par09 $ "Ss",SEQUENCIA,DOCUMENTO),12)	// Numero Documento
+					EndIf
+					
+					If Alltrim((cAliasTop)->ARQ) == "SD1" .And. !lContinua
+						lDev:=MTR900Dev("SD1",cAliasTop)
+						If (cAliasTOP)->TES <= "500" .And. !lDev        // entrada
+							// Montagem da planilha Qtde + Custo
+							// Documento ENTRADA   +  ENTRADA CUSTO TOTAL
+							aMovimentos[nQtdeaMov][08]  	+= (cAliasTOP)->QUANTIDADE		//Acrescenta ao Saldo Atual
+							aMovimentos[nQtdeaMov][16]  	:= (cAliasTOP)->QUANTIDADE      //Entradas Quantidade
+							aMovimentos[nQtdeaMov][17]    	:= (cAliasTOP)->CUSTO  			// Entradas Custo Total
+							If (cAliasTOP)->TIPONF != "C"
+								//Informação para a geração da Planilha  // CUSTO MEDIO
+								aMovimentos[nQtdeaMov][18]    	:= Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)		// CUSTO
+							EndIf
+							nEntrada   += (cAliasTOP)->QUANTIDADE
+							aSalAtu[1] += (cAliasTOP)->QUANTIDADE
+							nCEntrada  += (cAliasTOP)->CUSTO
+							aSalAtu[mv_par10+1] += (cAliasTOP)->CUSTO
+							aSalAtu[7] += (cAliasTOP)->QUANT2UM
+						Else
+							If (cAliasTOP)->TIPONF != "C"
+								//Informação para a geração da Planilha  // CUSTO MEDIO
+								aMovimentos[nQtdeaMov][18]    	:= Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)		// CUSTO
+							EndIf
+							If lDev
+								cCusto:=Transform((cAliasTOP)->CUSTO,cPicD1Cust)
+								aMovimentos[nQtdeaMov][08]	-= (cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][19]	:= (cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][20]	:= (cAliasTOP)->CUSTO
+								nSaida 	   -= (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] += (cAliasTOP)->QUANTIDADE
+								nCSaida	   -=(cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] += (cAliasTOP)->CUSTO
+								aSalAtu[7] += (cAliasTOP)->QUANT2UM
+							Else
+								aMovimentos[nQtdeaMov][08]	-= (cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][19]	:= (cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][20]	:= (cAliasTOP)->CUSTO
+								nSaida 	   += (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] -= (cAliasTOP)->QUANTIDADE
+								nCSaida	   +=(cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] -= (cAliasTOP)->CUSTO
+								aSalAtu[7] -= (cAliasTOP)->QUANT2UM
+							EndIf
+						EndIf
+					ElseIf Alltrim((cAliasTop)->ARQ) = "SD2" .And. !lContinua            //Case
+						lDev:=MTR900Dev("SD2",cAliasTop)
+						If (cAliasTOP)->TES <= "500" .Or. lDev
+							If lDev
+								cCusto:=Transform((cAliasTOP)->CUSTO,cPicD2Cust)
+								nEntrada   -= (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] -= (cAliasTOP)->QUANTIDADE
+								nCEntrada  -= (cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] -= (cAliasTOP)->CUSTO
+								aSalAtu[7] -= (cAliasTOP)->QUANT2UM
+								// saida qtde  +  saida custo total
+								aMovimentos[nQtdeaMov][08]  +=  (cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][16]	:= 	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][17]	:=	(cAliasTOP)->CUSTO
+							Else
+								nEntrada   += (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] += (cAliasTOP)->QUANTIDADE
+								nCEntrada  += (cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] += (cAliasTOP)->CUSTO
+								aSalAtu[7] += (cAliasTOP)->QUANT2UM
+								//Informação para a geração da Planilha  // CUSTO MEDIO
+								aMovimentos[nQtdeaMov][18]    	:= Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)		// CUSTO
+								//saida qtde   + saida custo total
+								aMovimentos[nQtdeaMov][08]	+= 	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][16]	:= 	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][17]	:=	(cAliasTOP)->CUSTO
+							EndIf
+						Else
+							nSaida     += (cAliasTOP)->QUANTIDADE
+							aSalAtu[1] -= (cAliasTOP)->QUANTIDADE
+							nCSaida    +=  (cAliasTOP)->CUSTO
+							aSalAtu[mv_par10+1] -= (cAliasTOP)->CUSTO
+							aSalAtu[7] -= (cAliasTOP)->QUANT2UM
+							aMovimentos[nQtdeaMov][08]	-= (cAliasTOP)->QUANTIDADE
+							aMovimentos[nQtdeaMov][18]	:= 	Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)		// CUSTO
+							aMovimentos[nQtdeaMov][19]	:=	(cAliasTOP)->QUANTIDADE
+							aMovimentos[nQtdeaMov][20]	:=	(cAliasTOP)->CUSTO
+						EndIf
+					ElseIf Alltrim((cAliasTop)->ARQ) == "SD3" .And. !lContinua           //Case
+						If	lInverteMov
+							If (cAliasTOP)->TES > "500"
+								aMovimentos[nQtdeaMov][08]	+= 	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][16]	:=	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][17]	:=	(cAliasTOP)->CUSTO
+								aMovimentos[nQtdeaMov][18]	:= Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)
+								nEntrada   += (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] += (cAliasTOP)->QUANTIDADE
+								nCEntrada  +=  (cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] += (cAliasTOP)->CUSTO
+								aSalAtu[7] += (cAliasTOP)->QUANT2UM
+							Else
+								//Informação para a geração da Planilha  // CUSTO MEDIO
+								aMovimentos[nQtdeaMov][08]	-= (cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][18]	:= Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)		// CUSTO
+								aMovimentos[nQtdeaMov][19]	:=	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][20]	:=	(cAliasTOP)->CUSTO
+								nSaida     += (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] -= (cAliasTOP)->QUANTIDADE
+								nCSaida    += (cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] -= (cAliasTOP)->CUSTO
+								aSalAtu[7] -= (cAliasTOP)->QUANT2UM
+							EndIf
+							If lCusFil .Or. lCusEmp
+								lPriApropri:=.F.
+							EndIf
+						Else
+							If (cAliasTOP)->TES <= "500"
+								//Informação para a geração da Planilha  // CUSTO MEDIO
+								aMovimentos[nQtdeaMov][08]	+= 	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][16]	:=	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][17]	:=	(cAliasTOP)->CUSTO
+								aMovimentos[nQtdeaMov][18]  := Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)		// CUSTO
+								nEntrada   += (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] += (cAliasTOP)->QUANTIDADE
+								nCEntrada  +=  (cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] += (cAliasTOP)->CUSTO
+								aSalAtu[7] += (cAliasTOP)->QUANT2UM
+							Else
+								//Informação para a geração da Planilha  // CUSTO MEDIO
+								aMovimentos[nQtdeaMov][08]	-= (cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][18]	:= 	Round((cAliasTOP)->CUSTO / (cAliasTOP)->QUANTIDADE,6)		// CUSTO
+								aMovimentos[nQtdeaMov][19]	:=	(cAliasTOP)->QUANTIDADE
+								aMovimentos[nQtdeaMov][20]	:=	(cAliasTOP)->CUSTO
+								nSaida     += (cAliasTOP)->QUANTIDADE
+								aSalAtu[1] -= (cAliasTOP)->QUANTIDADE
+								nCSaida    += (cAliasTOP)->CUSTO
+								aSalAtu[mv_par10+1] -= (cAliasTOP)->CUSTO
+								aSalAtu[7] -= (cAliasTOP)->QUANT2UM
+							EndIf
+							If lCusFil .Or. lCusEmp
+								lPriApropri:=.T.
+							EndIf
+						EndIf
+					EndIf   //EndCase
+					
+					If lFirst .And. lTransEnd
+						aMovimentos[nQtdeaMov][21]	:= 	aSalAtu[1]
+						aMovimentos[nQtdeaMov][22]	:= 	aSalAtu[mv_par10+1]
+					EndIf
+					// Rotina para tratar o campo Ressarcimento
+					RCA->(dbSetOrder(3))	//TMP_MERCAD+DTOS(TMP_DATA)+TMP_NUMDOC
+					If !Empty(aMovimentos[nQtdeaMov][12]) .and. RCA->(dbSeek( aMovimentos[nQtdeaMov][1] + DTOS(aMovimentos[nQtdeaMov][12]) + aMovimentos[nQtdeaMov][15] ))
+						aMovimentos[nQtdeaMov][23]	:= RCA->(((TMP_VAL10 + TMP_VAL13) - TMP_COL16) * (TMP_ALIQS / 100))
+					EndIf
+					Do Case
+						Case Alltrim((cAliasTop)->ARQ) == "SD3" .And. !lContinua .And. lTransEnd        //CLI - FOR - CC - PF - OP
+							aMovimentos[nQtdeaMov][24]	:= (cAliasTOP)->CC+" "+(cAliasTOP)->PROJETO+" "+(cAliasTOP)->OP
+						Case Alltrim((cAliasTop)->ARQ) == "SD1" .And. !lContinua .And. lTransEnd
+							cTipoNf := 'F-'
+							SD1->(dbGoTo((cAliasTop)->NRECNO))
+							SD2->(dbSetOrder(3))
+							If SD2->(dbSeek(xFilial("SD2")+SD1->D1_NFORI+SD1->D1_SERIORI+SD1->D1_FORNECE+SD1->D1_LOJA))
+								If !(SD2->D2_TIPO $ 'B|D')
+									cTipoNf := 'C-'
+								EndIf
+							EndIf
+							aMovimentos[nQtdeaMov][24]	:= cTipoNf+(cAliasTOP)->FORNECEDOR
+						Case Alltrim((cAliasTop)->ARQ) == "SD2" .And. !lContinua .And. lTransEnd
+							//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+							//³N - QNC: 002117                                                       ³
+							//³Corrigida a ultima coluna do relatorio onde apresentava nas notas     ³
+							//³de saida o número do pedido de compra , ao invés de apresentar        ³
+							//³o codigo do cliente quando o D2_TIPO="N",                             ³
+							//³quando D2_TIPO="B" mostrar o codigo do fornecedor.                    ³
+							//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+							aMovimentos[nQtdeaMov][24]	:= If(((cAliasTop)->TIPONF) $ "B|D", "F-","C-")+(cAliasTop)->FORNECEDOR
+						Case lContinua .And. aDadosTran[14] == "SD3"  .And. lTransEnd
+							If Empty(aDadosTran[11]) .And. Empty(aDadosTran[12])
+								aMovimentos[nQtdeaMov][24]	:= 	'CC'+aDadosTran[13]
+							ElseIf !Empty(aDadosTran[12])
+								aMovimentos[nQtdeaMov][24]	:=	'PJ'+aDadosTran[12]
+							ElseIf !Empty(aDadosTran[11])
+								aMovimentos[nQtdeaMov][24]	:=	'OP'+aDadosTran[11]
+							EndIf
+					EndCase
+					
+					lTransEnd := .T.
+					
+					If !lInverteMov .Or. (lInverteMov .And. lPriApropri)
+						If !lContinua //Acerto para utilizar o Array aDadosTranf[]
+							dbSkip()
+						EndIf
+					EndIf
+				EndDo
+				If !lFirst
+					If MTR900IsMNT() .and. FindFunction("NGProdMNT")
+						aProdsMNT := aClone(NGProdMNT())
+					EndIf
+				EndIf
+			EndDo
+			
+			dbSelectArea(cAliasTop)
+			dbCloseArea()
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³Rotina para chamar e exportar o array aMovimentos para a planilha EXCEL³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			fExcelMov()	// Gera Arquivo Excel
+			
+			dbSelectArea("SB1")
+			dbClearFilter()
+			If !Empty(cArq1) .And. File(cArq1 + OrdBagExt())
+				RetIndex('SB1')
+				FERASE(cArq1 + OrdBagExt())
+			EndIf
+			dbSetOrder(1)
+			dbSelectArea("SB2")
+			dbSetOrder(1)
+			dbSelectArea("SD1")
+			If !Empty(cTrbSD1) .And. File(cTrbSD1 + OrdBagExt())
+				RetIndex("SD1")
+				Ferase(cTrbSD1+OrdBagExt())
+			EndIf
+			dbSetOrder(1)
+			dbSelectArea("SD2")
+			If !Empty(cTrbSD2) .And. File(cTrbSD2 + OrdBagExt())
+				RetIndex("SD2")
+				Ferase(cTrbSD2+OrdBagExt())
+			EndIf
+			dbSetOrder(1)
+			dbSelectArea("SD3")
+			If !Empty(cTrbSD3) .And. File(cTrbSD2 + OrdBagExt())
+				RetIndex("SD3")
+				Ferase(cTrbSD3+OrdBagExt())
+			EndIf
+			dbSetOrder(1)
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Caso utilize o relatorio por empresa executar somente uma unica vez |
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If lCusEmp
+				Exit
+			EndIf
+			
+		EndIf
+		
+	Next nForFilial
+	
+	If aReturn[5] = 1
+		Set Printer To
+		dbCommitAll()
+		OurSpool(wnrel)
+	EndIf
+	
+	MS_FLUSH()
+	
+EndIf
+
+// Restaura Filial Corrente
+cFilAnt := cFilBack
+
+RETURN
+
+/* {Protheus.doc} fExcelMov.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Exportacao dos dados do relatorio para a planilha EXCEL
+*/
+Static Function fExcelMov()
+Local aArea		:= GetArea()                 	// retorna ambiente anterior
+Local aStruct   := {}                           // estrutura
+Local cDirDocs  :=  GetMV("FS_MATR46X")				//MsDocPath()
+Local cPath		:= AllTrim(GetTempPath())
+Local nY		:= 0                            // auxiliar do for
+Local nX        := 0                            // auxiliar do for
+Local cBuffer   := ""                           // recebe as variaveis de valores
+Local cCabec    := ""							// Cabecalho do registro
+Local oExcelApp := Nil                          // recebe planilha do excell
+Local nHandle   := 0
+Local cArquivo  := CriaTrab(,.F.)+".CSV"        // arquivo
+Local xValor    := Nil                          //  valor
+Local cAliasUser:= "RCA"
+Local aDados	:= {}
+LOcal nCont		:= 0
+Local nCont2	:= 0
+Local cCRLF		:= CHR(13) + CHR(10)
+Local cDescProd	:= ""
+Local cBreakGrp	:= .F.							// Chave para controle de quebra de grupo de registros
+Local aResume	:= {}							// Array auxiliar para totalizacao de grupos de registros
+Local aRefPict	:= {}
+
+// Carregar os dados para a exportacao para a planilha do Excel-- novo
+aDados := aMovimentos
+
+If ApOleClient("MsExcel")
+	//If (nHandle := FCreate(cDirDocs + "\"+cArquivo)) > 0   // APONTANDO PELO PARAMETRO NAO PERMITE GERAR
+	If (nHandle := FCreate(cPath + "\"+cArquivo)) > 0
+		
+		xValor := "Código"                          //1
+		xValor := PadR(xValor,Max(12,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Descrição"                       //2
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Marca"                           //3
+		xValor := PadR(xValor,Max(12,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Um"    			                //4
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Tipo"				            //5
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Grupo"			               //6
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Custo Medio"		               //7
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Qtd. Saldo"	                  //8
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "Vlr.Total"		              //9
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "POSICAO IPI"		             //10
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "ENDERECO"		               //11
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "DATA OPERACAO"		              //12
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "TES"		                     //13
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "C.F."		                 //14
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "DOCUMENTO NUMERO"		    //15
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "ENTRADAS QUANTIDADE"		    //16
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'@E 999,999,999.99')
+		
+		xValor := "ENTRADAS CUSTO TOTAL"		 //17
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'@E 999,999,999.99')
+		
+		xValor := "CUSTO MEDIO DO MOVIMENTO"	//18
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "SAIDAS QUANTIDADE"		     //19
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'@E 999,999,999.99')
+		
+		xValor := "SAIDAS CUSTO TOTAL"		     //20
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'@E 999,999,999.99')
+		
+		xValor := "SALDO QTDE"
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )  //21
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'@E 999,999,999.99')
+		
+		xValor := "SALDO VALOR TOTAL"
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )   //22
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		xValor := "RESSARCIMENTO"		         // 23
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'@E 999,999,999.99')
+		
+		xValor := "CLI,FOR, CC , PJ ou OP"		 //24
+		xValor := PadR(xValor,Max(30,Len(xValor) ) )
+		cBuffer += ToXlsFormat(xValor)
+		cBuffer += ";"
+		AAdd(aRefPict,'')
+		
+		cBuffer += cCRLF
+		cCabec	:= cBuffer
+		FWrite(nHandle, cCabec)
+		cBuffer := ''
+		
+		If Len(aDados) > 0 
+			cBreakGrp := aDados[1][1]	// Coluna Código do Produto
+			aResume := aClone(aDados[1])
+			AEval(aResume,{|x,i| aResume[i] := If(ValType(x)=='N',0,x)})
+		EndIf
+		
+		For nX := 1 To Len(aDados)
+			If cBreakGrp <> aDados[nX][1]
+				cBreakGrp := aDados[nX][1]	// Coluna Código do Produto
+				// Criação da Linha Totalizadora
+				For nY := 1 To Len(aResume)
+					If nY == 2
+						cLinha := 'T O T A I S'
+					Else
+						If Empty(aRefPict[nY])
+							cLinha := If(nY==1,aResume[nY],'')
+						Else
+							cLinha := If(ValType(aResume[nY])=='N',Transform(aResume[nY],aRefPict[nY]),If(nY==1,aResume[nY],''))
+						EndIf
+					EndIf
+					cBuffer += ToXlsFormat(cLinha)
+					cBuffer += ";"
+				Next nY
+				cBuffer += cCRLF + cCRLF + cCRLF
+				FWrite(nHandle, cBuffer + cCabec)
+				cBuffer	:= ""
+				aResume := aClone(aDados[nX])
+				AEval(aResume,{|x,i| aResume[i] := If(ValType(x)=='N',0,x)})
+			EndIf
+
+			For nY := 1 To Len(aDados[1])
+				cLinha := If( Empty(aRefPict[nY]), aDados[nX][nY], Transform(aDados[nX][nY],aRefPict[nY]))
+				// Acumulador de Dados Numéricos
+				If ValType(aResume[nY]) == 'N' .and. ValType(aDados[nX][nY]) == 'N'
+					aResume[nY] += aDados[nX][nY]
+				EndIf
+				cBuffer += ToXlsFormat(cLinha)
+				cBuffer += ";"
+			Next nY
+			cBuffer += cCRLF
+			FWrite(nHandle, cBuffer)
+			cBuffer	:= ""
+		Next nX
+		
+		// Criação da Linha Totalizadora		
+		For nY := 1 To Len(aResume)
+			If nY == 2
+				cLinha := 'T O T A I S'
+			Else
+				If Empty(aRefPict[nY])
+					cLinha := If(nY==1,aResume[nY],'')
+				Else
+					cLinha := If(ValType(aResume[nY])=='N',Transform(aResume[nY],aRefPict[nY]),If(nY==1,aResume[nY],''))
+				EndIf
+			EndIf
+			cBuffer += ToXlsFormat(cLinha)
+			cBuffer += ";"
+		Next nY
+		cBuffer += cCRLF
+		FWrite(nHandle, cBuffer)
+		cBuffer	:= ""
+		
+		// Parametro FS_MATR46X - tem a finalidade de apontar o local da geracao do arquivo EXCEL.
+		FClose(nHandle)
+		
+		//CpyS2T(cDirDocs + "\" + cArquivo, cPath, .T.)		// ANALISAR POIS TEM PROBLEMA DE DIREITO A ACESSO
+		//MSGInfo("Arquivo criado com Sucesso " + cPath+ "\" + cArquivo)    //cDirDocs
+		
+		oExcelApp := MsExcel():New()
+		oExcelApp:WorkBooks:Open(cPath + cArquivo)
+		oExcelApp:SetVisible(.T.)
+	Else
+		MsgStop("Erro na criacao do arquivo na estacao local. Contate o administrador do sistema") //"Erro na criacao do arquivo na estacao local. Contate o administrador do sistema"
+	EndIf
+Else
+	MsgStop("Microsoft Excel nao instalado.")	 //"Microsoft Excel nao instalado."
+EndIf
+
+RestArea(aArea)
+
+Return
+
+/* {Protheus.doc} Mtr900valx.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Exportacao dos dados do relatorio para a planilha EXCEL
+*/
+User Function Mtr900valx()
+Local lRet := .T.
+
+If mv_par09 $ "dsDS"
+	lRet := .T.
+Else
+	lRet := .F.
+EndIf
+
+Return lRet
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ MTR900Cab³ Autor ³                    ³ Data ³             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Cabecalho com dados do produto                             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe   ³ MTR900Cab(ExpA1,ExpC1,ExpC2,ExpN1,ExpL1,ExpC3)             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ ExpA1 = Array saldo atual	 	                          ³±±
+±±³          ³ ExpC1 = Alias 	                                          ³±±
+±±³          ³ ExpC2 = Picture do custo medio                             ³±±
+±±³          ³ ExpN1 = Tamanho do campo saldo  	                          ³±±
+±±³          ³ ExpL1 = Se esta' utilizando query                          ³±±
+±±³          ³ ExpC3 = Alias Top                                          ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³ Nenhum			                                          ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ Generico                                                   ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+/* {Protheus.doc} Mtr900Cab.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Emissao do cabeçalho da emissao para a planilha 	EXCEL
+*/
+
+Static Function Mtr900Cab(aSalAtu,cAlias,cPicB2Cust,nTam,lQuery,cAliasTop,cPicB2Tot)
+Local nCusMed 	:= 0
+Local i         := 0
+Local nIndice   := 0
+Local aSalAlmox	:= {}
+Local aArea     := {}
+Local cSeek		:= ""
+Local cFilBkp   := cFilAnt
+Local cTrbSB2	:= CriaTrab(,.F.)
+Local lVer116   := (VAL(GetVersao(.F.)) == 11 .And. GetRpoRelease() >= "R6" .Or. VAL(GetVersao(.F.))  > 11)
+Local cDescMarca:=	""
+Local cDescProd	:= ""
+
+Default lQuery 	  := .F.
+Default cAliasTop :="SB1"
+Default cPicB2Tot := PesqPictQt("B2_VATU1",18)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Calcula o Saldo Inicial do Produto             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If lCusFil
+	aArea:=GetArea()
+	//aSalAtu  := { 0,0,0,0,0,0,0,0 }
+	dbSelectArea("SB2")
+	dbSetOrder(1)
+	dbSeek(cSeek:=xFilial("SB2") + If(lQuery,(cAliasTOP)->PRODUTO,SB1->B1_COD))
+	While !Eof() .And. B2_FILIAL+B2_COD == cSeek
+		aSalAlmox := CalcEst(If(lQuery,(cAliasTOP)->PRODUTO,SB1->B1_COD),SB2->B2_LOCAL,mv_par05,,,( lCusRep .And. mv_par17==2 ) )
+		For i:=1 to Len(aSalAtu)
+			aSalAtu[i] += aSalAlmox[i]
+		Next i
+		dbSkip()
+	End
+	RestArea(aArea)
+ElseIf lCusEmp
+	aArea:=GetArea()
+	//aSalAtu  := { 0,0,0,0,0,0,0,0 }
+	dbSelectArea("SB2")
+	dbSetOrder(1)
+	INDREGUA("SB2",cTrbSB2,"B2_COD+B2_LOCAL",,,"Selecionando Registros")	//"Selecionando Registros"
+	nIndice := RetIndex("SB2")
+	dbSetOrder(nIndice+1)
+	dbSeek(cSeek:=If(lQuery,(cAliasTOP)->PRODUTO,SB1->B1_COD))
+	While !Eof() .And. SB2->B2_COD == cSeek
+		If !Empty(xFilial("SB2"))
+			cFilAnt:=SB2->B2_FILIAL
+		EndIf
+		aSalAlmox := CalcEst(If(lQuery,(cAliasTOP)->PRODUTO,SB1->B1_COD),SB2->B2_LOCAL,mv_par05,,,( lCusRep .And. mv_par17==2 ) )
+		For i:=1 to Len(aSalAtu)
+			aSalAtu[i] += aSalAlmox[i]
+		Next i
+		dbSkip()
+	End
+	dbSelectArea("SB2")
+	If !Empty(cTrbSB2) .And. File(cTrbSB2 + OrdBagExt())
+		RetIndex("SB2")
+		Ferase(cTrbSB2+OrdBagExt())
+	EndIf
+	cFilAnt := cFilBkp
+	RestArea(aArea)
+ElseIf AScan(aMovimentos,{|e| e[1] == (cAliasTOP)->PRODUTO}) == 0
+	aSalAtu := CalcEst(If(lQuery,(cAliasTOP)->PRODUTO,SB1->B1_COD),mv_par08,mv_par05,,, ( lCusRep .And. mv_par17==2 ) )
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Calcula o Custo de Reposicao do Produto        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If lCusRep .And. mv_par17==2
+	aSalAtu := {aSalAtu[1],aSalAtu[18],aSalAtu[19],aSalAtu[20],aSalAtu[21],aSalAtu[22],aSalAtu[07]}
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Calcula o Custo Medio do Produto               ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+SB2->(dbSetOrder(1))
+SB2->(MsSeek(xFilial("SB2") + If(lQuery,(cAliasTOP)->PRODUTO,SB1->B1_COD)))
+If aSalAtu[1] > 0
+	nCusmed := aSalAtu[mv_par10+1]/aSalAtu[1]
+ElseIf aSalAtu[1] == 0 .and. aSalAtu[mv_par10+1] == 0
+	nCusMed := 0
+Else
+	nCusmed := &(Eval(bBloco,"SB2->B2_CM",mv_par10))
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Armazenar o conteudo para a geração em  EXCEL³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+// Posicao IPI
+cPosIpi	:= ""
+cPosIpi	:= Alltrim( SUBS((cAliasTop)->B1_POSIPI,1,4)+"."+SUBS((cAliasTop)->B1_POSIPI,5,4)+"."+SUBS((cAliasTop)->B1_POSIPI,9,2) )
+
+cEnder	:= ""
+//Achar o endereco
+If lVer116
+	cEnder	:= If(lCusFil .Or. lCusEmp , MV_PAR08 , Posicione("NNR",1,xFilial("NNR")+MV_PAR08,"NNR_DESCRI")) 		   		//"Localizacao : "
+Else
+	cEnder	:= If(lCusFil .Or. lCusEmp , MV_PAR08 , SB2->B2_LOCALIZ) 														//"Localizacao : "
+EndIf
+
+cDescProd	:= 	Posicione("SB1",1,xFilial("SB1")+(cAliasTop)->PRODUTO,"B1_P_MULTB")
+cDescMarca	:= 	Posicione("ZX4",1,xFilial("ZX4")+cDescProd,"ZX4_NOME")
+
+Aadd(aMovimentos,{ 		(cAliasTop)->PRODUTO			,;  		// codigo produto
+(cAliasTop)->B1_DESC			,;          // descrição
+cDescMarca						,;			// marca
+(cAliasTop)->B1_UM				,;          // Unidade
+(cAliasTop)->TIPO		   		,;			// tipo
+(cAliasTop)->B1_GRUPO			,;			// Grupo
+aSalAtu[8]						,;			// custo medio
+aSalAtu[1]            			,;			// Qtde Saldo
+aSalAtu[mv_par10+4]				,;			// valor total
+cPosIpi						  	,;			// Posição IPI
+cEnder 							,;			// endereço
+""								,;          // Data Operacao
+""								,;          // TES
+""								,;          // C.F.
+""								,;          // Documento Numero
+0								,;          // Entradas Qtde
+0								,;          // Entradas Custo Total
+0								,;          // Custo Medio do Movimento
+0								,;          // Saida Qtde de
+0								,;          // Saidas custo Total
+0								,;          // Saldo Qtde
+0								,;          // Saldo Valor Total
+0								,;          // Ressarcimento
+""								})          // CLI - FOR - CC - PJ ou OP
+
+dbSelectArea(cAlias)
+Return NIL
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ MTR900Dev³ Autor ³ Rodrigo de A. Sartorio³ Data ³ 17/07/98 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³Avalia se item pertence a uma nota de devolu‡ao             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe   ³ MTR900Dev(ExpC1,ExpC2)				                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ ExpC1 = Alias                                              ³±±
+±±³          ³ ExpC2 = Alias Top                                          ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³ .T. / .F.                                                  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ MATR900                                                    ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+/* {Protheus.doc} MTR900Dev.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Avalia se item pertence a uma nota de devolu‡ao
+*/
+
+Static Function MTR900Dev(cAlias,cAliasTop)
+Static lListaDev := NIL
+
+Local lRet:=.F.
+Local cSeek:= If(!Empty(cAliasTop),(cAliasTop)->DOCUMENTO+(cAliasTop)->SERIE+(cAliasTop)->FORNECEDOR+(cAliasTop)->LOJA,"")
+
+// Identifica se lista dev. na mesma coluna
+lListaDev := If(ValType(lListaDev)#"L",GetMV("MV_LISTDEV"),lListaDev)
+
+If lListaDev .And. cAlias == "SD1"
+	dbSelectArea("SF1")
+	If Empty(cSeek)
+		cSeek:=SD1->D1_DOC+SD1->D1_SERIE+SD1->D1_FORNECE+SD1->D1_LOJA
+	EndIf
+	If dbSeek(xFilial("SF1") + cSeek) .And. SF1->F1_TIPO == "D"
+		lRet:=.T.
+	EndIf
+ElseIf lListaDev .And. cAlias == "SD2"
+	dbSelectArea("SF2")
+	If Empty(cSeek)
+		cSeek:=+SD2->D2_DOC+SD2->D2_SERIE+SD2->D2_CLIENTE+SD2->D2_LOJA
+	EndIf
+	If dbSeek(xFilial("SF2") + cSeek) .And. SF2->F2_TIPO == "D"
+		lRet:=.T.
+	EndIf
+EndIf
+dbSelectArea(If(Empty(cAliasTop),cAlias,cAliasTop))
+Return lRet
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³MTR900xCUnf ³ Autor ³Rodrigo de A. Sartorio ³ Data ³26/06/00 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³Ajusta grupo de perguntas p/ Custo Unificado                ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe   ³ MTR900Cunf(ExpL1)					                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ ExpL1 = Custo Unificado								 	  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ MATR900                                                    ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+
+/* {Protheus.doc} MTR900xCUnf.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Ajusta grupo de perguntas p/ Custo Unificado
+*/
+
+User Function MTR900xCUnf(lCusFil,lCusEmp)
+Local aSvAlias:=GetArea()
+Local nTamSX1 :=Len(SX1->X1_GRUPO)
+
+Default lCusFil := .F.
+Default lCusEmp := .F.
+
+dbSelectArea("SX1")
+If dbSeek(PADR("MTR900",nTamSX1)+"08",.F.)
+	If !("MTR900xVAlm" $ X1_VALID)
+		RecLock("SX1",.F.)
+		If Empty(X1_VALID)
+			Replace X1_VALID With "MTR900xVAlm"
+		Else
+			Replace X1_VALID With X1_VALID+".And.MTR900xVAlm"
+		EndIf
+		MsUnlock()
+	EndIf
+	If lCusFil .And. X1_CNT01 != Repl("*",TamSX3("B2_LOCAL")[1])
+		RecLock("SX1",.F.)
+		Replace X1_CNT01 With Repl("*",TamSX3("B2_LOCAL")[1])
+		MsUnlock()
+	EndIf
+	If lCusEmp .And. X1_CNT01 != Repl("#",TamSX3("B2_LOCAL")[1])
+		RecLock("SX1",.F.)
+		Replace X1_CNT01 With Repl("#",TamSX3("B2_LOCAL")[1])
+		MsUnlock()
+	EndIf
+EndIf
+RestArea(aSvAlias)
+Return(NIL)
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³MTR900VAlm ³ Autor ³Rodrigo de A. Sartorio ³ Data ³26/06/00 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³Valida Almoxarifado do KARDEX com relacao a custo unificado ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³ .T. / .F.                                                  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ MATR900                                                    ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+/* {Protheus.doc} MTR900xVAlm.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Valida Almoxarifado do KARDEX com relacao a custo unificado
+*/
+
+User Function MTR900xVAlm()
+Local lRet:=.T.
+Local cConteudo:=&(ReadVar())
+Local nOpc:=2
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³MV_CUSFIL - Parametro utilizado para verificar se o sistema   |
+//|utiliza custo unificado por:                                  |
+//|      F = Custo Unificado por Filial                          |
+//|      E = Custo Unificado por Empresa                         |
+//|      A = Custo Unificado por Armazem                         |
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local lCusFil    := AllTrim(SuperGetMV('MV_CUSFIL' ,.F.,"A")) == "F"
+Local lCusEmp    := AllTrim(SuperGetMv('MV_CUSFIL' ,.F.,"A")) == "E"
+
+If lCusFil .And. cConteudo != Repl("*",TamSX3("B2_LOCAL")[1])
+	nOpc := Aviso("Aten‡„o","Ao alterar o almoxarifado o custo medio unificado sera desconsiderado.",{"Confirma","Abandona"})	//"Aten‡„o"###"Ao alterar o almoxarifado o custo medio unificado sera desconsiderado."###"Confirma"###"Abandona"
+	If nOpc == 2
+		lRet:=.F.
+	EndIf
+EndIf
+If lCusEmp .And. cConteudo != Repl("#",TamSX3("B2_LOCAL")[1])
+	nOpc := Aviso("Aten‡„o","Ao alterar o almoxarifado o custo medio unificado sera desconsiderado.",{"Confirma","Abandona"})	//"Aten‡„o"###"Ao alterar o almoxarifado o custo medio unificado sera desconsiderado."###"Confirma"###"Abandona"
+	If nOpc == 2
+		lRet:=.F.
+	EndIf
+EndIf
+Return lRet
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡ao    ³ AjustaSX1³ Autor ³                       ³ Data ³           ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Altera descricao da pergunta no SX1                        ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ MATR900			                                          ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+
+/* {Protheus.doc} AjustaSX1.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Altera descricao da pergunta no SX1
+*/
+
+Static Function AjustaSX1()
+
+Local aAreaAnt := GetArea()
+Local aPerg    := {}
+Local cPerg    := "MTR900"
+Local aHelpPor := aHelpEng := aHelpSpa := {}
+Local nTamSX1  := Len(SX1->X1_GRUPO)
+Local aTamSX3  := TamSx3("B2_LOCAL")
+
+Aadd(aPerg,{"Digitacao","Digitacion","Typing"})
+Aadd(aPerg,{"Calculo","Calculo","Calculation"})
+
+dbSelectArea("SX1")
+dbSetOrder(1)
+
+If dbSeek(PADR(cPerg,nTamSX1)+"07") .And. SX1->X1_TIPO == "C"
+	RecLock("SX1",.F.)
+	Replace X1_TIPO     with "N"
+	Replace X1_PRESEL   with 1
+	Replace X1_GSC   	with "C"
+	Replace X1_DEF01    with "Sim"
+	Replace X1_DEFSPA1  with "Si"
+	Replace X1_DEFENG1  with "Yes"
+	Replace X1_DEF02    with "Nao"
+	Replace X1_DEFSPA2  with "No"
+	Replace X1_DEFENG2  with "No"
+	Replace X1_CNT01    with " "
+	MsUnLock()
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Ajusta tamanho da get de pergunta do armazem se diferente de B2_LOCAL³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SX1")
+dbSetOrder(1)
+If dbSeek(PADR(cPerg,nTamSX1)+"08") .And. SX1->X1_TIPO == "C" .And. SX1->X1_TAMANHO != aTamSX3[1]
+	RecLock("SX1",.F.)
+	Replace X1_TAMANHO with aTamSX3[1]
+	MsUnLock()
+EndIf
+
+If dbSeek(PADR(cPerg,nTamSX1)+"11") .And. !(AllTrim(X1_DEF01) == "Digitacao")
+	RecLock("SX1",.F.)
+	Replace X1_DEF01 	with aPerg[1][1]
+	Replace X1_DEFSPA1	with aPerg[1][2]
+	Replace X1_DEFENG1 	with aPerg[1][3]
+	Replace X1_DEF02 	with aPerg[2][1]
+	Replace X1_DEFSPA2	with aPerg[2][2]
+	Replace X1_DEFENG2 	with aPerg[2][3]
+	MsUnLock()
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Remove do grupo a pergunta 16 antiga                         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SX1")
+dbSetOrder(1)
+If dbSeek(PADR("MTR900",nTamSX1)+"16")
+	If SX1->X1_PERGUNT <> 'Seleciona Filiais?'
+		RecLock("SX1",.F.)
+		dbDelete()
+		MsUnlock()
+	EndIf
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Adiciona o Help da nova pergunta 16                          ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+aHelpPor := { 'Seleciona as filiais desejadas. Se NAO',;
+'apenas a filial corrente sera afetada.',;
+'' }
+aHelpSpa := { 'Selecciona las sucursales deseadas. Si',;
+'NO solamente la sucursal actual es',;
+'afectado.' }
+aHelpEng := { 'Select desired branch offices. If NO',;
+'only current branch office will be',;
+'affected.' }
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Adiciona no grupo a nova pergunta 16                         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+U_PUTSX1('MTR900',;                //-- 01 - X1_GRUPO
+'16',;                       //-- 02 - X1_ORDEM
+'Seleciona Filiais?',;       //-- 03 - X1_PERGUNT
+'¿Selecciona Sucursales?',;  //-- 04 - X1_PERSPA
+'Select Branch Offices?',;   //-- 05 - X1_PERENG
+'mv_chg',;                   //-- 06 - X1_VARIAVL
+'N',;                        //-- 07 - X1_TIPO
+1,;                          //-- 08 - X1_TAMANHO
+0,;                          //-- 09 - X1_DECIMAL
+2,;                          //-- 10 - X1_PRESEL
+'C',;                        //-- 11 - X1_GSC
+'',;                         //-- 12 - X1_VALID
+'',;                         //-- 13 - X1_F3
+'',;                         //-- 14 - X1_GRPSXG
+'',;                         //-- 15 - X1_PYME
+'mv_par16',;                 //-- 16 - X1_VAR01
+'Sim',;                      //-- 17 - X1_DEF01
+'Si',;                       //-- 18 - X1_DEFSPA1
+'Yes',;                      //-- 19 - X1_DEFENG1
+'',;                         //-- 20 - X1_CNT01
+'Nao',;                      //-- 21 - X1_DEF02
+'No',;                       //-- 22 - X1_DEFSPA2
+'No',;                       //-- 23 - X1_DEFENG2
+'',;                         //-- 24 - X1_DEF03
+'',;                         //-- 25 - X1_DEFSPA3
+'',;                         //-- 26 - X1_DEFENG3
+'',;                         //-- 27 - X1_DEF04
+'',;                         //-- 28 - X1_DEFSPA4
+'',;                         //-- 29 - X1_DEFENG4
+'',;                         //-- 30 - X1_DEF05
+'',;                         //-- 31 - X1_DEFSPA5
+'',;                         //-- 32 - X1_DEFENG5
+,;      		             //-- 33 - HelpPor
+,;          		         //-- 34 - HelpSpa
+,;           		        //-- 35 - HelpEng
+'')                          //-- 36 - X1_HELP
+
+U_PUTHelp("P.MTR90016.",aHelpPor,aHelpEng,aHelpSpa,.T.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Adiciona o Help da nova pergunta 17                          ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+aHelpPor := {'Selecione o tipo de custo a ser',;
+'impresso no relatorio.'			,;
+'- Custo Medio' ,;
+'- Custo de Reposição (Somente Argentina)'}
+aHelpSpa := {'Seleccione el tipo de costo que',;
+' se imprimira en el informe (Sólo Argentina)',;
+'- Costo Medio' ,'- Costo de Reposicion'}
+aHelpEng := {'Select the type of expense that',;
+' will be printed in the report.'	,;
+' Average cost ',;
+'- Replacement cost (Only Argentina)'}
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Adiciona no grupo a nova pergunta 17                         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+U_PUTSX1('MTR900',;				//-- 01 - X1_GRUPO
+'17',;						//-- 02 - X1_ORDEM
+'Qual Custo Imprimir?',;	//-- 03 - X1_PERGUNT
+'¿QuECosto imprimir?',;	//-- 04 - X1_PERSPA
+'What Cost Print?',;		//-- 05 - X1_PERENG
+'mv_chh',;					//-- 06 - X1_VARIAVL
+'N',;						//-- 07 - X1_TIPO
+1,;							//-- 08 - X1_TAMANHO
+0,;							//-- 09 - X1_DECIMAL
+1,;							//-- 10 - X1_PRESEL
+'C',;						//-- 11 - X1_GSC
+'',;						//-- 12 - X1_VALID
+'',;						//-- 13 - X1_F3
+'',;						//-- 14 - X1_GRPSXG
+'',;						//-- 15 - X1_PYME
+'mv_par17',;				//-- 16 - X1_VAR01
+'Medio',;					//-- 17 - X1_DEF01
+'Medio',;					//-- 18 - X1_DEFSPA1
+'Average',;					//-- 19 - X1_DEFENG1
+'',;						//-- 20 - X1_CNT01
+'Reposição',;				//-- 21 - X1_DEF02
+'Reposicion',;				//-- 22 - X1_DEFSPA2
+'Replacement',;				//-- 23 - X1_DEFENG2
+'',;						//-- 24 - X1_DEF03
+'',;						//-- 25 - X1_DEFSPA3
+'',;						//-- 26 - X1_DEFENG3
+'',;						//-- 27 - X1_DEF04
+'',;						//-- 28 - X1_DEFSPA4
+'',;						//-- 29 - X1_DEFENG4
+'',;						//-- 30 - X1_DEF05
+'',;						//-- 31 - X1_DEFSPA5
+'',;						//-- 32 - X1_DEFENG5
+,;							//-- 33 - HelpPor
+,;			   				//-- 35 - HelpEng
+,;			   				//-- 34 - HelpSpa
+'')							//-- 36 - X1_HELP
+
+U_PUTHelp("P.MTR90017.",aHelpPor,aHelpEng,aHelpSpa,.T.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Adiciona o Help A910CUSRP                                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+aHelpPor := {"ATENÇÃO (Somente Argentina)." ,;
+"O Custo de Reposição esta ",;
+"desativado, o relatorio sera impresso",;
+"pelo custo medio." }
+aHelpSpa := {"Atención(Sólo Argentina).",;
+"El Costo de Reposicion esta ",;
+"desactivado, el informe se",;
+"imprimira por el costo promedio. "}
+aHelpEng := {"Attention(Only Argentina).",;
+"The replacement cost is off,",;
+"the report will be printed by the",;
+"average cost." }
+U_PUTHelp("P"+"A910CUSRP",aHelpPor,aHelpEng,aHelpSpa,.T.)
+
+aHelpPor := { "Verifique a configuração do"			,"parametro MV_CUSREP e se existe na "	,"base de dados todos os campos"	,"utilizados para o custo de reposição."}
+aHelpSpa := { "Verifique la configuracion del"		,"parametro MV_CUSREP y si existen en"	,"la base de datos todos los campos","utilizados para el costo de reposicion."}
+aHelpEng := { "Check the configuration parameter"	,"MV_CUSREP and is in the database"		,"all the fields used for the"		,"replacement cost."}
+U_PUTHelp("S"+"A910CUSRP",aHelpPor,aHelpEng,aHelpSpa,.T.)
+
+aHelpPor := { "Considera  o  Armazem  para o cálculo do"," saldo no cadastro de saldos (SB2)."	,"- Quando MV_CUSFIL=F (Filial) utiliza **"	,"- Quando MV_CUFIL=E (Empresa) utiliza ##"}
+aHelpEng := { "Considera  o  Armazem  para o cálculo do"," saldo no cadastro de saldos (SB2)."	,"- Quando MV_CUSFIL=F (Filial) utiliza **"	,"- Quando MV_CUFIL=E (Empresa) utiliza ##"}
+aHelpSpa := { "Considera  o  Armazem  para o cálculo do"," saldo no cadastro de saldos (SB2)."	,"- Quando MV_CUSFIL=F (Filial) utiliza **"	,"- Quando MV_CUFIL=E (Empresa) utiliza ##"}
+U_PUTHelp("P"+".MTR90008.",aHelpPor,aHelpEng,aHelpSpa,.T.)
+RestArea(aAreaAnt)
+
+Return
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³MTR900IsMNT³ Autor ³ Lucas                ³ Data ³ 03.10.06 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Verifica se ha integração com o modulo SigaMNT/NG          ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ MATR900                                                    ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+/* {Protheus.doc} MTR900IsMNT.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Verifica se ha integração com o modulo SigaMNT/NG
+*/
+
+Static Function MTR900IsMNT()
+Local aArea
+Local aAreaSB1
+Local aProdsMNT := {}
+Local cProdMNT	 := ""
+Local nX := 0
+Local lIntegrMNT := .F.
+
+//Esta funcao encontra-se no modulo Manutencao de Ativos (NGUTIL05.PRX), e retorna os produtos (pode ser MAIS de UM), dos parametros de
+//Manutencao - "M" (MV_PRODMNT) / Terceiro - "T" (MV_PRODTER) / ou Ambos - "*" ou em branco
+If FindFunction("NGProdMNT")
+	aProdsMNT := aClone(NGProdMNT("M"))
+	If Len(aProdsMNT) > 0
+		aArea	 := GetArea()
+		aAreaSB1 := SB1->(GetArea())
+		
+		SB1->(dbSelectArea( "SB1" ))
+		SB1->(dbSetOrder(1))
+		For nX := 1 To Len(aProdsMNT)
+			If SB1->(dbSeek( xFilial("SB1") + aProdsMNT[nX] ))
+				lIntegrMNT := .T.
+				Exit
+			EndIf
+		Next nX
+		
+		RestArea(aAreaSB1)
+		RestArea(aArea)
+	EndIf
+Else //Se a funcao nao existir, processa com o parametro aceitando 1 (UM) Produto
+	cProdMNT := GetMv("MV_PRODMNT")
+	cProdMNT := cProdMNT + Space(15-Len(cProdMNT))
+	If !Empty(cProdMNT)
+		aArea	 := GetArea()
+		aAreaSB1 := SB1->(GetArea())
+		SB1->(dbSelectArea( "SB1" ))
+		SB1->(dbSetOrder(1))
+		If SB1->(dbSeek( xFilial('SB1') + cProdMNT ))
+			lIntegrMNT := .T.
+		EndIf
+		RestArea(aAreaSB1)
+		RestArea(aArea)
+	EndIf
+EndIf
+Return( lIntegrMNT )
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³MATR900X  ºAutor  ³Microsiga           º Data ³             º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³ Rotina para buscar o ICM do produto, para a geracao do     º±±
+±±º          ³  valor do Ressarcimento                                    º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ AP                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+
+/* {Protheus.doc} fCalIcmProd.PRX
+@author  Pedro
+@since 24/10/2014
+@version  P11
+@param
+@return
+@Project
+@obs  Rotina para buscar o ICM do produto, para a geracao do ressarcimento
+*/
+
+
+User Function fCalIcmProd()
+
+LOCAL nPerICM	:= 	0
+LOCAL MV_ESTICM := 	GetMv("MV_ESTICM")
+LOCAL MV_ESTADO := 	GetMv("MV_ESTADO")
+Local aTableSfk	:=	{}
+Local nQtdeaMov	:= Len(aMovimentos)
+Local cAliqIcm	:= ""
+
+nPerIcm := Val(Subs(MV_ESTICM,AT(MV_ESTADO,MV_ESTICM)+2,2))
+
+// calculo do Ressarcimento
+dbSelectArea("SFK")
+aTableSfk	:= GetArea()
+
+dbSetOrder(1) // filial + Produto + dtos(data)
+// NORBERTO >>>>>>>>>>
+If !Empty(aMovimentos[nQtdeaMov][12]) .and. dbSeek(xFilial("SFK") + aMovimentos[nQtdeaMov][01] + Dtos(aMovimentos[nQtdeaMov][12]) )
+	// NORBERTO <<<<<<<<<<
+	If xFilial("SFK") == SFK->FK_FILIAL .And. StrZero(Month(SFK->FK_DATA),2) + Year(SFK->FK_DATA)  ==   StrZero( Month( aMovimentos[nQtdeaMov][12]),2  ) + Year(aMovimentos[nQtdeaMov][12])
+		cAliqIcm	:=	 If(!Empty(SFK->FK_AICMS),SFK->FK_AICMS,nPerICM)
+	Endif
+	
+Else
+	cAliqIcm	:= nPerIcm
+EndIf
+
+RestArea(aTableSfk)
+
+Return(cAliqIcm)

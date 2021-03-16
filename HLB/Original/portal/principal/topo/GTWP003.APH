@@ -1,0 +1,102 @@
+<% 
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWP003   ºAutor  ³Eduardo C. Romanini º Data ³  02/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html do topo da pagina principal do portal Gt.        º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+Local nI := 0
+
+Local aMenu := U_WFMenu(HttpSession->cLogin) //Retorna os menus que o usuário logado possui acesso.
+
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<link href="portal_cliente_gt/css/topo.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="portal_cliente_gt/js/jquery.min.js"></script> <% /*JavaScript padrão para utilizar JQuery */ %>
+
+	<script language=javascript>
+		function go(p1,p2)
+		{
+			parent.menu.location.href=p1;
+			parent.principal.location.href=p2;
+		}
+	</script>
+</head>
+
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" class="FundoClaro" width="151" height="89">
+	
+	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<tr>
+			<td width="21%" background="portal_cliente_gt/Imagens/topo_fundo.jpg">
+				<img src="portal_cliente_gt/Imagens/topo_logo_esq.jpg" width="527" height="90" border="0">
+			</td>
+			<td width="926" align="center" background="portal_cliente_gt/Imagens/topo_fundo.jpg">
+				<table width="100%" border="0">
+					<tr>
+						<td align="left">						
+							<%
+                            //Exibe os botões de menu, de acordo com o grupo do usuario.
+							/*							
+							aMenu[1]:Codigo
+							aMenu[2]:Título
+							aMenu[3]:Imagem
+                            */
+							For nI := 1 To Len(aMenu)	
+                        			
+								If nI > 1                                
+								%>
+									&nbsp;
+									&nbsp;
+									&nbsp;
+									&nbsp;
+									
+								<%Endif%>                                
+									<a href="javascript:go('U_GTWP004.apw?tipo=<%= aMenu[nI][1]%>','U_GTWP005.apw')" title="<%= u_WFTraduzir(aMenu[nI][2]) %>" >
+										<img src="<%= aMenu[nI][3]%>" alt="<%= aMenu[nI][2]%>" width="60" height="60" border='0'/>
+									</a>
+						    <%	Next%>
+						</td>
+						<td width="*">
+<div id="box-idioma">
+	<script>
+        function mudarIdioma(idioma) {
+            $.post('U_GTWF002.apw', {cIdioma: idioma}, function(retorno){
+                if(retorno == 'ok') {
+                    var frames = parent.window.document.getElementsByTagName('frame');
+                    for(var i = 0; i < frames.length; i++)
+                        frames[i].contentWindow.location.reload();
+                }
+            });
+        }
+    </script>
+	<div>
+		<a href='U_GTWP001.apw' class='LogOut' target='_parent' title="Log-Out"><%= AllTrim(HttpSession->cLogin) %> | Log-Out</a>
+	</div>
+	<div id="box-bandeiras">
+	    <img src="portal_cliente_gt/Imagens/bra.png" width="20px" onclick="javascript: mudarIdioma('Português')">
+	    <img src="portal_cliente_gt/Imagens/eua.png" width="20px" onclick="javascript: mudarIdioma('English')">
+    </div>
+</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+			<td width="*%" align="center" background="portal_cliente_gt/Imagens/topo_fundo.jpg">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>  

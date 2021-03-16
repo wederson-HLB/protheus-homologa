@@ -1,0 +1,359 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include "tbiconn.ch"
+#Include "Topconn.ch"
+ 
+#DEFINE CRLF Chr(13)+Chr(10)
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWR009   ºAutor  ³Renato Rezende º Data ³ 	   22/09/15   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html do relatorio de relação de baixas da Discovery.  º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Portal GT                                                  º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWR009()
+*---------------------*
+Local cHtml	:= "" 
+Local cEmp    := Substr(HttpSession->cEmpresa,1,2)
+Local cLoja   := Substr(HttpSession->cEmpresa,3,2)
+
+WEB EXTENDED INIT cHtml
+
+If cEmp <> "49"
+	cHtml := "<html><body><h1>Essa empresa não possui acesso a esse relatorio</h1></body></html>" 
+Else
+	If Select("SX2") == 0
+		U_WFPrepEnv()
+	EndIf
+	
+	cHtml := ExecInPage("GTWR009")
+	
+EndIf
+
+WEB EXTENDED END
+	 
+Return cHtml   
+
+/*
+Função  : WR009Gera()
+Objetivo: Gerar o relatório e exibi-lo na tela
+Autor   : Renato Rezende
+Data    : 22/09/2015 
+*/
+*-----------------------*
+User Function WR009Gera()
+*-----------------------*
+Local cHtml		:= ""
+Local cDtDigDe	:= ""
+Local cDtDigAte	:= ""
+Local cDtBxDe	:= ""
+Local cDtBxAte	:= ""
+Local cEmp		:= Substr(HttpSession->cEmpresa,1,2)
+Local cLoja		:= Substr(HttpSession->cEmpresa,3,2)
+Local cBanco	:= ""
+Local cIp		:= ""
+Local cDest		:= ""
+Local cWhere1	:= ""
+Local cWhere2	:= ""
+Local cQuery	:= ""
+Local cLinha	:= "" 
+
+Local nValOri	:= 0
+Local nMulta	:= 0
+Local nVlCorre	:= 0
+Local nDescon	:= 0
+Local nImposto	:= 0
+Local nTotBx	:= 0
+Local nCon		:= 0
+
+Local lCor		:= .T.
+Local lExcel	:= .F.
+
+Local aCon := {}
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf                      
+
+cDtDigDe	:= HttpPost->cDtDigDe 
+cDtDigAte	:= HttpPost->cDtDigAte
+cDtBxDe		:= HttpPost->cDtBxDe 
+cDtBxAte	:= HttpPost->cDtBxAte
+
+//Validando se será exportado em excel
+If cDtDigDe == Nil
+	cDtDigDe	:= HttpGet->cDtDigDe 
+	cDtDigAte	:= HttpGet->cDtDigAte
+	cDtBxDe		:= HttpGet->cDtBxDe 
+	cDtBxAte	:= HttpGet->cDtBxAte
+EndIf
+
+If cDtDigDe != Nil
+	cDtDigDe := CtoD(cDtDigDe)
+	cDtDigDe := DtoS(cDtDigDe)
+EndIf
+If cDtDigAte != Nil	
+	cDtDigAte := CtoD(cDtDigAte)
+	cDtDigAte := DtoS(cDtDigAte)	
+EndIf
+If cDtBxDe != Nil	
+	cDtBxDe := CtoD(cDtBxDe)
+	cDtBxDe := DtoS(cDtBxDe)	
+EndIf
+If cDtBxAte != Nil	
+	cDtBxAte := CtoD(cDtBxAte)
+	cDtBxAte := DtoS(cDtBxAte)	
+EndIf
+
+//Retorna o ambiente da empresa logada
+aCon  := U_WFRetBanco(cEmp,cLoja)
+cBanco:= aCon[1]
+cIp   := aCon[2]
+	
+//Realiza a conexão com o banco de dados da empresa
+nCon := TCLink(cBanco,cIp,aCon[6])
+
+If Select("SQL") > 0
+	SQL->(DbClosearea())
+Endif
+
+//Executa a query para gerar o relatório
+cQuery:= " SELECT E5_FILIAL, "+CRLF
+cQuery+= "		  E5_PREFIXO, "+CRLF
+cQuery+= "		  E5_NUMERO, "+CRLF
+cQuery+= "		  E5_PARCELA, "+CRLF
+cQuery+= "		  E5_TIPODOC, "+CRLF
+cQuery+= "		  E5_TIPO, "+CRLF
+cQuery+= "		  E5_CLIENTE, "+CRLF
+cQuery+= "		  E5_LOJA, "+CRLF
+cQuery+= "		  A1.A1_NOME, "+CRLF
+cQuery+= "		  E5_NATUREZ, "+CRLF
+cQuery+= "		  E5_VENCTO, "+CRLF
+cQuery+= "		  E5_HISTOR, "+CRLF
+cQuery+= "		  E1_HIST, "+CRLF
+cQuery+= "		  E5_DATA, "+CRLF
+cQuery+= "		  E1.E1_EMISSAO, "+CRLF
+cQuery+= "		  E1.E1_VENCTO, "+CRLF
+cQuery+= "		  E1.E1_VLCRUZ, "+CRLF
+cQuery+= "		  E5_VALOR, "+CRLF
+cQuery+= "		  E5_VLJUROS + E5_VLMULTA AS 'MULTA', "+CRLF
+cQuery+= "		  E5_VLCORRE, "+CRLF
+cQuery+= "		  E5_VLDESCO, "+CRLF 
+cQuery+= "		  E1.E1_CSLL+E1.E1_COFINS+E1.E1_PIS+E1.E1_IRRF+E1.E1_INSS AS 'IMPOSTOS', "+CRLF
+cQuery+= "		  E5_BANCO+' - '+E5_AGENCIA+' - '+E5_CONTA AS 'BANCO', "+CRLF
+cQuery+= "		  E5_DTDIGIT, "+CRLF
+cQuery+= "		  E5_MOTBX, "+CRLF
+cQuery+= "		  E5_SEQ, "+CRLF
+cQuery+= "		  E5_FILORIG, "+CRLF
+cQuery+= "		  E5_RECPAG, "+CRLF
+cQuery+= "		  E5_SITUACA, "+CRLF
+cQuery+= "		  C5_P_AGC, "+CRLF
+cQuery+= "		  C5_P_NMAGC "+CRLF
+cQuery+= "		  FROM SE5"+cEmp+"0 E5 "+CRLF
+cQuery+= "		  LEFT JOIN SE1"+cEmp+"0 AS E1 ON  E1_FILIAL+E1_PREFIXO+E1_NUM+E1_PARCELA+E1_TIPO+E1_CLIENTE+E1_LOJA=E5.E5_FILIAL+E5.E5_PREFIXO+E5.E5_NUMERO+E5.E5_PARCELA+E5.E5_TIPO+E5.E5_CLIENTE+E5.E5_LOJA AND E1.D_E_L_E_T_ <> '*' "+CRLF
+cQuery+= "		  LEFT JOIN SC5"+cEmp+"0 AS C5 ON C5.C5_FILIAL+C5.C5_NUM = E1.E1_FILIAL+E1.E1_PEDIDO AND C5.D_E_L_E_T_ <> '*'  "+CRLF
+cQuery+= "		  LEFT JOIN SA1"+cEmp+"0 AS A1 ON A1.A1_COD+A1.A1_LOJA = E5.E5_CLIENTE+E5.E5_LOJA AND A1.D_E_L_E_T_ <> '*'  "+CRLF
+cQuery+= "		  WHERE E5_RECPAG = 'R'  "+CRLF
+cQuery+= "		  AND E5_DATA    between '"+cDtBxDe+"' AND '"+cDtBxAte+"'  "+CRLF
+cQuery+= "		  AND E5_DTDIGIT between '"+cDtDigDe+"' AND '"+cDtDigAte+"' "+CRLF
+cQuery+= "		  AND E5_DATA    <= '" +DTOS(DATE())+"' "+CRLF 
+cQuery+= "		  AND E5.D_E_L_E_T_ = ' '   "+CRLF
+cQuery+= "		  AND E5_TIPODOC NOT IN ('DC','D2','JR','J2','TL','MT','M2','CM','C2','TR','TE')  "+CRLF
+cQuery+= "		  AND E5_SITUACA NOT IN ('C','E','X')  "+CRLF
+cQuery+= "		  AND ((E5_TIPODOC = 'CD' AND E5_VENCTO <= E5_DATA) OR (E5_TIPODOC <> 'CD')) "+CRLF
+cQuery+= "		  AND E5_HISTOR NOT LIKE '%Baixa Automatica / Lote%'  "+CRLF
+cQuery+= "		  AND E5_TIPO <> '' AND E5_CLIENTE <> '' "+CRLF 
+//Verificando títulos cancelados
+cQuery+= "		  AND E5.E5_PREFIXO+E5.E5_NUMERO+E5.E5_PARCELA+E5.E5_TIPO+E5.E5_CLIENTE+E5.E5_LOJA+E5.E5_SEQ NOT IN ( "+CRLF
+cQuery+= "																											SELECT E5_PREFIXO+E5_NUMERO+E5_PARCELA+E5_TIPO+E5_CLIENTE+E5_LOJA+E5_SEQ FROM SE5490 "+CRLF			
+cQuery+= "																											WHERE E5_PREFIXO+E5_NUMERO+E5_PARCELA+E5_TIPO+E5_CLIENTE+E5_LOJA+E5_SEQ = E5.E5_PREFIXO+E5.E5_NUMERO+E5.E5_PARCELA+E5.E5_TIPO+E5.E5_CLIENTE+E5.E5_LOJA+E5.E5_SEQ "+CRLF
+cQuery+= " 																											AND E5_TIPODOC = 'ES' AND E5_RECPAG = 'P' AND D_E_L_E_T_ <> '*' ) "+CRLF
+cQuery+= "		  ORDER BY E5_FILIAL,E5_DATA,E5_BANCO,E5_AGENCIA,E5_CONTA,E5_NUMCHEQ "+CRLF
+ 
+dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQuery),"SQL",.F.,.T.)
+
+//Imprime os valores na tela
+SQL->(DbGoTop())
+
+Count to nRecCount
+
+If nRecCount> 0
+	SQL->(DbGoTop())
+	HttpCtType('text/html; charset=iso-8859-1')
+		
+	// Se tiver dados modifica o tipo de retorno
+	If HttpGet->cDtDigDe != Nil .And. HttpGet->cDtDigAte != Nil
+		cNome := ''
+		lExcel:= .T.
+		cDia := StrZero(Day(dDataBase), 2)
+		cMes := StrZero(Month(dDataBase), 2)
+		cAno := AllTrim(Str(Year(dDataBase)))
+			
+		cNome += AllTrim(HttpSession->cLogin) + '_'
+		cNome += cAno + cMes + cDia + '_' + AllTrim(Str(Round(Seconds(),0)))
+			
+		HttpCtDisp('attachment; filename="' + cNome + '.xls"')
+		HttpCtType('application/vnd.ms-excel')
+	
+		cHtml+='	<style type="text/css">'
+		cHtml+='	<!--'
+		cHtml+='	.Header {'
+		cHtml+='		color: #FFFFFF;'
+		cHtml+='		font-weight: bold;'
+		cHtml+='		background:#7E64A1;'
+		cHtml+='		font-family:Verdana;'
+		cHtml+='		font-size:9pt;
+		cHtml+='		white-space:nowrap;'//Para não quebrar a linha 
+		cHtml+='		text-align: center;'
+		cHtml+='	}'
+		cHtml+='	.Linha1 {'
+		cHtml+='		color: #000000;'
+		cHtml+='		background:#C4B5D2;'
+		cHtml+='		font-family:Verdana;'
+		cHtml+='		font-size:9pt;
+		cHtml+='		white-space:nowrap;'//Para não quebrar a linha 
+		cHtml+='		text-align: left;'
+		cHtml+='	}'
+		cHtml+='	.Linha2 {'
+		cHtml+='		color: #000000;'
+		cHtml+='		background:#E0DCED;'
+		cHtml+='		font-family:Verdana;'
+		cHtml+='		font-size:9pt;
+		cHtml+='		white-space:nowrap;'//Para não quebrar a linha
+		cHtml+='		text-align: left;'
+		cHtml+='	}'
+		cHtml+='	-->'
+		cHtml+='	</style>'
+	EndIf
+
+	cHtml +="<table border='1' bordercolor='#FFFFFF'>"
+	cHtml +="		<tr>"
+	cHtml +="			<td class='Header'>Prefixo</td>"
+	cHtml +="			<td class='Header'>Número</td>"
+	cHtml +="			<td class='Header'>Parcela</td>"
+	cHtml +="			<td class='Header'>Tipo</strong></td>"
+	cHtml +="			<td class='Header'>Cod. do Cliente</td>"
+	cHtml +="			<td class='Header'>Nome do Cliente</td>"
+	cHtml +="			<td class='Header'>Natureza</td>"
+	cHtml +="			<td class='Header'>Vencto. Título</td>"
+	cHtml +="			<td class='Header'>Hist.Baixa</td>"
+	cHtml +="			<td class='Header'>Dt. Baixa</td>"
+	cHtml +="			<td class='Header'>Valor Orig.</td>"
+	cHtml +="			<td class='Header'>Jur/Multa</td>"
+	cHtml +="			<td class='Header'>Correção</td>"
+	cHtml +="			<td class='Header'>Descontos</td>"
+	cHtml +="			<td class='Header'>Impostos</td>"
+	cHtml +="			<td class='Header'>Total Baixado</td>"
+	cHtml +="			<td class='Header'>Num. Bco.</td>"
+	cHtml +="			<td class='Header'>Dt. Dig.</td>"
+	cHtml +="			<td class='Header'>Mot. Baixa</td>"
+	cHtml +="			<td class='Header'>Origem</td>"
+	cHtml +="			<td class='Header'>Cód. Agência</td>"
+	cHtml +="			<td class='Header'>Nome Agência</td>"
+	cHtml +="			<td class='Header'>Hist.Título</td>"	
+	cHtml +="		</tr>"
+	
+	While SQL->(!EOF())
+	
+		//Alterar cor da linha
+		If lCor
+			cLinha := "Linha1"
+		Else
+			cLinha := "Linha2"
+		EndIf            
+	
+   		lCor := !lCor
+	
+		cHtml +="	<tr>"
+		cHtml +="		<td class='"+cLinha+"'>"+AllTrim(SQL->E5_PREFIXO)+"</td>"
+   		cHtml +="		<td class='"+cLinha+"'>"+AllTrim(SQL->E5_NUMERO)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+AllTrim(SQL->E5_PARCELA)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+AllTrim(SQL->E5_TIPO)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+AllTrim(SQL->E5_CLIENTE)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->A1_NOME)+"</td>"		
+		cHtml +="		<td class='"+cLinha+"'>"+AllTrim(SQL->E5_NATUREZ)+"</td>"		
+		cHtml +="		<td class='"+cLinha+"'>"+DtoC(LastDay(STOD(SQL->E1_VENCTO,3)))+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->E5_HISTOR)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+DtoC(StoD(SQL->E5_DATA))+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Transform(SQL->E1_VLCRUZ,"@E 99,999,999,999.99")+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Transform(SQL->MULTA,"@E 99,999,999,999.99")+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Transform(SQL->E5_VLCORRE,"@E 99,999,999,999.99")+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Transform(SQL->E5_VLDESCO,"@E 99,999,999,999.99")+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Transform(SQL->IMPOSTOS,"@E 99,999,999,999.99")+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Transform(SQL->E5_VALOR,"@E 99,999,999,999.99")+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->BANCO)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+DtoC(StoD(SQL->E5_DTDIGIT))+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->E5_MOTBX)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->E5_FILORIG)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->C5_P_AGC)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->C5_P_NMAGC)+"</td>"
+		cHtml +="		<td class='"+cLinha+"'>"+Alltrim(SQL->E1_HIST)+"</td>"		
+		cHtml +="	</tr>"
+		
+		nValOri := nValOri + SQL->E1_VLCRUZ
+		nMulta	:= nMulta + SQL->MULTA
+		nVlCorre:= nVlCorre + SQL->E5_VLCORRE
+		nDescon	:= nDescon + SQL->E5_VLDESCO
+		nImposto:= nImposto + SQL->IMPOSTOS
+		nTotBx	:= nTotBx + SQL->E5_VALOR
+		
+		If Len(cHtml) > 500000
+			HttpSend(cHtml)
+			cHtml:=""
+		EndIf
+			
+		SQL->(DbSkip())
+	EndDo
+	
+	cHtml+="		<tr>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'>Totais</td>"
+	cHtml+="			<td class='"+cLinha+"'>"+Alltrim(TRANSFORM(nValOri, '@E 99,999,999,999.99'))+"</td>"
+	cHtml+="			<td class='"+cLinha+"'>"+Alltrim(TRANSFORM(nMulta, '@E 99,999,999,999.99'))+"</td>"
+	cHtml+="			<td class='"+cLinha+"'>"+Alltrim(TRANSFORM(nVlCorre, '@E 99,999,999,999.99'))+"</td>"
+	cHtml+="			<td class='"+cLinha+"'>"+Alltrim(TRANSFORM(nDescon, '@E 99,999,999,999.99'))+"</td>"
+	cHtml+="			<td class='"+cLinha+"'>"+Alltrim(TRANSFORM(nImposto, '@E 99,999,999,999.99'))+"</td>"
+	cHtml+="			<td class='"+cLinha+"'>"+Alltrim(TRANSFORM(nTotBx, '@E 99,999,999,999.99'))+"</td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"
+	cHtml+="			<td class='"+cLinha+"'></td>"	
+	cHtml+="			<td class='"+cLinha+"'></td>"	
+	cHtml+="		</tr>"
+	cHtml+="</table>"
+Else               
+	cHtml := "<script type='text/javascript'>"
+	cHtml += "alert('Nao existe dados para o periodo informado.')"
+	cHtml += "</script>"
+EndIf
+
+//Fecha o arquivo temporário
+SQL->(DbCloseArea())
+
+//Encerra a conexão
+TCunLink(nCon)
+
+WEB EXTENDED END
+
+Return cHtml

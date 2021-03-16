@@ -1,0 +1,201 @@
+
+/*/{Protheus.doc} MT116GRV
+(Ponto de entrada para alterar variavel l116Auto para permitir criar interface do MATA116  )
+
+@author MarceloLauschner
+@since 07/04/2012
+@version 1.0
+
+@return Sem retorno esperado
+
+@example
+(examples)
+
+@see (http://tdn.totvs.com/display/public/mp/MT116GRV)
+/*/
+User Function MT116GRV()
+
+//INICIO - CENTRAL XML
+Local	aInParamIxb	:= aClone(ParamIxb)
+Local	aAreaOld	:= GetArea()
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML	
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MT116GRV",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	// Verifica se a rotina é automatica e se o objeto oMulti existe ( vindo do XMLDCONDOR )
+	If Type("l116Auto") <> "U" .And. Type("oMulti") <> "U"  .And. Type("ANFEDANFE") <> "U"
+		If l116Auto
+			If Type("oCTe:_CTeProc:_protCTe:_infProt:_chCTe")<> "U"
+				cChaveCte	:= oCTe:_CTeProc:_protCTe:_infProt:_chCTe:TEXT
+			ElseIf Type("oCTe:_enviCTe:_protCTe:_infProt:_chCTe")<> "U"
+				cChaveCte	:= oCTe:_enviCTe:_protCTe:_infProt:_chCTe:TEXT
+			ElseIf Type("oCTe:_procCTe:_protCTe:_infProt:_chCTE") <> "U"
+				cChaveCte := oCTe:_procCTe:_protCTe:_infProt:_chCTE:TEXT
+			Else
+				cChaveCte	:= Padr(" ",44)
+			Endif
+			ANFEDANFE[13]	:= cChaveCte //oCTe:_CTeProc:_protCTe:_infProt:_chCTe:TEXT
+			
+			If Type("F1_CHVNFE") <> "U"
+				M->F1_CHVNFE	:= ANFEDANFE[13]
+			Endif
+			
+			DbSelectArea("SF1")
+			If SF1->(FieldPos("F1_TPCTE")) > 0 .And. INCLUI .And. Len(aNfeDanfe) >= 18 
+				// N=Normal;C=Complem.Valores;A=Anula.Valores;S=Substituto
+				If ( AllTrim(oIdent:_tpCTe:TEXT) == "0" )
+					cTpCte	:=	"N"
+				ElseIf ( AllTrim(oIdent:_tpCTe:TEXT) = "1" )
+					cTpCte	:=	"C"
+				ElseIf ( AllTrim(oIdent:_tpCTe:TEXT) == "2" )
+					cTpCte	:=	"A"
+				ElseIf ( AllTrim(oIdent:_tpCTe:TEXT) == "3" )
+					cTpCte		:=	"S"
+				Else
+					cTpCte	:= " "
+				Endif
+				M->F1_TPCTE		:= RetTipoCte(cTpCte)
+				ANFEDANFE[18]	:= RetTipoCte(cTpCte)
+				
+			Endif
+			
+			If SF1->(FieldPos("F1_UFORITR")) > 0 .And. Type("aInfAdic") == "A"
+				If Type("oIdent:_UFIni") <> "U"
+					M->F1_UFORITR	:= oIdent:_UFIni:TEXT
+					aInfAdic[10]	:= oIdent:_UFIni:TEXT
+				Endif
+			Endif
+			
+			If SF1->(FieldPos("F1_MUORITR")) > 0  .And. Type("aInfAdic") == "A"
+				If Type("oIdent:_cMunIni") <> "U"
+					M->F1_MUORITR	:= Substr(oIdent:_cMunIni:TEXT,3)
+					aInfAdic[11]	:= Substr(oIdent:_cMunIni:TEXT,3)
+				Endif
+			Endif
+			
+			If SF1->(FieldPos("F1_UFDESTR")) > 0  .And. Type("aInfAdic") == "A"
+				If Type("oIdent:_UFFim") <> "U"
+					M->F1_UFDESTR	:= oIdent:_UFFim:TEXT
+					aInfAdic[12]	:= oIdent:_UFFim:TEXT
+				Endif
+			Endif
+			
+			If SF1->(FieldPos("F1_MUDESTR")) > 0  .And. Type("aInfAdic") == "A"
+				If Type("oIdent:_cMunFim") <> "U"
+					M->F1_MUDESTR	:= Substr(oIdent:_cMunFim:TEXT,3)
+					aInfAdic[13]	:= Substr(oIdent:_cMunFim:TEXT,3)
+				Endif
+			Endif
+			
+				
+			If SF1->(FieldPos("F1_MODAL")) > 0  .And. INCLUI .And. Len(aNfeDanfe) >= 23  
+				cModalCte		:= AllTrim(oIdent:_modal:TEXT)
+				aNFEDanfe[23]	:= RetModCTE(cModalCte) //cModalCte
+				//aDanfe[23]		:= RetModCTE(cModalCte)	//cModalCte
+				//O campo Modalidade de Transporte (F1_MODAL) foi criado, para que fosse possível informar no Documento de Entrada a modalidade do transporte (Rodoviário (01), Aéreo (02), Aquaviário (03), Ferroviário (04), Dutoviário (05),
+				//Multimodal (06)), necessário para aplicação de alíquota de ICMS diferenciada, nas operações com CTe envolvendo o Estado da Bahia.
+				//Ao alterar o conteúdo desse campo, os impostos serão recalculados de acordo com a alíquota de ICMS de cada modalidade.
+				//Este campo somente é habilitado para alteração quando a espécie do documento for CTe.
+				M->F1_MODAL		:= cModalCte				                                                                                
+			Endif
+				
+				
+			If SF1->(FieldPos("F1_TPFRETE")) > 0  .And. INCLUI .And. Len(aNfeDanfe) >= 14 
+				// Adicão do campo tipo de frete
+				If Type("oIdent:_forPag:TEXT") <> "U"
+					If Alltrim(oIdent:_forPag:TEXT)=="0"
+						cModFrete := "C"
+					ElseIf Alltrim(oIdent:_forPag:TEXT)=="1"
+						cModFrete := "F"
+					ElseIf Alltrim(oIdent:_forPag:TEXT)=="2"
+						cModFrete := "T"
+					ElseIf Alltrim(oIdent:_forPag:TEXT)=="9"
+						cModFrete := "S"
+					Else
+						cModFrete	:= " "
+					Endif
+					M->F1_TPFRETE	:= RetTipoFrete(cModFrete)
+					ANFEDANFE[14]	:= RetTipoFrete(cModFrete)
+					
+				Endif
+			Endif
+			
+			// Se o parametro de exibição do MATA116 estiver como .T., atribui .F. a variavel l116Auto para ativar o Dialog do MATA116
+			If INCLUI
+				l116Auto		:= !GetNewPar("XM_EXBM116",.F.)
+			Endif
+		Endif
+	Endif
+	
+	RestArea(aAreaOld)
+	
+	// Permite a execução do ponto de entrada caso o cliente tenha o mesmo ponto customizado
+	If ExistBlock("XMT116GRV")
+		EXECBLOCK("XMT116GRV",.F.,.F.)
+	Endif
+EndIf
+//FIM - CENTRAL XML
+	
+Return
+
+
+Static Function RetTipoModal(cCTE)
+//INICIO - CENTRAL XML
+Local aCombo1  :={}
+Local aComboCte:={}
+Local c3TPCTE   := ""
+Local nCT      := 0                                                                        
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	If SF1->(FieldPos("F1_MODAL"))>0
+		aCombo1:=x3CboxToArray("F1_MODAL")[1]
+		aSize(aComboCte,Len(aCombo1)+1)
+		For nCT:=1 to Len(aComboCte)
+			aComboCte[nCT]:=IIf(nCT==1,"  ",aCombo1[nCT-1])
+		Next nCT
+		nCT:=Ascan(aComboCTE, {|x| Substr(x,1,2) == cCTE})
+		If nCT>0
+			c3TPCTE:=aComboCte[nCT]
+		EndIf
+	EndIf
+EndIf
+//FIM - CENTRAL XML
+
+Return c3TPCTE
+
+
+
+Static Function RetTipoCTE(cCTE)
+
+//INICIO - CENTRAL XML
+Local aCombo1  :={}
+Local aComboCte:={}
+Local c1TPCTE   := ""
+Local nCT      := 0
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	If SF1->(FieldPos("F1_TPCTE"))>0
+		aCombo1:=x3CboxToArray("F1_TPCTE")[1]
+		aSize(aComboCte,Len(aCombo1)+1)
+		For nCT:=1 to Len(aComboCte)
+			aComboCte[nCT]:=IIf(nCT==1," ",aCombo1[nCT-1])
+		Next nCT
+		nCT:=Ascan(aComboCTE, {|x| Substr(x,1,1) == cCTE})
+		
+		If nCT>0
+			c1TPCTE:=aComboCte[nCT]
+		EndIf
+	EndIf
+EndIf
+//FIM - CENTRAL XML
+
+Return c1TPCTE

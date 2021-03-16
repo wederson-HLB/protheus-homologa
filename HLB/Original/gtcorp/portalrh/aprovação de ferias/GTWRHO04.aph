@@ -1,0 +1,231 @@
+<%    
+
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch' 
+#include "topconn.ch"
+#include 'tcfwfun.ch' 
+#include "tcfwdef.ch"
+
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWRHO04   ºAutor  ³Tiago Luiz Mendonça º Data ³  05/09/12  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da aprovação de ferias - formulario               º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+Local cNome           := ""
+Local cNomeSup        := ""  
+Local cMat            := ""
+Local cMatSup         := "" 
+
+Local n               :=  0
+ 
+Local lSessao    	  := .T.
+Local lAcesso      	  := .T.
+Local lDados     	  := .T.    
+
+	If  ValType(HttpSession->_TCFWFIL)<> "C" 
+		lSessao:=.F.
+	EndIF     
+	   
+	If lSessao  
+	   
+		//Posiciona no Funcionario  
+	   	SRA->(Dbseek( Alltrim(TCFWGetFil())+ TCFWGetMat())) 
+	   	
+		//Código do superior é composto por codigo da empresa + filial de origem + matricula  ex: CH01000399 
+		cMatSup  := cEmpAnt+TCFWGetFil()+TCFWGetMat()
+		
+		If !Empty(cMatSup)  
+		  
+			If Select("TempSup") > 0
+   	   			TempSup->(DbCloseArea())	               
+   	   		EndIf    
+	  
+ 			aStruZ75 := Z75->(dbStruct())
+    
+ 			//Cria temporario da SRA do superior                        
+			cQuery:=" SELECT * "
+			cQuery+=" FROM Z75YY0" 
+			cQuery+=" WHERE  D_E_L_E_T_ <> '*'  " 
+ 			cQuery+=" AND Z75_STATUS = 'P' "  
+			cQuery+=" AND Z75_EMP+Z75_FILORI+Z75_MATSUP = '"+cMatSup+"'"  
+	
+			TCQuery cQuery ALIAS "TempSup" NEW
+
+			For nX := 1 To Len(aStruZ75)
+				If aStruZ75[nX,2]<>"C"
+			 		TcSetField("TempSup",aStruZ75[nX,1],aStruZ75[nX,2],aStruZ75[nX,3],aStruZ75[nX,4])
+			 	EndIf
+			Next nX
+			
+			cTMP := CriaTrab(NIL,.F.)
+			Copy To &cTMP
+			dbCloseArea()
+			dbUseArea(.T.,,cTMP,"TempSup",.T.)    
+			
+			If !(TempSup->(!BOF() .and. !EOF()))
+        		lDados:=.F.
+	    	EndIf
+					 
+	    Else
+			lAcesso:=.F.
+	    EndIf
+	
+	EndIf                         
+	
+	/*  STATUS
+
+		P - PENDENTE DE APROVACAO
+		A - APROVADO 
+		F - FINALIZADO
+		C - REJEITADO / CANCELADO	
+
+	*/
+	
+    If lSessao .And. lAcesso .And. lDados%> 
+		
+		<!DOCTYPE html>
+		<html>
+			<head> 
+				<script language="JavaScript">
+   					function cancelar(){
+						document.solicita.action="W_TCFW000.APW";
+						document.forms.solicita.submit();  	
+  			 		}
+  				</script>     
+  				<script language="JavaScript">  
+  					function rejeitar(name) {
+       			   		
+       			   		var frm = document.solicita;  
+       			   		var asolicitacoes = new Array();
+       			   		var j  = 0  ;
+       
+    						//Percorre os elementos do formulário 
+    						for(i=0; i < frm.length; i++){
+    
+        						//Verifica se o elemento do formulário corresponde a um checkbox e se é o checkbox desejado
+        						if (frm.elements[i].type == "checkbox" &&  frm.elements[i].name == name ) {
+                
+                					//Verifica se o checkbox foi selecionado
+                					if(frm.elements[i].checked) {
+                    					
+                    					asolicitacoes[j]=frm.elements[i].value ;
+                    	                
+                    					j++;
+ 	
+                					}                    
+       							 }    
+   							 } 
+                                                         
+                            if (asolicitacoes.length < 1) {
+    							alert("Nenhuma solicitação foi marcada!");
+   						   		return false;
+                            }else{
+                            	document.solicita.action="U_GTWRHO05.APW";
+					   			document.forms.solicita.submit();                            
+                            	return true;
+                            }
+                            
+  					} 
+	   	  		</script>  				
+			</head>
+		 	<body>
+		  		<div  align='center' class="dados"> 		
+		 			<table border="0">
+			 			<tr>
+						 	<td>
+						  		<img border="0" src="imagens/icon_check.png" width="40" height="40">
+							<td> 
+						 	<td>
+								<b>Aprovação de ferias</b> 
+							<td>									
+						</tr>
+					</table>
+					<hr> 
+     			</div>	
+    	   		<%TempSup->(DbGoTop())%>
+    			<%While TempSup->(!Eof())%> 
+    					<%n++%>
+		     			<form id="solicita" name="solicita" method="post"> 
+		            		<br>
+							<input type="checkbox" name="solicitacoes" value=<%='"'+TempSup->Z75_EMP+TempSup->Z75_FILORI+TempSup->Z75_CODIGO+'"'%>/>
+								Solicitação :&nbsp;<%=TempSup->Z75_CODIGO%>&nbsp;&nbsp;Emissao :&nbsp;&nbsp;<%=TempSup->Z75_DTEMIS%>
+								<br>
+								<br>
+								<%=TempSup->Z75_NOME%>&nbsp;&nbsp;Data inicial:<%=TempSup->Z75_DTINI%>&nbsp;&nbsp;Data Final: <%=TempSup->Z75_DTFIM%><br/>
+								<br> 
+								<hr>								        
+ 					<%TempSup->(DbSkip())%>		                
+				<%EndDo%>  
+					   		<div align="center" >  		 	  	
+ 								<input type="button" name="validate" value="Voltar" onclick="javascript:cancelar()" class="button-center" > 
+ 								<input type="button" name="validate" value="Rejeitar" onclick="javascript:rejeitar('solicitacoes')" class="button-center" > 	  	
+ 								<button onclick="aprovar()" type="button" class="button-center"><span class="dados"><b>Aprovar</b></span></button>     
+							</div>      
+		   				</form>
+		       	<%If n == 0%> 
+						<br>
+						<br>
+						<br>
+						Nenhuma solicitação encontrada para ser aprovada
+						<br>
+						<br>
+				   		<br>		        
+			   	<%EndIf%>
+			</Body>
+		</html>		 	
+	<%else%>  
+		<div align="center" >  	
+			<%//Valida a sessão
+			%>	
+			<%if !(lSessao)%>
+				<br>
+				<br>
+				<img border="0" src="imagens/icon_connectivity.png" width="96" height="96">
+				<br>
+				<br>
+				Sessão expirada
+				<br>
+				<br>
+				<br>
+			<%endif%>  
+			<%//Valida se o usuário possui superior cadastrado.
+			%>		   
+			<%if !(lAcesso)%>
+				<br>
+				<br>
+				<img border="0" src="imagens/icon_keyacsess.png" width="96" height="96">
+				<br>
+				<br>
+				Você não possui acesso de aprovação de ferias, verificar com o pessoal de RH.
+				<br>
+				<br>
+				<br>
+			<%endif%> 
+			<%//Valida se o usuário possui superior cadastrado.
+			%>		   
+			<%if !(lDados)%>
+				<br>
+				<br>
+				<img border="0" src="imagens/icon_keyacsess.png" width="96" height="96">
+				<br>
+				<br>
+				Nenhuma solicitação encontrada para ser aprovada
+				<br>
+				<br>
+				<br>
+			<%endif%> 			 				
+		</div>
+	<%EndIf%>	

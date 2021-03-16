@@ -1,0 +1,206 @@
+#include "apwebex.ch"
+#include "totvs.ch"
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWC002 ºAutor  ³Eduardo C. Romanini  º  Data ³  11/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Cadastro de empresas do portal.                             º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Grant Thornton                                             º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+*---------------------*
+User Function GTWC002()
+*---------------------*
+Local cHtml	:= "" 
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cHtml := ExecInPage("GTWC002")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : GTWCM02
+Objetivo: Manutenção do cadastro de empresas
+Autor   : Eduardo C. Romanini
+Data    : 11/04/2012
+*/
+*---------------------*
+User Function GTWCM02()
+*---------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cHtml := ExecInPage("GTWCM02")
+
+WEB EXTENDED END
+	 
+Return cHtml
+
+/*
+Função  : WC002Grv()
+Objetivo: Gravação dos dados
+Autor   : Eduardo C. Romanini
+Data    : 04/04/2012
+*/
+*----------------------*
+User Function WC002Grv()
+*----------------------*
+Local cHtml	:= "" 
+Local cOper := ""
+
+Local aPost := ""
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+//Parametro recebido na chamada da função.
+cOper := HttpGet->cOper
+
+If Valtype(cOper) <> "U" .and. cOper <> "VIS"
+
+	//Verifica se o codigo está preenchido
+	If !Empty(HttpPost->ZW1_CODIGO)
+
+		//Inclusão
+		If cOper == "INC"
+		    ZW1->(RecLock("ZW1",.T.))
+		
+		//Alteração
+		ElseIf cOper == "ALT"
+			ZW1->(DbSetOrder(1))
+			If ZW1->(DbSeek(xFilial("ZW1")+HttpPost->ZW1_CODIGO+HttpPost->ZW1_CODFIL))
+				ZW1->(RecLock("ZW1",.F.))
+			Else
+				ZW1->(RecLock("ZW1",.T.))
+			EndIf
+		EndIf
+		
+		SX3->(DbSetOrder(1))
+		If SX3->(DbSeek("ZW1"))
+			While SX3->(!EOF())
+				If  X3Usado(SX3->X3_CAMPO)
+					ZW1->&(SX3->X3_CAMPO) := &("HttpPost->"+AllTrim(SX3->X3_CAMPO))
+				EndIf
+				SX3->(DbSkip())
+			EndDo
+		EndIf
+			
+		ZW1->(MsUnlock())
+	EndIf
+EndIf
+
+cHtml := ExecInPage("GTWC002")
+
+WEB EXTENDED END
+	 
+Return cHtml  
+
+/*
+Função  : WC002Emp()
+Objetivo: Rotina de busca de dados da empresa
+Autor   : Eduardo C. Romanini
+Data    : 08/05/2012
+*/
+*----------------------*
+User Function WC002Emp()
+*----------------------*
+Local cHtml   := ""
+Local cTipo   := ""
+Local cCod    := ""
+Local cFil    := ""
+Local cCnpj   := ""
+Local cWhere  := ""
+Local cOrder  := ""
+Local cUse    := ""
+Local cNome   := ""
+
+Local nCon := 0
+
+WEB EXTENDED INIT cHtml
+
+If Select("SX2") == 0
+	U_WFPrepEnv()
+EndIf
+
+cTipo := HttpGet->cTipo
+cUse := "% USE GTHD %"
+
+//Pesquisa pelo codigo
+If cTipo == "COD"
+
+	cCod := HttpGet->cCod
+	cFil := HttpGet->cFil
+
+	cWhere := "% Z04_CODIGO = '"+cCod+"' AND Z04_CODFIL = '"+cFil+"' %"
+	cOrder := "% Z04_CODIGO,Z04_CODFIL %"
+
+//Pesquisa pelo CNPJ
+ElseIf cTipo == "CNPJ"
+
+	cCnpj := HttpGet->cCnpj
+
+	cWhere := "% Z04_CNPJ = '"+cCnpj+"' %"
+	cOrder := "% Z04_CNPJ %"
+EndIf
+
+//Realiza a conexão com o banco de dados GTHD.
+nCon := TCLink("MSSQL7/GTHD","10.0.30.5",7894)
+
+//Inicio da Query
+BeginSql Alias 'QRY'
+
+    SELECT TOP 1 Z04_CODIGO,Z04_CODFIL,Z04_NOMECO,Z04_CNPJ,Z04_AMB,Z04_NOME,Z04_NOMFIL
+    FROM Z04010
+	WHERE %notDel%
+	  AND %exp:cWhere%
+	ORDER BY %exp:cOrder%
+
+EndSql
+
+If QRY->(BOF() .and. EOF())
+	
+	//Retorno em branco	
+	cHtml := '{"cod":"","fil":"","cnpj":"","razao":"","amb":"","nfant":""}'
+
+Else
+	cNome := AllTrim(QRY->Z04_NOME)+"-"+AllTrim(QRY->Z04_NOMFIL)
+	
+	//Retono com os dados
+    cHtml += "{"
+	cHtml += '"cod":"'+Alltrim(QRY->Z04_CODIGO)+'","fil":"'+Alltrim(QRY->Z04_CODFIL)+'","cnpj":"'+Alltrim(QRY->Z04_CNPJ)+'","razao":"'+EncodeUTF8(Alltrim(QRY->Z04_NOMECO))+'","amb":"'+Alltrim(QRY->Z04_AMB)+'","nfant":"'+EncodeUTF8(cNome)+'"'
+	cHtml += "}"
+
+EndIf
+
+QRY->(DbCloseArea())
+
+//Encerra a conexão
+TCunLink(nCon)
+
+WEB EXTENDED END
+
+Return cHtml

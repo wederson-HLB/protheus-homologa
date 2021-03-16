@@ -1,0 +1,139 @@
+<%    
+
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch' 
+#include "topconn.ch"
+#include 'tcfwfun.ch' 
+#include "tcfwdef.ch"
+
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWRHO05   ºAutor  ³Tiago Luiz Mendonça º Data ³  20/09/12  º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html da aprovação de ferias - rejeitar                º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                         º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+Local cNome           := ""
+
+Local aMat            :=  {}
+ 
+Local lSessao    	  := .T.
+
+
+	If  ValType(HttpSession->_TCFWFIL)<> "C" 
+		lSessao:=.F. 
+	Else
+		aMat:= StrTokArr(HttpSession->cSolicitacoes,",") 	
+	EndIF     
+	   
+	
+	/*  STATUS
+
+		P - PENDENTE DE APROVACAO
+		A - APROVADO 
+		F - FINALIZADO
+		C - REJEITADO / CANCELADO	
+
+	*/
+	
+    If lSessao%> 
+		
+		<!DOCTYPE html>
+		<html>
+			<head> 
+				<script language="JavaScript">
+   					function canc(){
+						document.cancela.action="U_GTWRHO04.APW";
+						document.forms.cancela.submit();  	
+  			 		}
+  				</script> 
+  				<script language="JavaScript">
+   		   			function conf(){
+   		   			
+   		   				if (document.cancela.obs.value==""){ 
+             				alert("Necessário informar o motivo do cancelamento");
+							return false;   
+                     	}else{
+                      		document.cancela.action="U_GTWRH006.APW";
+					  		document.forms.cancela.submit();                            
+         					return true;
+              			}   		   			
+ 			    			
+  			 		}     
+				</script>     				
+			</head>
+		 	<body>
+		  		<div  align='center' class="dados"> 		
+					<table border="0">
+			 			<tr>
+						 	<td>
+						  		<img border="0" src="imagens/icon_cancel2.png" width="40" height="40">
+							<td> 
+						 	<td>
+								<b>&nbsp;&nbsp;Cancelamento</b> 
+							<td>									
+						</tr>
+					</table>
+					<hr> 
+     			</div>
+     			<form id="cancela" name="cancela" method="post" >  	
+    	   		<%for i=1 to len(aMat)%>   
+    	   			<%Z75->(DbGoTop())%>  
+					<%Z75->(DbSetOrder(2))%>   
+					<%If Z75->(DbSeek("  "+alltrim(aMat[i]) ))%> 
+			
+		       	   			<br>
+						<%=Z75->Z75_NOME%>&nbsp;&nbsp;Emissao :&nbsp;&nbsp;<%=Z75->Z75_DTEMIS%>
+	     			<%EndIf%>  
+	     		<%next%>     
+	     					<br> 
+	     					<br> 
+	     					<br>
+	     					<hr>	
+	     	   		   		<div align="center">  
+	     	   		   			<br>  
+	     				   		Motivo:
+	     				   		<br> 
+	     				   		<label>	
+	     				   			<textarea id="obs" name="obs" rows="5" cols="50" maxlength="100"></textarea>
+	     				   		</label>	
+		     	   			</div>  
+		     	   			<br>
+		     	   						     			
+			   				<div align="center" >  		
+ 								<input type="button" name="cancelar" value=" Voltar" onclick="javascript:canc()" class="button-center" > 
+					   			<input type="button" name="confirmar" value="Confirma" onclick="javascript:conf()" > 	  				
+			   		  		</div>   
+			 	   		</form>   
+			</Body>
+		</html>		 	
+	<%else%>  
+		<div align="center" >  	
+			<%//Valida a sessão
+			%>	
+			<%if !(lSessao)%>  
+				<span class="dados"> 
+					<br>
+					<br>
+					<img border="0" src="imagens/icon_connectivity.png" width="96" height="96">
+					<br>
+					<br>
+					Sessão expirada
+					<br>
+					<br>
+					<br>     
+				</span>
+			<%endif%> 			 				
+		</div>
+	<%EndIf%>	

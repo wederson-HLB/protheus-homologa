@@ -1,0 +1,155 @@
+<% 
+#include 'apwebex.ch'
+#include 'totvs.ch'
+#include 'tbiconn.ch'
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³GTWC001   ºAutor  ³Eduardo C. Romanini º Data ³  03/04/12   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDesc.     ³Fonte html do cadastro de usuarios do portal Gt.            º±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ GT                                                        º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+Local nI := 0
+Local nY := 0
+
+Local aCabec  := {}
+Local aLinhas := {} 
+Local aCpos   := {}
+Local aReg    := {}
+
+aAdd(aCabec,"") //Adiciona linha em branco para o botão de visualização
+aAdd(aCabec,"") //Adiciona linha em branco para o botão de alteração
+
+SX3->(DbSetOrder(1))
+If SX3->(DbSeek("ZW0"))
+	While SX3->(!EOF()) .and. SX3->X3_ARQUIVO = "ZW0"
+
+		//Define o cabeçalho da tabela
+		If SX3->X3_BROWSE == "S"
+        	aAdd(aCabec,AllTrim(SX3->X3_TITULO))
+			aAdd(aCpos,SX3->X3_CAMPO)
+		EndIf
+
+		SX3->(DbSkip())
+	EndDo
+EndIf
+
+ZW0->(DbSetOrder(1))
+ZW0->(DbGoTop())
+While ZW0->(!EOF())
+    
+	//Define as linhas da tabela
+	aReg := {"",""} //Linhas em branco para o botão de visualização e alteração.
+	For nI:=1 To Len(aCpos)
+		aAdd(aReg,ZW0->&(aCpos[nI]))
+	Next
+	
+	aAdd(aLinhas,aReg)		
+		
+	ZW0->(DbSkip())	
+EndDo
+
+%>
+
+<html>
+
+<head>
+	<title><%= u_WFTraduzir("Cadastro de Usuários") %></title>
+	<link href='portal_cliente_gt/css/form.css' rel='stylesheet' type='text/css'> <% /*CSS de estilo para formularios do portal */ %>
+	<link href='portal_cliente_gt/css/paging.css' rel='stylesheet' type='text/css'><%/*CSS padrão para paginação*/%>
+
+	<script type="text/javascript" src="portal_cliente_gt/js/paging.js"></script> <%/*Script padrão para paginação*/%>
+</head>
+		
+<body>
+	<table id="tb" border="0" cellpadding="1" cellspacing="0" width="100%">
+		<tr>
+			<td class="titulo" style="height: 15px">
+				<%= u_WFTraduzir("Cadastro de Usuários") %> 
+			</td>
+		</tr>
+		<tr>
+		    <td><hr/></td>
+		</tr>
+		<tr>
+			<td>
+			   	<table id="tb0" class="browse">
+				  <tr>
+				    <td width="50%">
+	  					<a href="U_GTWCM01.apw?oper=INC" title="<%= u_WFTraduzir('Incluir') %>" style="display:inline-block;" target="_self">
+							<img src="portal_cliente_gt/Imagens/inc_usr.png" height="35px" width="35px" border="0" style="vertical-align:middle"/>
+						</a>                                  	
+				    </td>
+				    <td width="50%">
+					    <input type="text" name="Pesquisa" size="25" nowrap="nowrap">
+						<img border="0" img src="portal_cliente_gt/Imagens/busca.jpg" width="16" height="16">
+				    </td>
+                  </tr>	
+    			</table>
+			</td>
+		</tr>
+		<tr>
+			<td>	
+				<table id="tb1" class="browse">
+					<tr>
+						<% For nI:=1 To Len(aCabec) %>
+							<th scope="col" class='th'>
+								<%= u_WFTraduzir(aCabec[nI]) %>
+							</th>
+						<% Next %>
+					</tr>
+					<% For nI:=1 To Len(aLinhas)  %>
+						<tr>
+							<% For nY:=1 To Len(aLinhas[nI]) %>
+								<% //Botão Visualizar 
+								If nY == 1 %>
+									<td width="9" class='td'>
+										<a href="U_GTWCM01.apw?oper=VIS&login=<%=aLinhas[nI][3]%>" title="<%= u_WFTraduzir('Visualizar') %>">
+											<img src="portal_cliente_gt/Imagens/lupa.png" height="16px" width="16px" border="0" style="vertical-align:middle"/>
+										</a>
+                                 	</td>
+								<%  //Botão Editar
+								ElseIf nY == 2 %>
+									<td width="15" class='td'>
+										<a href="U_GTWCM01.apw?oper=ALT&login=<%=aLinhas[nI][3]%>">
+											<span class='textoPeq'><%= u_WFTraduzir("Editar") %></span>
+										</a>
+                                 	</td>
+								<% Else %>
+									<td class='td'>
+										<%= aLinhas[nI][nY] %>
+									</td>
+								<% EndIf %>
+								</td>
+							<% Next %>
+						</tr>
+					<% Next %>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+
+	<br>
+
+	<!-- div onde será criados os links da paginação -->
+	<div id="pageNav"></div>
+    <script>
+        var pager = new Pager('tb1', 10); 
+        pager.init(); 
+        pager.showPageNav('pager', 'pageNav'); 
+        pager.showPage(1);
+    </script>
+
+</body>	
+
+</html>	

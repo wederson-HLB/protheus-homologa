@@ -1,0 +1,1690 @@
+#include "rwmake.ch"        // incluido pelo assistente de conversao do AP6 IDE em 25/08/03
+#IFNDEF WINDOWS
+        #DEFINE PSAY SAY
+#ENDIF
+
+/*
+Funcao      : FSINFS
+Parametros  : Nenhum
+Retorno     : Nenhum   
+Objetivos   : Nota Fiscal de Saida  
+Autor     	: Edson Menezes 
+Data     	: 12/09/97
+Obs         : 
+TDN         : 
+Revisão     : Renato Rezende
+Data/Hora   : 13/12/2012
+Módulo      : Faturamento
+Cliente     : FSI
+*/
+
+*-------------------------*                                        
+User Function FSINFS()        // incluido pelo assistente de conversao do AP6 IDE em 25/08/03
+*-------------------------*
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
+//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
+//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
+//³ Incluido pelo assistente de conversao do AP6 IDE                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+SetPrvt("CBTXT,CBCONT,NORDEM,TAMANHO,LIMITE,TITULO,xMensTes,xDESPESA")
+SetPrvt("CDESC1,CDESC2,CDESC3,CNATUREZA,ARETURN,NOMEPROG")
+SetPrvt("CPERG,NLASTKEY,LCONTINUA,NLIN,WNREL,NTAMNF,XPOS_IPI,cDescAt")
+SetPrvt("CSTRING,NREGS,NLININI,XNUM_NF,XSERIE,XEMISSAO")
+SetPrvt("XTOT_FAT,XLOJA,XFRETE,XSEGURO,XBASE_ICMS,XBASE_IPI,nBaseICMS,nBasePISCOF ")
+SetPrvt("XVALOR_ICMS,XICMS_RET,XVALOR_IPI,XVALOR_MERC,XNUM_DUPLIC,XCOND_PAG")
+SetPrvt("XPBRUTO,XPLIQUI,XTIPO,XDESCONTO,XPED_VEND,XITEM_PED")
+SetPrvt("XNUM_NFDV,XPREF_DV,XICMS,XCOD_PRO,XQTD_PRO,XPRE_UNI")
+SetPrvt("XPRE_TAB,XIPI,XVAL_IPI,XDESC,XVAL_DESC,XVAL_MERC")
+SetPrvt("XTES,XCF,XICMSOL,XICM_PROD,XLOTE,XPESO_UNIT")
+SetPrvt("XDESCRICAO,XDESCRES,XUNID_PRO,XCOD_TRIB,XMEN_TRIB,XCOD_FIS")
+SetPrvt("XCLAS_FIS,XISS,XTIPO_PRO,XLUCRO,XPESO_LIQ,XPESO_BRU")
+SetPrvt("I,XPED,XPESO_BRUTO,XP_LIQ_PED,XTIPOPED,XCLIENTE")
+SetPrvt("XTIPO_CLI,XCOD_MENS,XMENSAGEM,XTPFRETE,XCONDPAG,XESPECIE")
+SetPrvt("XVOLUME,XCOD_VEND,XDESC_NF,XMENS,XDESC_PAG,XPED_CLI")
+SetPrvt("XDESC_PRO,J,XCOD_CLI,XNOME_CLI,XEND_CLI,XBAIRRO")
+SetPrvt("XCEP_CLI,XCOB_CLI,XREC_CLI,XMUN_CLI,XEST_CLI,XCGC_CLI")
+SetPrvt("XINSC_CLI,XTRAN_CLI,XTEL_CLI,XFAX_CLI,XSUFRAMA,XCALCSUF")
+SetPrvt("ZFRANCA,zImpZF,XVENDEDOR,XBSICMRET,XNOME_TRANSP,XEND_TRANSP,XMUN_TRANSP")
+SetPrvt("XEST_TRANSP,XVIA_TRANSP,XINSC_TRANSP,XCGC_TRANSP,XTEL_TRANSP,XPARC_DUP")
+SetPrvt("XVENC_DUP,XVALOR_DUP,XDUPLICATAS,XNATUREZA,NOPC,XFORNECE")
+SetPrvt("XNFORI,CPEDATU,CITEMATU,XPEDIDO,XPESOPROD,AFINALNF,cTES")
+SetPrvt("XOBS,XDATNFORI,LDESC,NVALTOTDS,NVALTOTIT,LFLPCLI")
+SetPrvt("XMEN_POS,XSIT_TRIB,XCLFISCAL,NBASE_ICMS,XFAX,XPESO_LIQUID")
+SetPrvt("CCOR,NTAMDET,XB_ICMS_SOL,XV_ICMS_SOL,NAJUSTE,BB")
+SetPrvt("NCOL,CPEDCLI,V,")
+SetPrvt("XVAL_DESZF")
+SetPrvt("XDESCCZFR")
+
+#IFNDEF WINDOWS
+// Movido para o inicio do arquivo pelo assistente de conversao do AP5 IDE em 25/08/03 ==>         #DEFINE PSAY SAY
+#ENDIF
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ FSINFS   ³ Autor ³ Edson Menezes         ³ Data ³ 12/09/97 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Nota Fiscal de Saida                                       ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ultima alt³ Imprimir NF de Entrada Alterado por Sandro F. Alves        ³±±
+±±³          ³ 30/03/99 imprimir nota complementar de icms,imprimir NF de ³±±
+±±           ³ Conhecimento de Frete para custo 04/06/99                  ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Define Variaveis Ambientais                                  ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para parametros                         ³
+//³ mv_par01             // Da Nota Fiscal                       ³
+//³ mv_par02             // Ate a Nota Fiscal                    ³ 
+//³ mv_par03             // Da Serie                             ³
+//³ mv_par04             // Saida ou Entrada                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+CbTxt    :=""
+CbCont   :=""
+nOrdem   :=0
+tamanho  :="G" 
+limite   :=220
+titulo   :=PADC("Nota Fiscal de Saida - Entrada",74)
+cDesc1   :=PADC("Este programa ira emitir a Nota Fiscal de Saida - Entrada",74)
+cDesc2   :=""
+cDesc3   :="" // PADC("da Nfiscal",74)
+cNatureza:="" 
+aReturn  :={ "Especial", 1,"Administracao", 1, 2, 1,"",1 }
+nomeprog :="FSINFS"
+cPerg    :="FSINFS"
+nLastKey :=0 
+lContinua:=.T.
+nLin     :=0
+wnrel    :="FSINFS"
+
+if !u_versm0("EF")    // VERIFICA EMPRESA
+   return
+endif
+
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Tamanho do Formulario de Nota Fiscal (em Linhas)          ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+nTamNf:=72     // Apenas Informativo 
+
+
+//ValidPerg()
+
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas, busca o padrao da FSINFS            ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+Pergunte(cPerg,.F.)               // Pergunta no SX1
+
+cString:="SF2"
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Envia controle para a funcao SETPRINT                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+wnrel:=SetPrint(cString,wnrel,cPerg,Titulo,cDesc1,cDesc2,cDesc3,.F.,"",.T.)
+
+If nLastKey == 27
+   Return
+Endif
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica Posicao do Formulario na Impressora                 ³          
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+SetDefault(aReturn,cString)
+
+If nLastKey == 27
+   Return
+Endif
+
+VerImp()       
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³                                                              ³
+//³ Inicio do Processamento da Nota Fiscal                       ³
+//³                                                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+#IFDEF WINDOWS
+       RptStatus({|| RptDetail()})// Substituido pelo assistente de conversao do AP6 IDE em 25/08/03 ==>        RptStatus({|| Execute(RptDetail)})
+#ELSE
+       RptDetail()
+#ENDIF
+/////////////////////////////////
+// Substituido pelo assistente de conversao do AP6 IDE em 25/08/03 ==> Function RptDetail
+
+*-------------------------*
+Static Function RptDetail()
+*-------------------------*
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Inicializa  regua de impressao                            ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+nRegs := Iif(Val(mv_par02) - Val(mv_par01)==0,1,Val(mv_par02) - Val(mv_par01))
+SetRegua(nRegs)
+
+If mv_par04 == 2
+  dbSelectArea("SF2")                // * Cabecalho da Nota Fiscal Saida
+  dbSetOrder(1)
+  dbSeek(xFilial("SF2")+mv_par01+mv_par03,.t.)
+
+   /////////////////   CRIACAO DE INDICE ESPECIFICO PARA A FSI - NOTA FISCAL + ITEM (JUNTOS)
+	Private cString := "SD2"
+	
+	_cKeySD2 := "D2_FILIAL + D2_DOC + D2_ITEM + D2_SERIE + D2_CLIENTE + D2_LOJA + D2_COD"  
+	
+	dbSelectArea('SD2')
+	dbSetOrder(1)
+	_cARQSD2 := CriaTrab('',.f.)
+	IndRegua('SD2', _cARQSD2,_cKeySD2,,,"Selecionando Registros ...")
+	nIndSD2 := RetIndex('SD2')
+	#IFNDEF TOP
+		dbSetIndex(_cARQSD2+OrdBagExt())
+	#ENDIF
+	dbSetOrder(nIndSD2+1)	
+	dbGoTop()
+	
+	/////////////////////////////////////////////////////////////////	
+	
+  //////  dbSelectArea("SD2")                // * Itens de Venda da Nota Fiscal
+  //////  dbSetOrder(3)  
+
+  /////// dbSetOrder(8)  
+  
+  dbSeek(xFilial()+mv_par01+'01'+mv_par03)
+
+  dbSelectArea("SF2")
+//  While !eof() .and. SF2->F2_DOC <= mv_par02 .and. lContinua
+  While !eof() .and. SF2->F2_DOC <= mv_par02 .and. lContinua .and. SF2->F2_SERIE =mv_par03 .and. SF2->F2_FILIAL = XFILIAL("SF2")
+//   IncRegua()                     // Termometro de Impressao
+
+//   If SF2->F2_SERIE #mv_par03    // Se a Serie do Arquivo for Diferente
+//      DbSkip()                    // do Parametro Informado !!!
+//      Loop
+//   Endif
+
+   #IFNDEF WINDOWS
+           IF LastKey()==286
+              @ 00,01 PSAY "** CANCELADO PELO OPERADOR **"
+              lContinua := .F.
+              Exit
+           Endif
+   #ELSE
+           IF lAbortPrint
+              @ 00,01 PSAY "** CANCELADO PELO OPERADOR **"
+              lContinua := .F.
+              Exit
+           Endif
+   #ENDIF
+
+   nLinIni:=nLin                         // Linha Inicial da Impressao
+
+   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   //³ Inicio de Levantamento dos Dados da Nota Fiscal              ³
+   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+   // * Cabecalho da Nota Fiscal
+
+   xNUM_NF     :=SF2->F2_DOC             // Numero
+   xSERIE      :=SF2->F2_SERIE           // Serie
+   xEMISSAO    :=SF2->F2_EMISSAO         // Data de Emissao
+   xTOT_FAT    :=SF2->F2_VALFAT          // Valor Total da Fatura
+   if xTOT_FAT == 0
+      xTOT_FAT := SF2->F2_VALMERC+SF2->F2_VALIPI+SF2->F2_SEGURO+SF2->F2_FRETE+SF2->F2_ICMSRET
+   endif
+   xLOJA       :=SF2->F2_LOJA            // Loja do Cliente
+   xFRETE      :=SF2->F2_FRETE           // Frete
+   xSEGURO     :=SF2->F2_SEGURO          // Seguro
+   xDESPESA    :=SF2->F2_DESPESA          // Seguro
+   xBASE_ICMS  :=SF2->F2_BASEICM         // Base   do ICMS
+   xBASE_IPI   :=SF2->F2_BASEIPI         // Base   do IPI
+   xVALOR_ICMS :=SF2->F2_VALICM          // Valor  do ICMS
+   xICMS_RET   :=SF2->F2_ICMSRET         // Valor  do ICMS Retido
+   xBSICMRET   :=SF2->F2_BRICMS          // Base de ICMS Retido
+   xVALOR_IPI  :=SF2->F2_VALIPI          // Valor  do IPI
+   xVALOR_MERC :=SF2->F2_VALMERC         // Valor  da Mercadoria
+   xNUM_DUPLIC :=SF2->F2_DUPL            // Numero da Duplicata
+   xCOND_PAG   :=SF2->F2_COND            // Condicao de Pagamento
+   xPBRUTO     :=SF2->F2_PBRUTO          // Peso Bruto
+   xPLIQUI     :=SF2->F2_PLIQUI          // Peso Liquido
+   xTIPO       :=SF2->F2_TIPO            // Tipo do Cliente
+   xDESCONTO   :=SF2->F2_DESCONT         // Desconto Fidelidade
+
+   dbSelectArea("SD2")                   // * Itens de Venda da N.F.
+   ///////dbSetOrder(3)
+   dbSetOrder(nIndSD2+1)
+   ///////dbSeek(xFilial()+xNUM_NF+xSERIE)
+   DBSEEK(XFILIAL()+XNUM_NF+'01'+XSERIE)   
+   
+   dbSelectArea("SA1")                // * Cadastro de Clientes
+   dbSetOrder(1)
+   dbSeek(xFilial()+SD2->D2_CLIENTE+SD2->D2_LOJA)
+
+   xPED_VEND:={}                         // Numero do Pedido de Venda
+   xITEM_PED:={}                         // Numero do Item do Pedido de Venda
+   xNUM_NFDV:={}                         // NUMERO QUANDO HOUVER DEVOLUCAO
+   xPREF_DV :={}                         // Serie  quando houver devolucao
+   xICMS    :={}                         // Porcentagem do ICMS
+   xCOD_PRO :={}                         // Codigo  do Produto
+   xQTD_PRO :={}                         // Quantidade do Produto
+   xPRE_UNI :={}                         // Preco Unitario de Venda
+   xPRE_TAB :={}                         // Preco Unitario de Tabela
+   xIPI     :={}                         // Porcentagem do IPI
+   xVAL_IPI :={}                         // Valor do IPI
+   xDESC    :={}                         // Desconto por Item
+   xVAL_DESC:={}                         // Valor do Desconto
+   xVAL_MERC:={}                         // Valor da Mercadoria
+   XVAL_DESZF:={}                         // Valor do Desconto ZONA FRANCA alt. Antonio Carlos 20080416
+   xTES     :={}                         // TES
+   xCF      :={}                         // Classificacao quanto natureza da Operacao
+   xICMSOL  :={}                         // Base do ICMS Solidario
+   xICM_PROD:={}                         // ICMS do Produto
+   xLOTE    :={}
+	xMensTes :={}
+   xTRIBTES :={} 
+   cMensagem:= "" 
+   
+   dbGoTop()     
+   
+   ctes:=SD2->D2_TES 
+   
+   nBaseICMS:=0   
+   nBasePisCof:=0
+   
+   While !eof() .and. SD2->D2_DOC==xNUM_NF .and. SD2->D2_SERIE==xSERIE
+          If SD2->D2_SERIE #mv_par03       // Se a Serie do Arquivo for Diferente
+             DbSkip()                       // do Parametro Informado !!!
+             Loop
+          Endif
+		  DbSelectArea("SF4")                   // * Tipos de Entrada e Saida
+		  DbSetOrder(1)
+		  DbSeek(xFilial()+SD2->D2_TES)
+	      If !Empty(SF4->F4_FORMULA)
+			 AADD(xMensTes , SF4->F4_FORMULA)
+		  Endif
+		  AADD(xTRIBTES , SUBSTR(SF4->F4_SITTRIB,1,2))
+	 	  DbSelectArea("SD2")
+      	  AADD(xPED_VEND ,SD2->D2_PEDIDO)
+      	  AADD(xITEM_PED ,SD2->D2_ITEMPV)
+      	  AADD(xNUM_NFDV ,IIF(Empty(SD2->D2_NFORI),"",SD2->D2_NFORI))
+      	  AADD(xPREF_DV  ,IIF(Empty(SD2->D2_SERIORI),"",SD2->D2_SeriOri))
+      	  AADD(xICMS     ,IIf(Empty(SD2->D2_PICM),0,SD2->D2_PICM))
+      	  AADD(xCOD_PRO  ,SD2->D2_COD)                                         
+      	  
+      	  AADD(xQTD_PRO  ,SD2->D2_QUANT)     // Guarda as quant. da NF  
+      	  SA1->(DBSEEK("  "+SD2->D2_CLIENTE+SD2->D2_LOJA))
+      	  IF SA1->A1_CALCSUF $ 'S'     // TLM
+      	     AADD(xPRE_UNI  ,SD2->D2_PRUNIT)  
+      	     AADD(xVAL_MERC ,SD2->D2_PRUNIT*SD2->D2_QUANT)
+      	     nBaseICMS +=(SD2->D2_PRUNIT*SD2->D2_QUANT)   
+      	     nBasePISCOF +=(SD2->D2_PRUNIT*SD2->D2_QUANT)+SD2->D2_DESCON
+      	  Else
+      	     AADD(xPRE_UNI  ,SD2->D2_PRCVEN+(SD2->D2_DESCON/SD2->D2_QUANT)) 
+      	     AADD(xVAL_MERC ,SD2->D2_TOTAL+SD2->D2_DESCON) 
+      	     nBaseICMS +=SD2->D2_TOTAL
+      	     nBasePISCOF +=(SD2->D2_PRUNIT*SD2->D2_QUANT)+SD2->D2_DESCON
+      	  EndIf      
+      	  AADD(xIPI      ,IIF(Empty(SD2->D2_IPI),0,SD2->D2_IPI))
+      	  AADD(xVAL_IPI  ,SD2->D2_VALIPI)
+      	  AADD(xDESC     ,SD2->D2_DESC)
+      	  AADD(xVAL_DESC ,SD2->D2_DESCON)
+		  AADD(XVAL_DESZF,SD2->D2_DESCZFR) //Antonio Carlos 20080416
+     	  AADD(xTES      ,SD2->D2_TES)
+      	  AADD(xCF       ,SD2->D2_CF)
+      	  AADD(xICM_PROD ,IIf(Empty(SD2->D2_PICM),0,SD2->D2_PICM))
+      	  AADD(xLOTE,SD2->D2_NUMLOTE)
+      	  SD2->(dbskip())
+   EndDo
+   
+   If Empty(xPED_VEND)
+      AADD(xPED_VEND ,SD2->D2_PEDIDO)
+   EndIf   
+
+   dbSelectArea("SB1")                     // * Desc. Generica do Produto
+   dbSetOrder(1)
+   xPESO_UNIT:={}                          // Peso Unitario do Produto
+   xDESCRICAO:={}                          // CODIGO PRODUTO NA FSI
+   xDESCRES  :={}                          // DESCRICAO RESUMIDA FSI
+   xUNID_PRO :={}                          // Unidade do Produto
+   xCOD_TRIB :={}                          // Codigo de Tributacao
+   xMEN_TRIB :={}                          // Mensagens de Tributacao
+   xCOD_FIS  :={}                          // Cogigo Fiscal
+   xCLAS_FIS :={}                          // Classificacao Fiscal
+   xISS      :={}                          // Aliquota de ISS
+   xTIPO_PRO :={}                          // Tipo do Produto
+   xLUCRO    :={}                          // Margem de Lucro p/ ICMS Solidario
+	XPOS_IPI :={} 
+
+   xPESO_LIQ :=0                           // Peso Liquido
+   xPESO_BRU :=0                           // Peso Bruto
+   I:=1
+
+   For I:=1 to Len(xCOD_PRO)
+
+       dbSeek(xFilial()+xCOD_PRO[I])
+       xPESO_LIQ  := xPESO_LIQ + (xQTD_PRO[I]*SB1->B1_PESO)
+       xPESO_BRU  := xPESO_BRU + (xQTD_PRO[I]*SB1->B1_PESO)
+       AADD(xUNID_PRO ,SB1->B1_UM)
+       AADD(xDESCRICAO,SB1->B1_DESC)
+       AADD(xDESCRES  ,SB1->B1_DESREC) 
+       //AADD(xDESCRES  ,SB1->B1_DESC)
+       AADD(xCOD_TRIB ,SB1->B1_ORIGEM)
+       ////AADD(XPOS_IPI  ,SB1->B1_POSIPI)
+       If SB1->B1_ALIQISS > 0
+          AADD(xISS ,SB1->B1_ALIQISS)
+       Endif
+       AADD(xTIPO_PRO ,SB1->B1_TIPO)
+       AADD(xLUCRO    ,SB1->B1_PICMRET)
+		 IF ASCAN(xCLAS_FIS,SB1->B1_CLASFIS,1,LEN(xCLAS_FIS)) = 0
+       	AADD(xCLAS_FIS ,SB1->B1_CLASFIS)
+       	AADD(XPOS_IPI  ,SB1->B1_POSIPI)
+   	 else
+       	AADD(xCLAS_FIS ,SB1->B1_CLASFIS)
+       	AADD(XPOS_IPI  ,SPACE(8))   	 
+       ENDIF
+      //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+      //³ Calculo do Peso Liquido da Nota Fiscal  ³
+      //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+   Next
+
+   dbSelectArea("SC5")                            // * Pedidos de Venda
+   dbSetOrder(1)
+
+   xPED        := {}
+   xPESO_BRUTO := 0
+   xP_LIQ_PED  := 0
+
+   For I:=1 to Len(xPED_VEND)
+
+      dbSeek(xFilial()+xPED_VEND[I])
+
+      If ASCAN(xPED,xPED_VEND[I])==0
+         dbSeek(xFilial()+xPED_VEND[I])
+         xTIPOPED    :=SC5->C5_TIPO               // Tipo do Pedido de Venda
+         xCLIENTE    :=SC5->C5_CLIENTE            // Codigo do Cliente
+         xTIPO_CLI   :=SC5->C5_TIPOCLI            // Tipo de Cliente
+         xCOD_MENS   :=SC5->C5_MENPAD             // Codigo da Mensagem Padrao
+         xMENSAGEM   :=SC5->C5_MENNOTA            // Mensagem para a Nota Fiscal
+         xTPFRETE    :=SC5->C5_TPFRETE            // Tipo de Entrega
+         xCONDPAG    :=SC5->C5_CONDPAG            // Condicao de Pagamento
+         xPESO_BRUTO :=SC5->C5_PBRUTO             // Peso Bruto
+         xP_LIQ_PED  :=xP_LIQ_PED + SC5->C5_PESOL // Peso Liquido
+         xESPECIE    :=SC5->C5_ESPECI1
+         xVOLUME     :=SC5->C5_VOLUME1
+         xCOD_VEND:= {SC5->C5_VEND1,;             // Codigo do Vendedor 1
+                      SC5->C5_VEND2,;             // Codigo do Vendedor 2
+                      SC5->C5_VEND3,;             // Codigo do Vendedor 3
+                      SC5->C5_VEND4,;             // Codigo do Vendedor 4
+                      SC5->C5_VEND5}              // Codigo do Vendedor 5
+         xDESC_NF := {SC5->C5_DESC1,;             // Desconto Global 1
+                      SC5->C5_DESC2,;             // Desconto Global 2
+                      SC5->C5_DESC3,;             // Desconto Global 3
+                      SC5->C5_DESC4}              // Desconto Global 4
+         AADD(xPED,xPED_VEND[I])
+      Endif
+
+      If xTIPOPED $ "B/D"
+         xMens := .F.
+      Endif
+
+
+   Next
+
+   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   //³ Pesquisa da Condicao de Pagto               ³
+   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+   dbSelectArea("SE4")                    // Condicao de Pagamento
+   dbSetOrder(1)
+   dbSeek(xFilial("SE4")+xCONDPAG)
+   xDESC_PAG := SE4->E4_DESCRI
+
+   dbSelectArea("SC6")                    // * Itens de Pedido de Venda
+   dbSetOrder(1)
+   xPED_CLI :={}                          // Numero de Pedido
+   xDESC_PRO:={}                          // Descricao aux do produto
+   J:=Len(xPED_VEND)
+   For I:=1 to J
+       dbSeek(xFilial()+xPED_VEND[I]+xITEM_PED[I])
+       If Ascan(xPED_CLI,SC6->C6_PEDCLI)==0
+          AADD(xPED_CLI ,SC6->C6_PEDCLI)
+       Endif
+       AADD(xDESC_PRO,SC6->C6_DESCRI)
+       AADD(xVAL_DESC,SC6->C6_VALDESC)
+   Next
+
+   If xTIPO $ 'N~C~P~I~S~T~O'
+
+      dbSelectArea("SA1")                // * Cadastro de Clientes
+      dbSetOrder(1)
+      dbSeek(xFilial()+xCLIENTE+xLOJA)
+      xCOD_CLI :=SA1->A1_COD             // Codigo do Cliente
+      xNOME_CLI:=SA1->A1_NOME            // Nome
+      xEND_CLI :=SA1->A1_END             // Endereco
+      xBAIRRO  :=SA1->A1_BAIRRO          // Bairro
+      xCEP_CLI :=SA1->A1_CEP             // CEP
+      xCOB_CLI :=SA1->A1_ENDCOB          // Endereco de Cobranca
+      xREC_CLI :=SA1->A1_ENDENT          // Endereco de Entrega
+      xMUN_CLI :=SA1->A1_MUN             // Municipio
+      xEST_CLI :=SA1->A1_EST             // Estado
+      xCGC_CLI :=SA1->A1_CGC             // CGC
+      xINSC_CLI:=SA1->A1_INSCR           // Inscricao estadual
+      xTRAN_CLI:=SA1->A1_TRANSP          // Transportadora
+      xTEL_CLI :=SA1->A1_TEL             // Telefone
+      xFAX_CLI :=SA1->A1_FAX             // Fax
+      xSUFRAMA :=SA1->A1_SUFRAMA            // Codigo Suframa
+      xCALCSUF :=SA1->A1_CALCSUF            // Calcula Suframa
+      // Alteracao p/ Calculo de Suframa
+      if !empty(xSUFRAMA) .and. xCALCSUF =="S"
+         IF XTIPO == 'D' .OR. XTIPO == 'B'
+            zFranca := .F.
+         else
+            zFranca := .T.
+         endif
+      Else
+         zfranca:= .F.
+      endif
+
+   Else
+
+      zFranca:=.F.
+      dbSelectArea("SA2")                // * Cadastro de Fornecedores
+      dbSetOrder(1)
+      dbSeek(xFilial()+xCLIENTE+xLOJA)
+      xCOD_CLI :=SA2->A2_COD             // Codigo do Fornecedor
+      xNOME_CLI:=SA2->A2_NOME            // Nome Fornecedor
+      xEND_CLI :=SA2->A2_END             // Endereco
+      xBAIRRO  :=SA2->A2_BAIRRO          // Bairro
+      xCEP_CLI :=SA2->A2_CEP             // CEP
+      xCOB_CLI :=""                      // Endereco de Cobranca
+      xREC_CLI :=""                      // Endereco de Entrega
+      xMUN_CLI :=SA2->A2_MUN             // Municipio
+      xEST_CLI :=SA2->A2_EST             // Estado
+      xCGC_CLI :=SA2->A2_CGC             // CGC
+      xINSC_CLI:=SA2->A2_INSCR           // Inscricao estadual
+      xTRAN_CLI:=SA2->A2_TRANSP          // Transportadora
+      xTEL_CLI :=SA2->A2_TEL             // Telefone
+      xFAX_CLI :=SA2->A2_FAX             // Fax
+
+   Endif
+
+   dbSelectArea("SA3")                   // * Cadastro de Vendedores
+   dbSetOrder(1)
+   xVENDEDOR:={}                         // Nome do Vendedor
+   I:=1
+   J:=Len(xCOD_VEND)
+   For I:=1 to J
+      dbSeek(xFilial()+xCOD_VEND[I])
+      AADD(xVENDEDOR,SA3->A3_NREDUZ)
+   Next
+
+   /*If xICMS_RET >0                          // Apenas se ICMS Retido > 0
+      dbSelectArea("SF3")                   // * Cadastro de Livros Fiscais
+      dbSetOrder(4)
+      dbSeek(xFilial()+SA1->A1_COD+SA1->A1_LOJA+SF2->F2_DOC+SF2->F2_SERIE)
+      If Found()
+         xBSICMRET:=F3_VALOBSE
+      Else
+         xBSICMRET:=0
+      Endif
+   Else
+      xBSICMRET:=0
+   Endif          */
+   dbSelectArea("SA4")                   // * Transportadoras
+   dbSetOrder(1)
+   dbSeek(xFilial()+SF2->F2_TRANSP)
+   // Endif  //RETIRADO DEVIDO A ERRO
+   xNOME_TRANSP :=SA4->A4_NOME           // Nome Transportadora
+   xEND_TRANSP  :=SA4->A4_END            // Endereco
+   xMUN_TRANSP  :=SA4->A4_MUN            // Municipio
+   xEST_TRANSP  :=SA4->A4_EST            // Estado
+   xVIA_TRANSP  :=SA4->A4_VIA            // Via de Transporte
+   xINSC_TRANSP :=SA4->A4_INSEST        // Inscricao Estadual
+   xCGC_TRANSP  :=SA4->A4_CGC            // CGC
+   xTEL_TRANSP  :=SA4->A4_TEL            // Fone
+
+   dbSelectArea("SE1")                   // * Contas a Receber
+   dbSetOrder(1)
+   xPARC_DUP  :={}                       // Parcela
+   xVENC_DUP  :={}                       // Vencimento
+   xVALOR_DUP :={}                       // Valor
+   xDUPLICATAS:=IIF(dbSeek(xFilial()+xSERIE+xNUM_DUPLIC,.T.),.T.,.F.) // Flag p/Impressao de Duplicatas
+
+   while !eof() .and. SE1->E1_NUM==xNUM_DUPLIC .and. xDUPLICATAS==.T.
+      If !("NF" $ SE1->E1_TIPO)
+         dbSkip()
+         Loop
+      Endif
+      AADD(xPARC_DUP ,SE1->E1_PARCELA)
+      AADD(xVENC_DUP ,SE1->E1_VENCTO) 
+      //If Empty (xVAL_DESZF[1])
+         AADD(xVALOR_DUP,SE1->E1_VALOR)
+      //Else
+        // AADD(xVALOR_DUP,xVAL_MERC[1] + xVAL_DESZF[1])
+     // EndIf
+      RecLock("SE1",.f.)
+      SE1->E1_Emis1:= CtoD("  \  \  ")
+      SE1->E1_LA   := " "
+      dbUnLock()
+      dbSkip()
+   EndDo
+
+   dbSelectArea("SF4")                   // * Tipos de Entrada e Saida
+   DbSetOrder(1)
+   dbSeek(xFilial()+xTES[1])
+   xNATUREZA:=SF4->F4_TEXTO              // Natureza da Operacao
+	///xMensTes := FORMULA(SF4->F4_FORMULA)
+
+   Imprime()
+
+   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   //³ Termino da Impressao da Nota Fiscal                          ³
+   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+   nLin:=0
+   dbSelectArea("SF2")
+   dbSkip()                      // passa para a proxima Nota Fiscal
+
+  EndDo
+  dbSelectArea("SF2")
+  Retindex("SF2")
+  dbSelectArea("SD2")
+  Retindex("SD2")
+Else
+
+   DbSelectArea("SF1")
+   dbSeek(xFilial("SF1")+mv_par01+mv_par03,.t.)
+//   WhiLe !eof() .and. SF1->F1_DOC <= mv_par02 .and. lContinua
+	While !eof() .and. SF1->F1_DOC <= mv_par02 .and. SF1->F1_SERIE == mv_par03 .and. lContinua
+	IncRegua()		      // Termometro de Impressao
+      If SF1->F1_SERIE #mv_par03      // Se a Serie do Arquivo for Diferente
+         DbSkip()                      // do Parametro Informado !!!
+		   Loop
+		Endif
+
+		If SF1->F1_Formul <> "S"
+	   	DbSkip()
+	   	Loop
+		Endif
+
+      If SF1->F1_TX == "S"
+	 	 #IFNDEF WINDOWS
+	      Set Device to Screen
+	      DrawAdvWindow(" Reimpressao ",10,25,14,56)
+	      SetColor("b/bg")
+	      @ 12,27 Say "Nota "+SF1->F1_DOC+" ja impressa..!!!!"
+	      nOpc:=Menuh({"Imprime Novamente","Cancela"},14,26,"b/w,w+/n,r/w","IC","",1)
+	      Set Device to Print
+	  	#ELSE
+	      IF MsgYesNo("Nota "+SF1->F1_DOC+" ja impressa..!! Imprime Novamente.? ")
+		 		nOpc := 1
+	      Else
+		 		nOpc := 2
+	      Endif
+	  	#ENDIF
+	  		If nOpc == 2
+	     		dbSkip()
+	     		Loop
+	  		EndIF
+		EndIf
+		IF LastKey()== -33 // ALT_F4
+	  	#IFDEF WINDOWS
+	    If MsgYesNo("CANCELA IMPRESSAO?")
+	      nOpc:= 1
+	    Else
+	      nOpc:= 2
+	    End
+	  	#ELSE
+	    Set Device to Screen
+	    DrawAdvWindow(" Cancelamento ",10,25,14,56)
+	    SetColor("b/bg")
+	    @ 12,27 Say "Impressao a Cancelar!!"
+	    nOpc:=Menuh({"Sai da Impressao","Cancela"},14,26,"b/w,w+/n,r/w","IC","",1)
+	    Set Device to Print
+	    DrawAdvWindow("Esta N.F. apresenta problemas c/ o param. Unidade de Medida",10,25,17,56)
+	  	#ENDIF
+	  		If nOpc == 2
+	    		lContinua := .F.
+	    		Exit
+	  		End
+		Endif
+	nLinIni:=nLin			      // Linha Inicial da Impressao
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+         //³ Inicio de Levantamento dos Dados da Nota Fiscal              ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+   xNUM_NF     :=SF1->F1_DOC                 // Numero
+   xSERIE      :=SF1->F1_SERIE               // Serie
+  	xFORNECE    :=SF1->F1_FORNECE	      // Cliente/Fornecedor
+	xEMISSAO    :=SF1->F1_dtDigit	      // Data de Emissao
+	xTOT_FAT    :=SF1->F1_VALBRUT	      // Valor Bruto da Compra
+   xLOJA       :=SF1->F1_LOJA               // Loja do Cliente
+   xFRETE      :=SF1->F1_FRETE              // Frete
+  	//xSEGURO     :=SF1->F1_DESPESA	      // Despesa  && Comentei pq: Duas variáveis estão recebendo o mesmo campo. FR 26/07/07
+	xBASE_ICMS  :=SF1->F1_BASEICM	      // {} Base   do ICMS
+	xBASE_IPI   :=SF1->F1_BASEIPI	      // Base	do IPI
+	xBSICMRET   :=SF1->F1_BRICMS	      // Base do ICMS Retido
+	xVALOR_ICMS :=SF1->F1_VALICM	      // 0 Valor  do ICMS
+	xICMS_RET   :=SF1->F1_ICMSRET	      // Valor	do ICMS Retido
+	xVALOR_IPI  :=SF1->F1_VALIPI	      // Valor	do IPI
+	xVALOR_MERC :=SF1->F1_VALMERC	      // Valor	da Mercadoria
+	xNUM_DUPLIC :=SF1->F1_DUPL	      // Numero da Duplicata
+	xCOND_PAG   :=SF1->F1_COND	      // Condicao de Pagamento
+   xTIPO       :=SF1->F1_TIPO               // Tipo do Cliente
+   xNFORI      :=SF1->F1_NFORI              // NF Original
+	xPREF_DV    :=SF1->F1_SERIORI	      // Serie Original
+	xDESPESA     :=SF1->F1_DESPESA        // Despesas acessórias - incluindo o seguro cfe. informado por Elaine Chamado 18272
+//JOSE
+	xVolume		:= SF1->F1_P_VOLUM
+	xEspecie		:= SF1->F1_P_ESPEC
+	xPeso_Bruto	:= SF1->F1_P_BRUTO
+	xPeso_liq	:= SF1->F1_P_LIQUI
+	// * Itens da N.F. de Compra
+	dbSelectArea("SD1")
+	dbSetOrder(1)
+	dbSeek(xFilial()+xNUM_NF+xSERIE+xFORNECE+xLOJA)
+	cPedAtu := SD1->D1_PEDIDO
+	cItemAtu:= SD1->D1_ITEMPC
+	xPEDIDO  :={}			      // Numero do Pedido de Compra
+	xITEM_PED:={}			      // Numero do Item do Pedido de Compra
+	xNUM_NFDV:={}			      // Numero quando houver devolucao
+	xPREF_DV :={}			      // Serie	quando houver devolucao
+	xICMS	 	:={}			      // Porcentagem do ICMS
+	xCOD_PRO :={}			      // Codigo  do Produto
+	xQTD_PRO :={}			      // Peso/Quantidade do Produto
+	xPRE_UNI :={}			      // Preco Unitario de Compra
+	xIPI	 	:={}			      // Porcentagem do IPI
+	xPESOPROD:={}			      // Peso do Produto
+	xVAL_IPI :={}			      // Valor do IPI
+	xDESC	 	:={}			      // Desconto por Item
+	xVAL_DESC:={}			      // Valor do Desconto
+	xVAL_MERC:={}			      // Valor da Mercadoria
+	XVAL_DESZF:={}                         // Valor do Desconto ZONA FRANCA Antonio Carlos 20080416
+	xTES	 	:={}			      // TES
+	xCF	 	:={}			      // Classificacao quanto natureza da Operacao
+	xICMSOL  :={}			      // Base do ICMS Solidario
+	xICM_PROD:={}			      // ICMS do Produto
+	aFinalNF :={}			      // Volume,Peso Liquido,Peso Bruto,Especie,Marca,Numero e Transportadora
+	xObs	 	:={}			      // Obs
+   xNFOri   :={}
+   xDatNFOri:={}
+ 	XMENSTES := {}
+	XTRIBTES :={} 
+	cMensagem:= ""
+	lDesc	 	:= .f.
+	nValTotDs:= 0
+	nVAlTotIt:= 0
+	while !eof() .and. SD1->D1_DOC==xNUM_NF .and. SD1->D1_Fornece==xFornece
+	     If SD1->D1_SERIE #mv_par03   // Se a Serie do Arquivo for Diferente
+			DbSkip()		   // do Parametro Informado !!!
+			Loop
+	     Endif
+			DbSelectArea("SF4")                   // * Tipos de Entrada e Saida
+			DbSetOrder(1)
+			DbSeek(xFilial()+SD1->D1_TES)
+		  ///AADD(xMensTes := FORMULA(SF4->F4_FORMULA)
+		  IF VAL(SD1->D1_ITEM) = 1
+		  		cDescAt := SD1->D1_DESCRIC
+		  ENDIF
+		  If !Empty(SF4->F4_FORMULA)
+		  	AADD(xMensTes ,SF4->F4_FORMULA)
+		  Endif
+		  AADD(xTRIBTES , SUBSTR(SF4->F4_SITTRIB,1,2))		  
+		  DBSELECTAREA("SD1")
+	     AADD(xPEDIDO   ,SD1->D1_PEDIDO)	 // Ordem de Compra
+	     AADD(xITEM_PED ,SD1->D1_ITEMPC)	 // Item da O.C.
+	     AADD(xNUM_NFDV ,IIF(Empty(SD1->D1_NFORI),"",SD1->D1_NFORI))
+	     AADD(xPREF_DV  ,SD1->D1_SERIORI)	 // Serie Original
+	     AADD(xICMS     ,IIf(Empty(SD1->D1_PICM),0,SD1->D1_PICM))
+	     // AAdd(xBase_ICMS,SD1->(D1_BaseICM-D1_ValIPI))
+	     AADD(xCOD_PRO  ,SD1->D1_COD)	 // Produto
+	     AADD(xQTD_PRO  ,SD1->D1_QUANT)	 // Guarda as quant. da NF
+	     
+	     if !Empty(SD1->D1_P_OBS)
+	        cMensagem	:= SD1->D1_P_OBS	
+	     EndIf
+	     
+	     If SD1->D1_Tipo == "D"
+	       dbSelectArea("SD2")
+	       dbSetOrder(3)
+	       dbSeek(xFilial()+SD1->(D1_NFOri+D1_SeriOri+D1_Fornece+D1_Loja+D1_Cod))
+	       If SD2->(Found())
+		 			If SD2->D2_Descon > 0
+		   			AADD(xVAL_MERC ,SD1->D1_TOTAL+SD2->D2_Descon)    // Valor Total
+			   		AADD(xPRE_UNI  ,SD2->D2_PRUNIT)	// Valor Unitario
+			   		nValTotIt:= nValTotIt + (SD1->D1_TOTAL+SD2->D2_Descon)
+			   		nValTotDs:= nValTotDs + SD2->D2_Descon
+			   		lDesc:= .t.
+			 		Else
+			   		AADD(xPRE_UNI  ,SD1->D1_VUNIT)      // Valor Unitario
+			   		AADD(xVAL_MERC ,SD1->D1_TOTAL)      // Valor Total
+			 		End
+		    Else
+		 		AADD(xPRE_UNI	,SD1->D1_VUNIT)       // Valor Unitario
+		 		AADD(xVAL_MERC ,SD1->D1_TOTAL)      // Valor Total
+	       End
+	     Else
+	       AADD(xPRE_UNI  ,SD1->D1_VUNIT)	   // Valor Unitario
+	       AADD(xVAL_MERC ,SD1->D1_TOTAL)	   // Valor Total
+	     End
+	     dbSelectArea("SD1")
+//	     dbSetOrder(1)
+//	     dbSeek(xFilial()+xNUM_NF+xSERIE+xFORNECE+xLOJA)
+         AADD(xIPI      ,SD1->D1_IPI)          // % IPI
+         AADD(xVAL_IPI  ,SD1->D1_VALIPI)       // Valor do IPI
+         AADD(xPESOPROD ,SD1->D1_PESO)         // Peso do Produto
+         AADD(xDESC     ,SD1->D1_DESC)         // % Desconto
+         AADD(xTES      ,SD1->D1_TES)          // Tipo de Entrada/Saida
+         AADD(xCF       ,SD1->D1_CF)           // Codigo Fiscal
+	     	AADD(xICM_PROD ,IIf(Empty(SD1->D1_PICM),0,SD1->D1_PICM))
+              If !Empty(SD1->D1_NFori)
+                 AADD(xNFOri,SD1->D1_NFOri)
+                 dbSelectArea("SF2")
+                 
+                 //INICIO HAMILTON
+                 dbSetOrder(1)
+                 IF dbSeek(xFilial("SD1")+SD1->(D1_NFOri+D1_SeriOri+D1_Fornece+D1_loja))
+                    AADD(xDatNFOri ,F2_Emissao)
+                 ELSE   
+                    AADD(xDatNFOri ,CTOD(SPACE(8)))                               
+                 ENDIF   
+                //FIM HAMILTON
+                // ORIG AADD(xDatNFOri ,SF2->(dbSetOrder(1),dbSeek(xFilial("SD1")+SD1->(D1_NFOri+D1_SeriOri+D1_Fornece+D1_loja)),F2_Emissao))
+                 dbSelectArea("SD1")
+              End
+              dbskip()
+	EndDo
+	lFlpCli := .T.
+	dbSelectArea("SB1")                     // * Desc. Generica do Produto
+	dbSetOrder(1)
+	xUNID_PRO:={}				// Unidade do Produto
+	xDESC_PRO:={}				// Descricao do Produto
+	xMEN_POS :={}				// Mensagem da Posicao IPI
+	xDESCRICAO:={}				// Descricao do Produto
+	xCOD_TRIB:={}				// Codigo de Tributacao
+	xMEN_TRIB:={}				// Mensagens de Tributacao
+	xCOD_FIS :={}				// Cogigo Fiscal
+	xCLAS_FIS:={}				// Classificacao Fiscal
+//	xSIT_TRIB:={}				// Situacao Tributaria
+	xISS	 :={}				// Aliquota de ISS
+	xTIPO_PRO:={}				// Tipo do Produto
+	xLUCRO	 :={}				// Margem de Lucro p/ ICMS Solidario
+   XPOS_IPI  :={}
+	xCLFISCAL:={}
+	xSUFRAMA :=""
+	xCALCSUF :=""
+  
+//	nBase_ICMS:=0
+	I:=1
+	For I:=1 to Len(xCOD_PRO)
+	    // nBase_ICMS:= nBase_ICMS + xBase_ICMS[I]
+	    dbSeek(xFilial()+xCOD_PRO[I])
+	    dbSelectArea("SB1")
+	    AADD(xDESC_PRO ,SB1->B1_DESC)
+	    AADD(xUNID_PRO ,SB1->B1_UM)
+	    AADD(xCOD_TRIB ,SB1->B1_ORIGEM)
+	    If Ascan(xMEN_TRIB, SB1->B1_ORIGEM)==0
+		   AADD(xMEN_TRIB ,SB1->B1_ORIGEM)
+	    Endif
+	    AADD(xDESCRICAO ,SB1->B1_DESC)
+	    AADD(xMEN_POS  ,SB1->B1_POSIPI)
+//ZEFSN
+	    ////AADD(xPOS_IPI  ,SB1->B1_POSIPI)
+	    If SB1->B1_ALIQISS > 0
+		  AADD(xISS,SB1->B1_ALIQISS)
+	    Endif
+	    AADD(xTIPO_PRO ,SB1->B1_TIPO)
+	    AADD(xLUCRO    ,SB1->B1_PICMRET)
+//	    AADD(xSIT_TRIB ,SB1->B1_CLASFIS)
+
+		 IF ASCAN(xCLAS_FIS,SB1->B1_CLASFIS,1,LEN(xCLAS_FIS)) = 0
+       	AADD(xCLAS_FIS ,SB1->B1_CLASFIS)
+       	AADD(XPOS_IPI  ,SB1->B1_POSIPI)
+   	 else
+       	AADD(xCLAS_FIS ,SB1->B1_CLASFIS)
+       	AADD(XPOS_IPI  ,SPACE(8))   	 
+       ENDIF
+
+	    ////AADD(xCLAS_FIS ,SB1->B1_CLASFIS)
+	Next
+//	xValor_ICMS:= nBase_ICMS * (xICM_Prod[1]/100)
+//	IIf(xValor_ICMS == 0,nBase_ICMS:= 0,Nil)
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+         //³ Pesquisa da Condicao de Pagto               ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	dbSelectArea("SE4")                // Condicao de Pagamento
+	dbSetOrder(1)
+	dbSeek(xFilial("SE4")+xCOND_PAG)
+	xDESC_PAG := SE4->E4_DESCRI
+         If xTIPO $ "D~B"
+	    dbSelectArea("SA1")                // * Cadastro de Clientes
+	    dbSetOrder(1)
+	    dbSeek(xFilial()+xFORNECE+xLOJA)
+	    xCOD_CLI :=SA1->A1_COD	       // Codigo do Cliente
+	    xNOME_CLI:=SA1->A1_NOME	       // Nome
+	    xEND_CLI :=SA1->A1_END	       // Endereco
+	    xBAIRRO  :=SA1->A1_BAIRRO	       // Bairro
+	    xCEP_CLI :=SA1->A1_CEP	       // CEP
+	    xCOB_CLI :=SA1->A1_ENDCOB	       // Endereco de Cobranca
+	    xREC_CLI :=SA1->A1_ENDENT	       // Endereco de Entrega
+	    xMUN_CLI :=SA1->A1_MUN	       // Municipio
+	    xEST_CLI :=SA1->A1_EST	       // Estado
+	    xCGC_CLI :=SA1->A1_CGC	       // CGC
+	    xINSC_CLI:=SA1->A1_INSCR	       // Inscricao estadual
+//	    xTRAN_CLI:=SA1->A1_TRANSP	       // Transportadora
+	    xTEL_CLI :=SA1->A1_TEL	       // Telefone
+	    xFAX_CLI :=SA1->A1_FAX	       // Fax
+	Else
+	    dbSelectArea("SA2")                // * Cadastro de Fornecedores
+	    dbSetOrder(1)
+	    dbSeek(xFilial()+xFORNECE+xLOJA)
+	    xCOD_CLI :=SA2->A2_COD		  // Codigo do Cliente
+	    xNOME_CLI:=SA2->A2_NOME		  // Nome
+	    xEND_CLI :=SA2->A2_END		  // Endereco
+	    xBAIRRO  :=SA2->A2_BAIRRO		  // Bairro
+	    xCEP_CLI :=SA2->A2_CEP		  // CEP
+	    xCOB_CLI :=""                         // Endereco de Cobranca
+	    xREC_CLI :=""                         // Endereco de Entrega
+	    xMUN_CLI :=SA2->A2_MUN		  // Municipio
+	    xEST_CLI :=SA2->A2_EST		  // Estado
+	    xCGC_CLI :=SA2->A2_CGC		  // CGC
+	    xINSC_CLI:=SA2->A2_INSCR		  // Inscricao estadual
+//	    xTRAN_CLI:=SA2->A2_TRANSP		  // Transportadora
+	    xTEL_CLI :=SA2->A2_TEL		  // Telefone
+	    xFAX     :=SA2->A2_FAX		  // Fax
+	EndIf
+	dbSelectArea("SE1")                   // * Contas a Receber
+	dbSetOrder(1)
+	xPARC_DUP  :={} 		      // Parcela
+	xVENC_DUP  :={} 		      // Vencimento
+	xVALOR_DUP :={} 		      // Valor
+	xDUPLICATAS:=IIF(dbSeek(xFilial()+xSERIE+xNUM_DUPLIC,.T.),.T.,.F.) // Flag p/Impressao de Duplicatas
+	while !eof() .and. SE1->E1_NUM==xNUM_DUPLIC .and. xDUPLICATAS==.T.
+	     AADD(xPARC_DUP ,SE1->E1_PARCELA)
+	     AADD(xVENC_DUP ,SE1->E1_VENCTO)
+	     AADD(xVALOR_DUP,xVAL_MERC[1] ) //+ xVAL_DESZF[1])
+	     dbSkip()
+	EndDo
+
+	dbSelectArea("SF4")                   // * Tipos de Entrada e Saida
+	dbSetOrder(1)
+	dbSeek(xFilial()+XTES[1])
+	xNATUREZA:=SF4->F4_TEXTO	      // Natureza da Operacao
+	///xMensTes := FORMULA(SF4->F4_FORMULA)
+
+
+	dbSelectArea("SA4")
+	dbSetOrder(1)
+         // dbSeek(xFilial()+aFinalNF[1][7])
+         // xNOME_TRANSP :=SA4->A4_NOME               // Nome Transportadora
+         // xEND_TRANSP  :=SA4->A4_END       // Endereco
+         // xMUN_TRANSP  :=SA4->A4_MUN       // Municipio
+         // xEST_TRANSP  :=SA4->A4_EST       // Estado
+         // xVIA_TRANSP  :=SA4->A4_VIA       // Via de Transporte
+         // xCGC_TRANSP  :=SA4->A4_CGC       // CGC
+         // xTEL_TRANSP  :=SA4->A4_TEL       // Fone
+	xTPFRETE     :=" "           // Tipo de Frete
+//	xVOLUME      := 0	     // Volume
+//	xESPECIE     :=" "           // Especie
+//	xPESO_LIQ    := 0	     // Peso Liquido
+//	xPESO_BRUTO  := 0	     // Peso Bruto
+	xCOD_MENS    :=" "           // Codigo da Mensagem
+	xMENSAGEM    :=" "           // Mensagem da Nota
+//	xPESO_LIQUID :=" "
+	If xQTD_PRO[1] <= 0 .and. .not. xTipo $ "C~I~P"
+	  #IFDEF WINDOWS
+	    MsgBox("Esta N.F. "+xNUM_NF+" e Pedido "+cPedAtu+" apresenta problemas com o parametro Unidade de Medida, favor vereficar!","Atencao","INFO")
+	    Return .t.
+	  #ELSE
+	    DrawAdvWindow("Esta N.F. apresenta problemas c/ o param. Unidade de Medida",10,25,17,56)
+	    Inkey(0)
+	    Return .t.
+	  #ENDIF
+	End
+	Set Device to Print
+	Imprime()
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Termino da Impressao da Nota Fiscal   ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	nLin:=0
+	RecLock("SF1")
+	Replace F1_TX With "S"
+	dbUnLock()
+	dbSelectArea("SF1")     //
+	dbSkip()		// e passa para a proxima Nota Fiscal
+   EndDo
+   dbSelectArea("SF1")
+   Retindex("SF1")
+   dbSelectArea("SD1")
+   Retindex("SD1")
+End
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³                                                              ³
+//³                      FIM DA IMPRESSAO                        ³
+//³                                                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Fechamento do Programa da Nota Fiscal                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+Set Device To Screen
+SetPgEject(.F.)
+If aReturn[5] == 1
+   Set Printer TO
+   dbcommitAll()
+   ourspool(wnrel)
+Endif
+
+MS_FLUSH()
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Fim do Programa                                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³                                                              ³
+//³                   FUNCOES ESPECIFICAS                        ³
+//³                                                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ VERIMP   ³ Autor ³   Marcos Simidu       ³ Data ³ 20/12/95 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Verifica posicionamento de papel na Impressora             ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ FSINFS                                                     ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Inicio da Funcao    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+// Substituido pelo assistente de conversao do AP6 IDE em 25/08/03 ==> Function VerImp
+
+*-------------------------*
+Static Function VerImp()
+*-------------------------*
+
+nLin:= 0                // Contador de Linhas
+nLinIni:=0
+If aReturn[5]==2
+
+   nOpc    := 1
+   #IFNDEF WINDOWS
+           cCor       := "B/BG"
+   #ENDIF
+   While .T.
+
+      SetPrc(0,0)
+      dbCommitAll()
+
+      @ nLin ,000 PSAY " "
+      @ nLin ,004 PSAY "*"
+      @ nLin ,022 PSAY "."
+      #IFNDEF WINDOWS
+              Set Device to Screen
+              DrawAdvWindow(" Formulario ",10,25,14,56)
+              SetColor(cCor)
+              @ 12,27 Say "Formulario esta posicionado?"
+              nOpc:=Menuh({"Sim","Nao","Cancela Impressao"},14,26,"b/w,w+/n,r/w","SNC","",1)
+              Set Device to Print
+      #ELSE
+              IF MsgYesNo("Fomulario esta posicionado ? ")
+                 nOpc := 1
+              ElseIF MsgYesNo("Tenta Novamente ? ")
+                 nOpc := 2
+              Else
+                 nOpc := 3
+              Endif
+      #ENDIF
+
+      Do Case
+         Case nOpc==1
+            lContinua:=.T.
+            Exit
+         Case nOpc==2
+            Loop
+         Case nOpc==3
+            lContinua:=.F.
+            Return
+      EndCase
+   End
+Endif
+
+Return
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Fim da Funcao       ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ IMPDET   ³ Autor ³ Elaine Cavalheiro     ³ Data ³ 20/12/96 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Impressao de Linhas de Detalhe da Nota Fiscal              ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ FSINFS                                                     ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Inicio da Funcao    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+// Substituido pelo assistente de conversao do AP6 IDE em 25/08/03 ==> Function IMPDET
+
+*-------------------------*
+Static Function IMPDET()
+*-------------------------*
+
+nTamDet :=14            // Tamanho da Area de Detalhe
+
+I:=1
+J:=1
+
+xB_ICMS_SOL:=0          // Base  do ICMS Solidario
+xV_ICMS_SOL:=0          // Valor do ICMS Solidario
+xDESCCZFR:=0
+xVAL_ZF	 :=0
+zImpZF:=.F.    
+ 
+If xTipo <> 'C'
+
+   For I:=1 to nTamDet
+
+    If I<= Len(xCOD_PRO)
+                
+          // @ nLin, 001  PSAY Iif(xTipo $ "P~I" .or. xCF[1] == "1352"," ",xDESC_PRO[I])
+          // ALTERACAO 13/07/04
+          // @ nLin, 001  PSAY Iif(xTipo $ "P~I~C" .or. xCF[1] == "1352"," ",xCOD_PRO[I])
+          @ nLin, 001  PSAY SUBSTR(xCOD_PRO[I],1,15)
+ 
+          If mv_par04 == 2
+          //ALTERACAO 13/07/04
+          //@ nLin, 034  PSAY Iif(xTipo $ "P~I~C".or. xCF[1] == "1352"," ",SUBS(xDESCRES[I],1,50))
+             @ nLin, 034  PSAY subs(xDESCRES[I],1,50)
+             
+             If Subs(xDESCRES[I],51,50) != SPACE(50)           	
+                nLin := nLin + 1
+                //ALTERACAO 13/07/04
+                //@ nLin, 034  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352"," ",SUBS(xDESCRES[I],51,50))
+                @ nLin, 034  PSAY subs(xDESCRES[I],51,50)
+             Endif
+          Else
+             //ALTERACAO 13/07/04
+             //@ nLin, 034 PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352"," ",xDescricao[I])
+             @ nLin, 034 PSAY subs(xDescricao[I],1,len(xDescricao[I]))
+          End
+          @ nLin, 097  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352"," ",SUBSTR(xCLAS_FIS[I],1,1))
+          @ nLin, 099  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352"," ",SUBSTR(xCOD_TRIB[I],1,1)+SUBSTR(XTRIBTES[I],1,2))
+          @ nLin, 104  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352"," ",xUNID_PRO[I])
+          @ nLin, 109  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xQTD_PRO[I])  Picture"@E 999,999.99"  
+          IF SA1->A1_CALCSUF $ 'S'  // TLM
+	         @ nLin, 123  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xPRE_UNI[I] )  Picture"@E 999,999.99"
+             @ nLin, 143  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xVAL_MERC[I] ) Picture"@E 999,999.99" 	         
+	      Else
+		     @ nLin, 123  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xPRE_UNI[I] + (IIF(Type("XVAL_DESZF[I]")<>"U",XVAL_DESZF[I], 0) /xQTD_PRO[I]))  Picture"@E 999,999.99"
+             @ nLin, 143  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xVAL_MERC[I]+ (IIF(Type("XVAL_DESZF[I]")<>"U",XVAL_DESZF[I], 0))) Picture"@E 999,999.99"          	
+	      EndIf   
+          @ nLin, 157  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xICM_PROD[I]) Picture"99"
+          @ nLin, 160  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xIPI[I])      Picture"99"
+          If  xTipo <> "D"
+             @ nLin, 164  PSAY Iif(xTipo $ "P~I~C".or. xCF[1]=="1352",0,xVAL_IPI[I])  Picture"@E 999,999.99"
+          EndIf
+          
+          If xDesc[I] > 0   
+             IF !(SA1->A1_CALCSUF $ 'S')  
+                nLin := nLin + 1
+                @ nLin, 036 PSAY "DESCONTO DE "
+                @ nLin, 048 PSAY xDESC[I]      Picture "99"
+                @ nLin, 051 PSAY "%"
+                @ nLin, 141 PSAY xVAL_DESC[I]  Picture "@E@R (999,999.99)"
+             EndIf   
+          End 
+          
+          If !Empty(xNFOri)
+             nLin := nLin + 1
+             @ nLin, 036 PSAY Iif(xTipo $ "P^C^I"," ","DEVOLUCAO REF. NF ")
+             @ nLin, 054 PSAY Iif(xTipo $ "P^C^I"," ",xNFOri[i]+"  "+DtoC(xDatNFOri[I]))
+          End
+          If xCF[1] == "1352"                 '
+             nLin := nLin + 1
+             @ nLin, 036 PSAY "NF COMPLEMENTO DE PRECO REFERENTE CONHECIMENTO FRETE"
+          End 
+          // J:=J+1
+          //--> Trata Zona Franca 
+		  If mv_par04 == 2
+			 xDESCONTO := xDESCONTO + xVAL_DESC[I]
+			 xDESCCZFR := xDESCCZFR + XVAL_DESZF[I]
+			 //XVAL_ZF   += xVAL_MERC[I]+ XVAL_DESZF[I]   TLM 
+			 XVAL_ZF   += xVAL_MERC[I]+ xVAL_DESC[I]
+		  Endif
+		   
+    Else
+        //------------------> Impressão de Mensagem Especifica
+        IF MV_PAR04 == 2         //--> Nota Fiscal de Saida 
+           IF xEst_cli $ 'AM/AP/RO/RR' .And. !zImpZF
+              nLIN:=nLIN+2
+		 	  If xDESCCZFR > 0  
+				 nLin :=nLin+1                                                 
+				 @ nLin, 022  PSAY "Desconto de 7%    Ref.ICMS   R$ "
+				 //@ nLin, pcol()+1 PSAY XVAL_ZF *0.07   Picture"@E 9,999,999.99" // Nova Base p/ cálculo do ICMS.
+				 // TLM 
+				 SF4->(DbSetOrder(1))
+				 SF4->(DbSeek(xFilial()+cTes))
+				 If SF4->F4_BASEICM <> 0
+				    @ nLin, pcol()+1 PSAY (((nBaseICMS)*(SF4->F4_BASEICM/100))*0.07)    Picture"@E 9,999,999.99"   
+				 Else
+				    @ nLin, pcol()+1 PSAY (((nBaseICMS))*0.07)    Picture"@E 9,999,999.99" 
+				 EndIf
+				 nLin :=nLin+1
+			  Endif
+			  If xDESCCZFR > 0
+				 nLin :=nLin+1
+				 @ nLin, 022  PSAY "Desconto de 1.65% Ref.PIS    R$ "
+				 @ nLin, pcol()+1 PSAY nBasePISCOF *0.0165   Picture"@E 9,999,999.99"
+				 nLin :=nLin+1
+			  Endif
+			  If xDESCCZFR > 0
+				 nLin :=nLin+1
+				 @ nLin, 022  PSAY "Desconto de 7.6%  Ref.Cofins R$ "
+				 @ nLin, pcol()+1 PSAY nBasePISCOF  *0.076   Picture"@E 9,999,999.99"
+				 nLin :=nLin+1
+			  Endif
+			  zImpZF:=.T.
+			  I:=nLIN
+	       Endif
+       Endif
+    Endif
+    
+    nLin := nLin + 1
+
+
+
+  Next I
+       
+Else
+  
+   @ nLin, 034  PSAY "Complemento de Importacao"    
+   @ nLin, 143  PSAY xTOT_FAT Picture "@E 999,999.99"
+                                                                                                       
+EndIf 
+
+
+Return
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Fim da Funcao       ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ DUPLIC   ³ Autor ³   Marcos Simidu       ³ Data ³ 20/12/95 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Impressao do Parcelamento das Duplicacatas                 ³±±                     	
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ FSINFS                                                     ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Inicio da Funcao    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+// Substituido pelo assistente de conversao do AP6 IDE em 25/08/03 ==> Function DUPLIC
+
+*-------------------------*
+Static Function DUPLIC()
+*-------------------------*
+
+@ nLin,nCol Psay Chr(27)+"0"
+@ nLin,nCol Psay Chr(15)
+
+For BB:= 1 to Len(xVALOR_DUP)
+   If xDUPLICATAS==.T. .and. BB<=Len(xVALOR_DUP).And.nLin <= 19
+      @ nLin, nCol  PSAY xNUM_DUPLIC+Space(15)+xPARC_DUP[BB]+Space(09)+Dtoc(xVENC_DUP[BB])+Space(16)+Transform(xVALOR_DUP[BB],"@E 9,999,999.99")
+      nCol +=080 
+      If nCol == 175  
+         nLin += 1
+         nCol := 24  
+      Endif
+      
+   Endif
+Next
+@ nLin,nCol Psay Chr(27)+"2"
+
+Return
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Fim da Funcao       ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ LI       ³ Autor ³   Marcos Simidu       ³ Data ³ 20/12/95 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Pula 1 linha                                               ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ Generico RDMAKE                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Inicio da Funcao    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Fim da Funcao       ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ IMPRIME  ³ Autor ³   Marcos Simidu       ³ Data ³ 20/12/95 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Imprime a Nota Fiscal de Entrada e de Saida                ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ Generico RDMAKE                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+// Substituido pelo assistente de conversao do AP6 IDE em 25/08/03 ==> Function Imprime
+
+*-------------------------*
+Static Function Imprime()
+*-------------------------*
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³                                                              ³
+//³              IMPRESSAO DA N.F. DA FSI DO BRASIL              ³
+//³                                                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Impressao do Cabecalho da N.F.      ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+@ 01, 000 PSAY Chr(18)          // Compressao de Impressao
+@ 02, 093 PSAY xNUM_NF          // Numero da Nota Fiscal
+If mv_par04 == 2                // X de Marca‡ao na NF Saida ou Endrada
+      @ 03, 067 PSAY "X"
+Else
+      @ 03, 080 PSAY "X"
+Endif
+
+
+@ 08, 001 PSAY substr(xNATUREZA,1,25)               // Texto da Natureza de Operacao
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Alteracao em 23/05/01-Edelcio Cano: Microsiga F.Leste         ³
+//³           Verifica se o CFOP eh 3 ou 4 Caracteres.           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+IF LEN(ALLTRIM(xCF[1])) == 3
+       @ 08, 032 PSAY xCF[1] Picture"@R 9.99" // Codigo da Natureza de Operacao
+ELSE
+       @ 08, 031 PSAY xCF[1] Picture"@R 9.999" // Codigo da Natureza de Operacao
+ENDIF
+
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Impressao dos Dados do Cliente      ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+@ 11, 001 PSAY xCOD_CLI+"/"+xLoja+"  "+xNOME_CLI  //Codigo e Nome do Cliente
+
+If !EMPTY(xCGC_CLI)                   // Se o C.G.C. do Cli/Forn nao for Vazio
+   @ 11, 067 PSAY xCGC_CLI Picture"@R 99.999.999/9999-99"
+Else
+   @ 11, 067 PSAY " "                // Caso seja vazio
+Endif
+
+@ 11, 093 PSAY xEMISSAO              // Data da Emissao do Documento
+
+@ 13, 001 PSAY xEND_CLI                                 // Endereco
+@ 13, 049 PSAY xBAIRRO                                  // Bairro
+@ 13, 074 PSAY xCEP_CLI Picture"@R 99999-999"           // CEP
+/// @ 13, 093 PSAY dDatabase                                // Data Saida/Entrada
+
+@ 15, 001 PSAY xMUN_CLI                                 // Municipio
+@ 15, 037 PSAY xTEL_CLI                                 // Telefone/FAX
+@ 15, 056 PSAY xEST_CLI                                 // U.F.
+@ 15, 067 PSAY xINSC_CLI                                // Insc. Estadual
+/// @ 15, 093 PSAY time()                                   // Hora da Saida
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Impressao da Fatura/Duplicata       ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+nLin := 18
+BB   := 1
+nCol := 15             //  duplicatas
+DUPLIC()
+
+@ 21, 001 PSAY xREC_CLI                                 // Endereco de Entrega habilitar pois havera mudanca de formulario
+
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Dados dos Produtos Vendidos         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+@ 023, 000 PSAY Chr(15)   // Compressao de Impressao
+
+nLin := 24
+
+ImpDet()                 // Detalhe da NF
+                                                           
+If xDESCONTO != 0 .and. mv_par04 == 2
+   If zFranca
+       @ nLin, 012  PSAY "ABATIMENTO ICMS 7%"
+   Endif
+//   @ nLin, 100  PSAY xDESCONTO          Picture"@E 99,999,999.99"
+Endif
+
+
+
+//---------------------------------toto
+@ nLin, 000 PSAY Chr(18)   // Descompressao de Impressao
+
+If !Empty(xSuframa)
+   nLin := 39
+   @ nLin,005 PSAY "CODIGO SUFRAMA : "+xSuframa
+EndIf
+
+IF !Empty(xMENSAGEM)
+   nLin := 40
+   @ nLin, 005 PSAY xMENSAGEM
+ENDIF
+
+//If !Empty(xCOD_MENS)
+//   nLin := 41
+//   @ nLin, 005 PSAY FORMULA(xCOD_MENS)
+//Endif
+
+
+//If Len(xISS) == 0
+
+//  nLin:=37
+//  ImpMenp()             // Imprime Mensagem Padrao da Nota Fiscal
+
+//Endif
+
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Prestacao de Servicos Prestados     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//If Len(xISS) > 0
+
+//   nLin := 40
+//   Impmenp()
+
+//   nLin :=41
+//   MensObs()
+
+//   @ 44, 120  PSAY xTOT_FAT  Picture"@E@Z 999,999,999.99"   // Valor do Servico
+
+//Endif
+nSomaDesc := 0                                                              
+For i := 1 to Len(xVAL_DESZF)
+    nSomaDesc := nSomaDesc +  xVAL_DESZF[i]
+Next 
+
+If xTipo <> 'C'
+
+   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   //³ Calculo dos Impostos                ³
+   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+                                                  
+   @ 44, 005  PSAY xBASE_ICMS  Picture"@E@Z 999,999,999.99"  // Base do ICMS
+   @ 44, 022  PSAY xVALOR_ICMS Picture"@E@Z 999,999,999.99"  // Valor do ICMS
+   If xTipo <> "D" 
+      @ 44, 040  PSAY xBSICMRET   Picture"@E@Z 999,999,999.99"  // Base ICMS Ret.
+      @ 44, 059  PSAY xICMS_RET   Picture"@E@Z 999,999,999.99"  // Valor  ICMS Ret.
+   EndIf
+   @ 44, 086  PSAY Iif(xTipo $ "P~I",0,xVALOR_MERC+nSomaDesc) Picture"@E@Z 999,999,999.99"  // Valor Tot. Prod.  
+   //@ 44, 086  PSAY Iif(xTipo $ "P~I",0,xVALOR_MERC) Picture"@E@Z 999,999,999.99"  // Valor Tot. Prod.   - TLM    
+   
+   @ 46, 005  PSAY xFRETE      Picture"@E@Z 999,999,999.99"  // Valor do Frete
+   //@ 46, 022  PSAY xSEGURO     Picture"@E@Z 999,999,999.99"  // Valor Seguro  && FR 26/07/07:Não precisa pq já está dentro do XDESPESA.
+   @ 46, 039  PSAY xDESPESA    Picture"@E@Z 999,999,999.99"  // Valor Seguro
+   If  xTipo <> "D"
+      @ 46, 059  PSAY xVALOR_IPI  Picture"@E@Z 999,999,999.99"  // Valor do IPI
+   EndIf
+   @ 46, 086  PSAY Iif(xTipo $ "P~I",0,xTOT_FAT)    Picture"@E@Z 999,999,999.99"  // Valor Total NF
+
+   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   //³ Impressao Dados da Transportadora  ³
+   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+   @ 49, 001 PSAY IIF(MV_PAR04==2,XNOME_TRANSP,"" )      // Nome da Transport.
+ 
+   If xTPFRETE=='C'                                    // Frete por conta do
+      @ 49, 058 PSAY "1"                               // Emitente (1)
+   Else                                                //     ou
+      @ 49, 058 PSAY "2"                               // Destinatario (2)
+   Endif
+
+   @ 49, 063 PSAY " "                                  // Res. p/Placa do Veiculo
+   @ 49, 076 PSAY " "                                  // Res. p/xEST_TRANSP                          // U.F.
+
+   If !EMPTY(xCGC_TRANSP)                              // Se C.G.C. Transportador nao for Vazio
+      @ 49, 081 PSAY xCGC_TRANSP Picture"@R 99.999.999/9999-99"
+   Else
+      @ 49, 081 PSAY " "                               // Caso seja vazio
+   Endif
+
+   IF MV_PAR04 == 2
+      @ 51, 001 PSAY xEND_TRANSP                          // Endereco Transp.
+      @ 51, 050 PSAY xMUN_TRANSP                          // Municipio
+      @ 51, 076 PSAY xEST_TRANSP                          // U.F.
+      @ 51, 081 PSAY xINSC_TRANSP                         // Inscr. Estad.
+   END
+   @ 53, 001 PSAY xVOLUME                              // Quant. Volumes Pedido
+
+   @ 53, 018 PSAY xESPECIE                             // Especie do Pedido
+
+   If !Empty(xPESO_BRUTO)
+      @ 53, 064 PSAY xPESO_BRUTO   Picture"@E@Z 999,999,999.99"//"@E 999,999"   // Peso Bruto Pedido
+   Else
+      @ 53, 064 PSAY IIF(MV_PAR04==2,xPESO_BRU,0)     Picture"@E@Z 999,999,999.99"//"@E@Z 999,999"   // Peso Bruto Calculado
+   Endif
+
+   IF mv_par04 == 2
+      If xP_LIQ_PED >0
+         @ 53, 087 PSAY xP_LIQ_PED    Picture"@E@Z 999,999,999.99" //"@E 999,999"   // Peso Liquido Pedido
+      Else
+	     @ 53, 087 PSAY xPESO_LIQ     Picture"@E@Z 999,999,999.99" //"@E 999,999"   // Peso Liquido Calculado
+	  Endif
+   ELSE
+      @ 53, 087 PSAY xPESO_LIQ     Picture"@E@Z 999,999,999.99" //"@E 999,999"   // Peso Liquido Calculado
+   End
+
+   @ 056, 000 PSAY Chr(15)   // Compressao de Impressao
+   
+   For i = len(xcod_pro) to 10
+      aadd(xclas_fis," ")
+	  aadd(xpos_ipi," ")
+   next
+
+   For i = 1 to len(xcod_pro)
+      If substr(xpos_ipi[i],1,8) = space(8)
+         xclas_fis[i] := " "
+	  Endif
+   Next
+
+   @ 56, 040  PSAY xCLAS_FIS[1] +"  "+ XPOS_IPI[1]+"    "+xCLAS_FIS[2] +"  "+ XPOS_IPI[2]
+   @ 57,03 PSAY "XXXXXXXXXX"
+   @ 57,23 PSAY "XXXXXXXXXX"
+   @ 57, 040  PSAY xCLAS_FIS[3] +"  "+ XPOS_IPI[3]+"    "+xCLAS_FIS[4] +"  "+ XPOS_IPI[4]
+   //alteracao solicitada
+   @ 58,03 PSAY "XXXXXXXXXX"
+   @ 58,23 PSAY "XXXXXXXXXX"
+
+   @ 58, 040  PSAY xCLAS_FIS[5] +"  "+ XPOS_IPI[5]+"    "+xCLAS_FIS[6] +"  "+ XPOS_IPI[6]
+   @ 59, 040  PSAY xCLAS_FIS[7] +"  "+ XPOS_IPI[7]+"    "+xCLAS_FIS[8] +"  "+ XPOS_IPI[8]
+
+   //nLin := 60
+   @ 60,001 PSAY iif(mv_par04 == 2 ,xPED_VEND[1],"")
+   @ 60, 040  PSAY xCLAS_FIS[9] +"  "+ XPOS_IPI[9]+"    "+xCLAS_FIS[10] +"  "+ XPOS_IPI[10]
+
+   If !Empty(xCOD_MENS)
+      @ 61, 040  PSAY SUBSTR(FORMULA(xCOD_MENS),1,50)
+   EndIf
+
+   cPedCli:=""
+   If mv_par04 == 2
+      If Len(xPED_CLI) > 0
+         For V:=1 To Len(xPED_CLI)
+            cPedCli := cPedCli + ALLTRIM(xPED_CLI[V])
+			If V #Len(xPED_CLI)
+         	   cPedCli := cPedCli + "/"
+       	    Endif
+         Next
+   	     @ 62,001 PSAY cPedCli
+ 	  Endif
+	  If !Empty(xCOD_MENS)
+         @ 62, 040  PSAY SUBSTR(FORMULA(xCOD_MENS),51,50)
+	  Endif
+
+	  If len(XMENSTES) > 0
+   		 @ 63,040 PSAY SUBSTR(FORMULA(XMENSTES[1]),1,50)
+   		 @ 64,001 PSAY xCOD_VEND[1]+ "/"
+	 	 @ 64,040 PSAY SUBSTR(FORMULA(XMENSTES[1]),51,50)
+	  Else
+		 @ 64,001 PSAY xCOD_VEND[1]	
+	  Endif
+  
+	  If !Empty(cMensagem) 
+		 @ 64, 040  PSAY SUBSTR(cMensagem,01,50)
+		 If Len(Alltrim(cMensagem)) > 50
+		    @ 65, 040  PSAY SUBSTR(cMensagem,51,100)
+		 EndIf
+	  EndIf
+ 	  If Len(xNUM_NFDV) > 0  .and. !Empty(xNUM_NFDV[1]) .and. xTipo <> "P" .and. xTipo <> "D" .and. xTipo <> "I"
+   	     @ 66, 023 PSAY "NF Orig. "+ xNUM_NFDV[1]+IF(xPREF_DV[1]=="","","/"+xPREF_DV[1])
+   	     nLin := nLin + 1
+ 	  Endif
+      
+      If xTipo == "D" .and.  xBSICMRET > 0 .And. xICMS_RET > 0
+        @ 66, 040  PSAY  "Base Icms Ret: "
+        @ 66, 055  PSAY  xBSICMRET   Picture "@E@Z 999,999.99"  // Base ICMS Ret.
+        @ 66, 070  PSAY  "Icms Ret: "
+        @ 66, 080  PSAY  xICMS_RET   Picture "@E@Z 999,999.99"  // Valor  ICMS Ret.
+     EndIf
+   
+   ELSE
+   //JOSE
+      If !Empty(xCOD_MENS)
+         @ 62, 040  PSAY SUBSTR(FORMULA(xCOD_MENS),51,50)
+	     nLinMsg:=63
+      Else
+         nLinMsg:= 61
+      Endif
+	
+	  If len(XMENSTES) > 0
+	     @ nLinMsg,040 PSAY SUBSTR(FORMULA(XMENSTES[1]),1,50)
+		 @ nLinMsg+1,040 PSAY SUBSTR(FORMULA(XMENSTES[1]),51,50)
+	  Endif
+
+     @ 66, 040 PSAY cDescAt
+   
+   EndIF
+
+Else
+
+@ 46, 086  PSAY xTOT_FAT   Picture "@E@Z 999,999,999.99"  // Valor Total NF
+
+EndIF   
+
+
+@ 67, 000 PSAY chr(18)
+@ 68, 094 PSAY xNUM_NF                   // Numero da Nota Fiscal
+
+@ 72, 000 PSAY chr(18)                   // Descompressao de Impressao
+
+SetPrc(0,0)                              // (Zera o Formulario)
+
+Return .t.
+
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºFun‡„o    ³VALIDPERG º Autor ³ AP5 IDE            º Data ³  23/01/03   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDescri‡„o ³ Verifica a existencia das perguntas criando-as caso seja   º±±
+±±º          ³ necessario (caso nao existam).                             º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Programa principal                                         º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+*-------------------------*
+Static Function ValidPerg
+*-------------------------*
+
+Local _sAlias := Alias()
+Local aRegs := {}
+Local i,j
+
+dbSelectArea("SX1")
+dbSetOrder(1)
+
+cPerg := PADR(cPerg,6)
+
+AAdd( aRegs, { cPerg, "01", "Da Nota Fiscal    ?" ,"¨De Factura        ?","From Invoice       ?","mv_ch1","C",6,0,0,"G","","mv_par01","","","","","","","","","","","","","","","","","","","","","","","","","",""} )
+AAdd( aRegs, { cPerg, "02","Ate a Nota Fiscal  ?" ,"¨A  Factura        ?","To   Invoice       ?","mv_ch2","C",6,0,0,"G","","mv_par02","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","",""} )
+AAdd( aRegs, { cPerg, "03","Da Serie           ?" ,"¨De Serie          ?","From Invoice Type  ?","mv_ch3","C",3,0,0,"G","","mv_par03","","","","","","","","","","","","","","","","","","","","","","","","","",""} )
+AAdd( aRegs, { cPerg, "04","Tipo de Operacao   ?" ,"¨Tipo de Operacion ?","Operation Type     ?","mv_ch4","N",1,0,2,"C","","mv_par04","NF. Entrada","Factura Entrada","Inflow Invoice","","","NF. Saida","Factura Salida","Outflow Invoice","","","","","","","","","","","","","","","","","",""} )
+//AAdd( aRegs, { cPerg, "05","Quantidade         ?" ,""                    ,"","mv_ch5","N",12,2,0,"G","","mv_par05","","","","        0.00","","","","","","","","","","","","","","","","","","","","","",""} )
+//AAdd( aRegs, { cPerg, "06","Especie            ?" ,""                    ,"","mv_ch6","C",9,0,0,"G","","mv_par06","","","","","","","","","","","","","","","","","","","","","","","","","",""} )
+//AAdd( aRegs, { cPerg,"07","Peso Bruto         ?","","","mv_ch7","N",12,3,0,"G","","mv_par07","","","","       0.000","","","","","","","","","","","","","","","","","","","","","",""} )
+//AAdd( aRegs, { cPerg,"08","Peso Liquido       ?","","","mv_ch8","N",12,3,0,"G","","mv_par08","","","","       0.000","","","","","","","","","","","","","","","","","","","","","",""} )
+
+For i:=1 to Len(aRegs)
+	If !dbSeek(cPerg+aRegs[i,2])
+		RecLock("SX1",.T.)
+		For j:=1 to FCount()
+			If j <= Len(aRegs[i])
+				FieldPut(j,aRegs[i,j])
+			Endif
+		Next
+		MsUnlock()
+	Endif
+Next
+
+dbSelectArea(_sAlias)
+
+Return
+

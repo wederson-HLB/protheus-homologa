@@ -1,0 +1,510 @@
+#Include 'Protheus.ch'
+
+/*/{Protheus.doc} MA103BUT
+(Ponto de entrada para adicionar botões na Tela do Documento de Entrada. Usado para dar Refresh na Aba Informações Danfe)
+@type function
+@author marce
+@since 20/02/2017
+@version 1.0
+@return ${return}, ${return_description}
+@example
+(examples)
+@see (links_or_references)
+/*/
+User Function MA103BUT()
+
+//INICIO - CENTRAL XML	
+Local	aInParamIxb	:=	aClone(ParamIxb)
+Local	aInfo		:= ParamIxb[1]
+Local	nIx,nIr
+Local 	nPosNfOri 	:= aScan(aHeader,{|x| AllTrim(x[2]) == "D1_NFORI"} )
+Local 	nPosSerOri	:= aScan(aHeader,{|x| AllTrim(x[2]) == "D1_SERIORI"} )
+Local 	nPosItOri	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_ITEMORI'})
+Local 	nPosCod		:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_COD'})
+Local	nPosMva		:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_MARGEM'})
+Local	nPosItem	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_ITEM'})
+Local	nPosBIcm	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_BASEICM'})
+Local	nPosPIcm	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_PICM'})
+Local	nPosVIcm	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_VALICM'})
+Local	nPosBIPI	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_BASEIPI'})
+Local	nPosPIPI	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_IPI'})
+Local	nPosVIPI	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_VALIPI'})
+Local	nPosBricms	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_BRICMS'})
+Local	nPosIcmRet	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_ICMSRET'})
+Local	lIsA2SIMPN	:= .F. // Verifica se o fornecedor é Optante do Simples Nacional
+Local	aButtons	:= {}
+Private	aUsButtons	:= {}
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML	
+	// Ponto de entrada para verificar se o mesmo deve ser executado
+	// 21/01/2018 
+	If ExistBlock( "ZEXPEXML" )
+		lRet := ExecBlock( "ZEXPEXML", .F., .F.,{"MA103BUT",aInParamIxb} )
+		If Type("lRet") == "L"
+			If !lRet
+				Return 
+			Endif
+		Endif
+	EndIf
+	
+	If INCLUI .Or. ALTERA
+		If Alltrim(cEspecie) $ "CTE" .And. cFormul # "S" .And. Type("cModFrete") == "C"  .And. Len(aNFEDanfe) >= 14 .And. Empty(aNFEDanfe[14])
+			aNFEDanfe[14]	:= RetTipoFrete(cModFrete)
+			aDanfe[14]		:= RetTipoFrete(cModFrete)
+		Endif
+
+		If Alltrim(cEspecie) $ "CTE" .And. cFormul # "S" .And. Type("nValPedagio") == "N"  .And. Len(aNFEDanfe) >= 15 .And. Empty(aNFEDanfe[15])
+			aNFEDanfe[15]	:= nValPedagio
+			aDanfe[15]		:= nValPedagio
+		Endif
+
+		If Alltrim(cEspecie) $ "CTE" .And. cFormul # "S" .And. Type("cTpCte") == "C"  .And. Len(aNFEDanfe) >= 18 .And. Empty(aNFEDanfe[18])
+			aNFEDanfe[18]	:= RetTipoCTE(cTpCte)
+			aDanfe[18]		:= RetTipoCTE(cTpCte)
+		Endif
+
+		//.And. Type("cModFrete") == "C" .And. Type("cModalCte") == "C"
+		If Alltrim(cEspecie) $ "CTE" .And. cFormul # "S" .And. Type("cModalCte") == "C" .And. Len(ANFEDanfe) >= 23 .And. Empty(aNFEDanfe[23])
+			aNFEDanfe[23]	:= RetModCTE(cModalCte)
+			aDanfe[23]		:= RetModCTE(cModalCte)
+		Endif
+
+		// 26/05/2017 - Melhoria para considerar valor de Pedágio 
+		If Alltrim(cEspecie) $ "CTE" .And. cFormul # "S"
+			// Verifica se usa a UF de Origem
+			If !(GetNewPar("XM_CTEUFA2",.F.))
+				If GetNewPar("XM_CTEUFA3",.F.)
+					If Type("cUfDes") == "C"
+						MaFisAlt("NF_UFDEST",cUfDes)
+					Endif
+					If Type("cUfOri") == "C"
+						MaFisAlt("NF_UFORIGEM",cUfOri)
+					Endif
+				Endif
+				oGetDados:oBrowse:SetFocus()
+				oGetDados:oBrowse:Refresh()
+			Endif
+
+			If Type("nValPedagio") == "N"  
+				If nValPedagio > 0
+					MaFisAlt("NF_VALPEDG",nValPedagio)
+				Endif
+			Endif
+			
+		Endif
+
+
+		// 06/04/2017 - Melhoria para preencher as aliquotas da nota de origem -
+		// Função A103NFORI não é executada na validação via ExecAuto porém é necessário fazer a validação dos impostos conforme a nota de origem
+		// Chamando a função NfeNfe2Acols()
+		If cTipo $ "B#D"
+			For nIx	:= 1 To Len(aCols)
+				dbSelectArea("SD2")
+				dbSetOrder(3)
+				If MsSeek(xFilial('SD2')+aCols[nIx][nPosNfOri]+aCols[nIx][nPosSerOri]+CA100FOR+CLOJA+aCols[nIx][nPosCod]+aCols[nIx][nPosItOri])
+					NfeNfe2ACols(SD2->(Recno()),nIx)
+				Endif
+			Next nIx
+			// 16/05/2017 - Melhoria para forçar o ajuste dos valores de impostos conforme o XML para facilitar o lançamento da nota fiscal.
+		ElseIf Type("oMulti") <> "U" .And. Type("nMVPAR12") <> "U" 
+			If nMVPAR12 == 1 .Or. nMVPAR12 == 5
+				lIsA2SIMPN	:= MaFisRet(,'NF_SIMPNAC') == "1"  // Verifica se o fornecedor é Optante do Simples Nacional
+				For nIx	:= 1 To Len(aCols)			//
+					For nIr := 1 To Len(oMulti:aCols) // /Chave SD1 - D1_FILIAL+D1_DOC+D1_SERIE+D1_FORNECE+D1_LOJA+D1_COD+D1_ITEM
+						If (xFilial('SD1') + cNFiscal + cSerie + CA100FOR + CLOJA  + aCols[nIx][nPosCod] + aCols[nIx,nPosItem]) == oMulti:aCols[nIr,nPxKeySd1]
+							//MsgAlert(xFilial('SD2') + cNFiscal + cSerie + CA100FOR + CLOJA  + aCols[nIx][nPosCod] + aCols[nIx,nPosItem],oMulti:aCols[nIr,nPxKeySd1])
+							If !lIsA2SIMPN
+								If nPosbIPI > 0
+									aCols[nIx][nPosBIPI]:= oMulti:aCols[nIr,nPxBasIpi]
+								Endif
+
+								MaFisAlt("IT_BASEIPI",oMulti:aCols[nIr,nPxBasIpi],nIx)
+
+								If nPosPIPI > 0
+									aCols[nIx][nPosPIPI]:= oMulti:aCols[nIr,nPxPIpi]
+								Endif
+								MaFisAlt("IT_ALIQIPI",oMulti:aCols[nIr,nPxPIpi],nIx)
+
+								If nPosVIPI > 0
+									aCols[nIx][nPosVIPI]:= oMulti:aCols[nIr,nPxValIpi]
+								Endif
+								MaFisAlt("IT_VALIPI",oMulti:aCols[nIr,nPxValIpi],nIx)
+
+								If nPosBIcm > 0
+									aCols[nIx][nPosBIcm]:= oMulti:aCols[nIr,nPxBasIcm]
+								Endif
+								MaFisAlt("IT_BASEICM",oMulti:aCols[nIr,nPxBasIcm],nIx)
+
+								If nPosPIcm > 0
+									aCols[nIx][nPosPIcm]:= oMulti:aCols[nIr,nPxPicm]
+								Endif
+								MaFisAlt("IT_ALIQICM",oMulti:aCols[nIr,nPxPicm],nIx)
+
+								If nPosVIcm > 0
+									aCols[nIx][nPosVIcm]:= oMulti:aCols[nIr,nPxValIcm]
+								Endif
+								MaFisAlt("IT_VALICM",oMulti:aCols[nIr,nPxValIcm],nIx)
+							Else
+								// Atualiza ICMS conforme crédito permitido no XML da nota 
+								If nPosBIcm > 0
+									aCols[nIx][nPosBIcm]:= oMulti:aCols[nIr,nPxTotNfe]
+								Endif
+								MaFisAlt("IT_BASEICM",oMulti:aCols[nIr,nPxTotNfe],nIx)
+
+								If nPosPIcm > 0
+									aCols[nIx][nPosPIcm]:= oMulti:aCols[nIr,nPxPIcmSN]
+								Endif
+								MaFisAlt("IT_ALIQICM",oMulti:aCols[nIr,nPxPIcmSN],nIx)
+
+								If nPosVIcm > 0
+									aCols[nIx][nPosVIcm]:= oMulti:aCols[nIr,nPxCrdIcmSN]
+								Endif
+								MaFisAlt("IT_VALICM",oMulti:aCols[nIr,nPxCrdIcmSN],nIx)
+							Endif
+							If oMulti:aCols[nIr,nPxMva] > 0
+								If nPosMva > 0
+									aCols[nIx][nPosMva]	:= oMulti:aCols[nIr,nPxMva]
+								Endif
+								MaFisAlt("IT_MARGEM",oMulti:aCols[nIr,nPxMva],nIx)
+							Endif
+							If nPosBricms > 0
+								aCols[nIx][nPosBricms]:= oMulti:aCols[nIr,nPxBasRet]
+							Endif
+							MaFisAlt("IT_BASESOL",oMulti:aCols[nIr,nPxBasRet],nIx)
+
+							If nPosIcmRet > 0
+								aCols[nIx][nPosIcmRet]:= oMulti:aCols[nIr,nPxIcmRet]
+							Endif
+							MaFisAlt("IT_VALSOL",oMulti:aCols[nIr,nPxIcmRet],nIx)
+
+						Endif
+					Next
+				Next nIx
+			Endif
+		Endif
+	Endif
+
+	If Type("oMulti") <> "U"
+		Aadd(aButtons,{"BUDGET",{|| sfVldImp() },"Conferir itens e impostos","Conferir Impostos"})
+	Endif
+
+	// Verifica se o cliente não tem primeiro o programa com o prefixo Z - Especifico para clientes que já usaram o prefixo X em outra customização
+	If ExistBlock( "ZMA103BUT" )
+		aUsButtons := ExecBlock( "ZMA103BUT", .F., .F.,{aInfo} )
+		If Type("aUsButtons") == "A"
+			AEval( aUsButtons, { |x| AAdd( aButtons, x ) } )
+		Endif
+	Else
+		// Executa Ponto de Entrada do Cliente
+		If ExistBlock( "XMA103BUT" )
+			aUsButtons := ExecBlock( "XMA103BUT", .F., .F.,{aInfo} )
+			If Type("aUsButtons") == "A"
+				AEval( aUsButtons, { |x| AAdd( aButtons, x ) } )
+			Endif
+		EndIf
+	Endif
+Endif
+//FIM - CENTRAL XML
+
+Return aButtons
+
+
+/*/{Protheus.doc} RetTipoCTE
+(long_description)
+@type function
+@author marce
+@since 20/02/2017
+@version 1.0
+@param cCTE, character, (Descrição do parâmetro)
+@return ${return}, ${return_description}
+@example
+(examples)
+@see (links_or_references)
+/*/
+Static Function RetTipoCTE(cCTE)
+ 
+//INICIO - CENTRAL XML
+Local aCombo1  :={}
+Local aComboCte:={}
+Local cTPCTE   := ""
+Local nCT      := 0
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	If SF1->(FieldPos("F1_TPCTE"))>0
+		aCombo1:=x3CboxToArray("F1_TPCTE")[1]
+		aSize(aComboCte,Len(aCombo1)+1)
+		For nCT:=1 to Len(aComboCte)
+			aComboCte[nCT]:=IIf(nCT==1," ",aCombo1[nCT-1])
+		Next nCT
+		nCT:=Ascan(aComboCTE, {|x| Substr(x,1,1) == cCTE})
+		If nCT>0
+			cTPCTE:=aComboCte[nCT]
+		EndIf
+	EndIf
+EndIf
+//FIM - CENTRAL XML
+
+Return cTPCTE
+
+
+Static Function sfVldImp()
+
+//INICIO - CENTRAL XML
+Local	lRet	:= .T. 
+Local	nContAut	:= 0
+Private	lRecursivo	:= .F.                                                                    
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	While lRet 
+		lRet := sfRtVldImp()
+		nContAut++
+		
+		If nContAut > 100 
+			If MsgYesNo("Já foram mais de 100 interações em modo automático. Deseja continuar mesmo assim?")
+				nContAut	:= 0
+			Else
+				lRet :=	.F.			
+			Endif
+		Endif
+	Enddo
+EndIf
+//FIM - CENTAL XML
+Return 
+
+
+Static Function sfRtVldImp()
+
+//INICIO - CENTRAL XML
+Local	lRet		:= .F.
+Local	aAreaOld	:= GetArea()
+Local	nIx,nIr
+
+Local	oDlgDiv
+Local	lLbx
+Local 	nPosNfOri 	:= aScan(aHeader,{|x| AllTrim(x[2]) == "D1_NFORI"} )
+Local 	nPosSerOri	:= aScan(aHeader,{|x| AllTrim(x[2]) == "D1_SERIORI"} )
+Local 	nPosItOri	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_ITEMORI'})
+Local 	nPosCod		:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_COD'})
+Local	nPosMva		:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_MARGEM'})
+Local	nPosItem	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_ITEM'})
+Local	nPosBIcm	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_BASEICM'})
+Local	nPosPIcm	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_PICM'})
+Local	nPosVIcm	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_VALICM'})
+Local	nPosBIPI	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_BASEIPI'})
+Local	nPosPIPI	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_IPI'})
+Local	nPosVIPI	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_VALIPI'})
+Local	nPosBricms	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_BRICMS'})
+Local	nPosIcmRet	:= aScan(aHeader,{|x| AllTrim(x[2]) == 'D1_ICMSRET'})
+Local	lIsA2SIMPN	:= MaFisRet(,'NF_SIMPNAC') == "1"  // Verifica se o fornecedor é Optante do Simples Nacional
+Local	nTamD1		:= Len(SD1->D1_FILIAL+SD1->D1_DOC+SD1->D1_SERIE+SD1->D1_FORNECE+SD1->D1_LOJA+SD1->D1_COD+SD1->D1_ITEM)
+Private oLbx		
+Private	aDiverg		:= {}
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML
+	For nIx	:= 1 To Len(aCols)			//
+		For nIr := 1 To Len(oMulti:aCols) // /Chave SD1 - D1_FILIAL+D1_DOC+D1_SERIE+D1_FORNECE+D1_LOJA+D1_COD+D1_ITEM
+			If Padr(xFilial('SD1') + cNFiscal + cSerie + CA100FOR + CLOJA  + aCols[nIx][nPosCod] + aCols[nIx,nPosItem],nTamD1) == Padr(oMulti:aCols[nIr,nPxKeySd1],nTamD1)
+				//If (xFilial('SD1') + cNFiscal + cSerie + CA100FOR + CLOJA  + aCols[nIx][nPosCod] + aCols[nIx,nPosItem]) == oMulti:aCols[nIr,nPxKeySd1]
+				If oMulti:aCols[nIr,nPxBasIpi] <> MaFisRet(nIx,"IT_BASEIPI")
+					Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+					aCols[nIx][nPosCod],;			// Código Produto
+					"Base IPI",;					// Tipo de Divergência
+					MaFisRet(nIx,"IT_BASEIPI"),;	// Valor da Nota
+					oMulti:aCols[nIr,nPxBasIpi],;	// Valor no Xml
+					"IT_BASEIPI",;
+					nIx,;
+					nPosBIPI}) 
+				Endif 
+				If nPosPIPI > 0
+					If oMulti:aCols[nIr,nPxPIpi] <> MaFisRet(nIx,"IT_ALIQIPI")
+						Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+						aCols[nIx][nPosCod],;			// Código Produto
+						"% IPI",;					// Tipo de Divergência
+						MaFisRet(nIx,"IT_ALIQIPI"),;	// Valor da Nota
+						oMulti:aCols[nIr,nPxPIpi],;	// Valor no Xml
+						"IT_ALIQIPI",;
+						nIx,;
+						nPosPIPI})
+					Endif 
+				Endif 
+				//MaFisAlt("IT_VALIPI",oMulti:aCols[nIr,nPxValIpi],nIx)
+				If oMulti:aCols[nIr,nPxValIpi] <> MaFisRet(nIx,"IT_VALIPI")
+					Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+					aCols[nIx][nPosCod],;			// Código Produto
+					"Valor IPI",;					// Tipo de Divergência
+					MaFisRet(nIx,"IT_VALIPI"),;	// Valor da Nota
+					oMulti:aCols[nIr,nPxValIpi],;	// Valor no Xml
+					"IT_VALIPI",;
+					nIx,;
+					nPosVIPI})
+				Endif 
+				//MaFisAlt("IT_BASEICM",oMulti:aCols[nIr,nPxBasIcm],nIx)
+				If oMulti:aCols[nIr,nPxBasIcm] <> MaFisRet(nIx,"IT_BASEICM")
+					Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+					aCols[nIx][nPosCod],;			// Código Produto
+					"Base ICMS",;					// Tipo de Divergência
+					MaFisRet(nIx,"IT_BASEICM"),;	// Valor da Nota
+					oMulti:aCols[nIr,nPxBasIcm],;	// Valor no Xml
+					"IT_BASEICM",;
+					nIx,;
+					nPosBIcm}) 
+				Endif 
+				If !lIsA2SIMPN
+					//MaFisAlt("IT_VALICM",oMulti:aCols[nIr,nPxPicm],nIx)
+					If oMulti:aCols[nIr,nPxValIcm] <> MaFisRet(nIx,"IT_VALICM")
+						Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+						aCols[nIx][nPosCod],;			// Código Produto
+						"Valor ICMS",;					// Tipo de Divergência
+						MaFisRet(nIx,"IT_VALICM"),;	// Valor da Nota
+						oMulti:aCols[nIr,nPxValIcm],;	// Valor no Xml
+						"IT_VALICM",;
+						nIx,;
+						nPosVIcm}) 
+					Endif 
+					If nPosPIcm > 0
+						If oMulti:aCols[nIr,nPxPicm] <> MaFisRet(nIx,"IT_ALIQICM")
+							Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+							aCols[nIx][nPosCod],;			// Código Produto
+							"% ICMS",;					// Tipo de Divergência
+							MaFisRet(nIx,"IT_ALIQICM"),;	// Valor da Nota
+							oMulti:aCols[nIr,nPxPicm],;	// Valor no Xml
+							"IT_ALIQICM",;
+							nIx,;
+							nPosPIcm}) 
+						Endif 
+					Endif
+
+				Else
+					//MaFisAlt("IT_ALIQICM",oMulti:aCols[nIr,nPxCrdIcmSN],nIx)
+					If oMulti:aCols[nIr,nPxCrdIcmSN] <> MaFisRet(nIx,"IT_VALICM")
+						Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+						aCols[nIx][nPosCod],;			// Código Produto
+						"Valor ICMS",;					// Tipo de Divergência
+						MaFisRet(nIx,"IT_VALICM"),;	// Valor da Nota
+						oMulti:aCols[nIr,nPxCrdIcmSN],;	// Valor no Xml
+						"IT_VALICM",;
+						nIx,;
+						nPosVIcm}) 
+					Endif 
+				Endif
+
+				//MaFisAlt("IT_BASESOL",oMulti:aCols[nIr,nPxBasRet],nIx)
+				If oMulti:aCols[nIr,nPxBasRet] <> MaFisRet(nIx,"IT_BASESOL")
+					Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+					aCols[nIx][nPosCod],;			// Código Produto
+					"Base ICMS ST",;				// Tipo de Divergência
+					MaFisRet(nIx,"IT_BASESOL"),;	// Valor da Nota
+					oMulti:aCols[nIr,nPxBasRet],;	// Valor no Xml
+					"IT_BASESOL",;
+					nIx,;
+					nPosBricms}) 
+				Endif 
+				If oMulti:aCols[nIr,nPxMva] > 0
+					If nPosMva > 0
+						If oMulti:aCols[nIr,nPxMva] <> MaFisRet(nIx,"IT_MARGEM")
+							Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+							aCols[nIx][nPosCod],;			// Código Produto
+							"% MVA ",;				// Tipo de Divergência
+							MaFisRet(nIx,"IT_MARGEM"),;	// Valor da Nota
+							oMulti:aCols[nIr,nPxMva],;	// Valor no Xml
+							"IT_MARGEM",;
+							nIx,;
+							nPosMva}) 
+						Endif 
+					Endif
+					//MaFisAlt("IT_MARGEM",oMulti:aCols[nIr,nPxMva],nIx)
+				Endif
+
+				//MaFisAlt("IT_VALSOL",oMulti:aCols[nIr,nPxIcmRet],nIx)
+				If oMulti:aCols[nIr,nPxIcmRet] <> MaFisRet(nIx,"IT_VALSOL")
+					Aadd(aDiverg,{	aCols[nIx,nPosItem],;			// Item 
+					aCols[nIx][nPosCod],;			// Código Produto
+					"Valor ICMS ST",;				// Tipo de Divergência
+					MaFisRet(nIx,"IT_VALSOL"),;	// Valor da Nota
+					oMulti:aCols[nIr,nPxIcmRet],;	// Valor no Xml
+					"IT_VALSOL",;
+					nIx,;
+					nPosIcmRet})
+				Endif 
+			Endif
+		Next
+	Next
+
+	If Len(aDiverg) == 0 
+		MsgInfo("Não houveram diferenças entre os impostos",ProcName(0)+"."+ Alltrim(Str(ProcLine(0))))
+		RestArea(aAreaOld)
+		Return lRet
+	Endif
+	
+	If !lRecursivo
+		DEFINE MSDIALOG oDlgDiv TITLE "Divergência de Impostos" FROM 0,0 TO 240,600 Of oMainWnd PIXEL
+
+		@ 10,10 LISTBOX oLbx FIELDS HEADER "Item","Produto","Tipo Divergência","Valor na Nota","Valor no XML" SIZE 285,095 OF oDlgDiv PIXEL
+
+		oLbx:SetArray( aDiverg )                                       
+
+		oLbx:bLine := {|| { aDiverg[oLbx:nAt,1],;
+		aDiverg[oLbx:nAt,2],;
+		aDiverg[oLbx:nAt,3],;
+		Transform(aDiverg[oLbx:nAt,4],"@E 9,999,999.99"),;
+		Transform(aDiverg[oLbx:nAt,5],"@E 9,999,999.99")}}
+
+
+		@ 107,010 Button oTodos Prompt "Ajustar Todos" Size 45,10 Action (lRet := .T.,lRecursivo := .T. ,oDlgDiv:End()) OF oDlgDiv Pixel
+		
+		@ 107,060 Button oOnly PROMPT "Ajustar Item" Size 45,10 Action (lRet := .T.,sfAtuDif(oLbx:nAt),oDlgDiv:End(),(aCols[aDiverg[oLbx:nAt,7]][aDiverg[oLbx:nAt,8]] := aDiverg[oLbx:nAt,5] , MaFisAlt(aDiverg[oLbx:nAt,6],aDiverg[oLbx:nAt,5],aDiverg[oLbx:nAt,7]),Eval(bRefresh)))  OF oDlgDiv Pixel
+		
+		@ 107,110 Button oTodos PROMPT "Ajustar Todos" Size 45,10 Action oDlgDiv:End() OF oDlgDiv Pixel 
+		
+		ACTIVATE MSDIALOG oDlgDiv CENTER
+
+	Else
+		sfAtuDif(1)
+		aCols[aDiverg[1,7]][aDiverg[1,8]] := aDiverg[1,5] 
+		MaFisAlt(aDiverg[1,6],aDiverg[1,5],aDiverg[1,7])
+		Eval(bRefresh)
+		lRet := .T.
+	Endif
+		
+	RestArea(aAreaOld)
+EndIf
+//FIM - CENTRAL XML
+
+Return lRet
+
+Static Function sfAtuDif(nLinAtu)
+ 
+//INICIO - CENTRAL XML
+Local		cChvNfe		:= aArqXml[oArqXml:nAt,nPosChvNfe]
+Local		cItemNfe	:= aDiverg[nLinAtu,1]
+Local		cInCpoAlt	:= aDiverg[nLinAtu,6]
+Local		cInVlAnt	:= cValToChar(aDiverg[nLinAtu,4])
+Local		cInVlNew	:= cValToChar(aDiverg[nLinAtu,5])                              
+
+If SUPERGETMV("MV_P_00118", .F. , .F. )	//Valida se está habilitado para uso da central XML	
+	aRestPerg	:= StaticCall(CRIATBLXML,RestPerg,.T./*lSalvaPerg*/,/*aPerguntas*/,/*nTamSx1*/)
+	Pergunte("XMLDCONDOR",.F.)
+	// Reposiciona o registro da chave eletronica
+	U_DbSelArea("CONDORXML",.F.,1)
+	Set Filter To
+	If DbSeek(cChvNfe)//aDanfe[13])
+		// Grava divergencia, forçando o lançamento semi-automático
+		StaticCall(XMLDCONDOR,sfAtuXmlOk,"DT"/*cOkMot*/,;
+		.T./*lAtuItens*/,;
+		cItemNfe/*cItem*/,;
+		/*cMsgAux*/,;
+		/*nLinXml*/,;
+		cChvNfe,;//aDanfe[13]/*cInChave*/,;
+		/*lAtuOk*/,;
+		/*cInAssunto*/,;
+		/*cDestMail*/,;
+		cInCpoAlt,;
+		cInVlAnt,;
+		cInVlNew)
+	Endif
+	lRet	:= .F.
+	StaticCall(CRIATBLXML,RestPerg,/*lSalvaPerg*/,aRestPerg/*aPerguntas*/,/*nTamSx1*/)
+EndIf
+//FIM - CENTRAL XML
+
+Return
