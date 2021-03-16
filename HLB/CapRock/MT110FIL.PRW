@@ -12,11 +12,9 @@ Local cIdGestor := SuperGetMV("MV__GERCOM", .F.,"000898/000899/000900/000901")
 Local aAlias    := GetArea()
 
 If cEmpAnt $ "XF"   
-
     If! __cUserId $ AllTrim(cIdGestor)
         cFiltro:="C1_USER ='"+__cUserId+"'"  
     EndIf    
-
 EndIf
 
 RestArea(aAlias)
