@@ -33,7 +33,7 @@ Private aMsgSch  := {}
 
 Private cCadastro  := STR0001 // "Retorno Bancario Automatico (Pagar)"
 
-ConOut("*** CUSTOMIZA플O EZ4 "+cCadastro+Dtoc(Date())+" "+Time())
+ConOut("*** CUSTOMIZA플O EZ4 "+cCadastro+Dtoc(Date())+" "+Time()+" LINHA: 36")
 
 if Valtype(aParam) <> "A"
 	ConOut("*** - "+STR0002) // "Processo pode ser executado apenas via Schedule"
@@ -56,7 +56,7 @@ If Empty(GetMv("MV_RETMAIL",, "")) .and. Len(aMsgSch) > 0
 	Next
 EndIf
 
-ConOut("*** CUSTOMIZA플O EZ4 "+cCadastro+Dtoc(Date())+" "+Time())
+ConOut("*** CUSTOMIZA플O EZ4 "+cCadastro+Dtoc(Date())+" "+Time()+" LINHA: 59")
 
 Return Nil
 
@@ -159,12 +159,8 @@ Do While (cAlias)->( ! Eof())
 			If SX1->( DbSeek(PadR( cPerg, Len(SX1->X1_GRUPO)) +Strzero(nB,2)))
 				Reclock("SX1",.F.)
 				ConOut("## EZ4 - FINA430: "+CVALTOCHAR(nB)+" = "+CVALTOCHAR(aVetPar[nB,2]))
-				if nB == 3 
 					SX1->X1_CNT01 := SUBSTR(aVetPar[nB,2],1,60)
 					SX1->X1_CNT02 := SUBSTR(aVetPar[nB,2],61)
-				Else
-					SX1->X1_CNT01 := aVetPar[nB,2]
-				EndIf
 
 				if SX1->X1_GSC == "C"
 					SX1->X1_PRESEL := Val(aVetPar[nB,2])
@@ -190,12 +186,9 @@ Do While (cAlias)->( ! Eof())
 			If SX1->( DbSeek(PadR("FIN650", Len(SX1->X1_GRUPO)) +Strzero(nB,2)))
 				Reclock("SX1",.F.)
 				ConOut("## EZ4 - FINR650: "+CVALTOCHAR(nB)+" = "+CVALTOCHAR(aVet650[nB,2]))
-				if nB == 1 
 					SX1->X1_CNT01 := SUBSTR(aVet650[nB,2],1,60)
 					SX1->X1_CNT02 := SUBSTR(aVet650[nB,2],61)
-				Else
-					SX1->X1_CNT01 := aVet650[nB,2]
-				EndIf
+
 				if SX1->X1_GSC == "C"
 					SX1->X1_PRESEL := Val(aVet650[nB,2])
 				Endif	
@@ -217,7 +210,7 @@ Do While (cAlias)->( ! Eof())
 		FINA430()
 
 //		if Len(aMsgSch) > 0 .or. Len(aFA205R) > 0
-		FA205MAIL(STR0001,aVetPar[03,2],aMsgSch) // "Retorno Bancario Automatico (Pagar)"
+		//FA205MAIL(STR0001,aVetPar[03,2],aMsgSch) // "Retorno Bancario Automatico (Pagar)"
 		
 		if Len(aMsgSch) == 0
 			// copia o arquivo para o diretorio de backup

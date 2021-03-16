@@ -49,7 +49,7 @@ Else
 	Do Case
 		//Contas a Receber
 		//Baixas a Receber
-		Case cRotina == "FINA070"
+		Case cRotina $  "FINA070/FINA740"
 			cRet := Alltrim(SE1->E1_TIPO)+" "+Alltrim(SE1->E1_NUM)+" - "+POSICIONE("SED",1,XFILIAL("SED")+ SE1->E1_NATUREZ,"ED_DESCRIC")
 		//Comentado porque ao clicar no Baixas automáticos era posicionado no título que estava selecionado no browser e não no que seria baixado. 
 		//Baixas Rec Automat
@@ -61,7 +61,7 @@ Else
 		
 		//Contas a Pagar
 		//Baixas Pagar Man
-		Case cRotina == "FINA080"
+		Case cRotina $ "FINA080/FINA750"  //CAS - 29/01/2021 - Adicionado o função FINA750
 			cRet := Alltrim(SE2->E2_TIPO)+" "+Alltrim(SE2->E2_NUM)+" - "+POSICIONE("SED",1,XFILIAL("SED")+ SE2->E2_NATUREZ,"ED_DESCRIC")
 		//Comentado porque ao clicar no Baixas automáticos era posicionado no título que estava selecionado no browser e não no que seria baixado.
 		//Baixas Pagar Autom

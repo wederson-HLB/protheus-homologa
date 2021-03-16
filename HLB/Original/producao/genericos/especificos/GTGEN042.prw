@@ -16,10 +16,10 @@ Local aAreaSD1 := GetArea()
 
 If !lFluig 
 	Return
-Endif
+Endif 
 
-If IsInCallStack("U_GTGEN047") 
-   Return 
+If IsInCallStack("U_GTGEN047") .Or. IsInCallStack("U_Q6EST001")
+   Return                                                                 	
 EndIf
 
 Private nNumFluig := 0
@@ -33,13 +33,13 @@ Private cFilDoc := SF1->F1_FILIAL
 If SD1->(FieldPos("D1_P_NUMFL"))>0
 	nNumFluig := posicione("SD1",1,xFilial("SD1")+cNum+cSer+cFor+cLoj,"D1_P_NUMFL")  //SD1->D1_P_NUMFL	
 Else
-	MsgInfo("O campo do Numero do Num.ID não existe.","Aviso") //MSN - 16/07/2019 - Ateração de Num.Fluig para Num. ID TICKET - #13548
+	MsgInfo("O campo de Numero do Fluig não existe.","Aviso")
 	Return
 Endif
 	
 Static oDlg
   
-  DEFINE MSDIALOG oDlg TITLE "Número Num.ID" FROM 000, 000  TO 245, 285 COLORS 0, 16777215 PIXEL    //MSN - 16/07/2019 - Ateração de Num.Fluig para Num. ID TICKET - #13548
+  DEFINE MSDIALOG oDlg TITLE "Número Fluig" FROM 000, 000  TO 245, 285 COLORS 0, 16777215 PIXEL
     //Grupo dados da NF
     @ 004, 004 GROUP oGroup1 TO 040, 140 OF oDlg COLOR 0, 16777215 PIXEL
     @ 008, 010 SAY oSay4 PROMPT "Documento : "+alltrim(cNum)+"" SIZE 060, 008 OF oDlg COLORS 0, 16777215 PIXEL
@@ -48,11 +48,11 @@ Static oDlg
     @ 028, 070 SAY oSay7 PROMPT "Loja : "+alltrim(cLoj)+"" SIZE 060, 008 OF oDlg COLORS 0, 16777215 PIXEL
     //Grupo Fluig
     @ 044, 004 GROUP oGroup2 TO 100, 140 OF oDlg COLOR 0, 16777215 PIXEL
-    @ 050, 010 SAY oSay1 PROMPT "Favor informar o número do Num.ID, " SIZE 123, 009 OF oDlg COLORS 0, 16777215 PIXEL 					//MSN - 16/07/2019 - Ateração de Num.Fluig para Num. ID TICKET - #13548
+    @ 050, 010 SAY oSay1 PROMPT "Favor informar o número da solicitação do Fluig, " SIZE 123, 009 OF oDlg COLORS 0, 16777215 PIXEL
     @ 060, 010 SAY oSay2 PROMPT "este será replicado para todos os itens da NF e" SIZE 123, 009 OF oDlg COLORS 0, 16777215 PIXEL
     @ 070, 010 SAY oSay3 PROMPT "será utilizado para consultas no próprio Protheus." SIZE 123, 009 OF oDlg COLORS 0, 16777215 PIXEL
 	//Grupo Dados Fluig
-    @ 083, 015 SAY oSay8 PROMPT "Num. ID :" SIZE 032, 010 OF oDlg COLORS 0, 16777215 PIXEL
+    @ 083, 015 SAY oSay8 PROMPT "Num. Fluig :" SIZE 032, 010 OF oDlg COLORS 0, 16777215 PIXEL
     @ 083, 049 MSGET oGet1 VAR nNumFluig SIZE 051, 010 OF oDlg COLORS 0, 16777215 PIXEL PICTURE "@E 99999999"
     @ 105, 045 BUTTON oButton1 PROMPT "Confirmar" Action ExecNFluig() SIZE 054, 011 OF oDlg PIXEL
 
@@ -63,7 +63,7 @@ Return
 
 /*
 Funcao      : ExecNFluig()
-Objetivos   : Rotina que executa a alteração do numero do ID em cada item do documento de entrada.               //MSN - 16/07/2019 - Ateração de Num.Fluig para Num. ID TICKET - #13548
+Objetivos   : Rotina que executa a alteração do numero do Fluig em cada item do documento de entrada.
 Autor       : Richard Steinhauser Busso
 Data/Hora   : 23/10/2017
 */

@@ -104,9 +104,10 @@ Local lEspecie   := .T.
 Local aProdAgrupa
 Local nPosCod
 Local aStProd 
+Local lUsaEnd  := (SuperGetMV("MV_LOCALIZ") == "S")
 
 /*
-	* Leandro Brito - Inclusao array de impostos, sempre serEo ultimo elemento do ParamIxb ( nfesefaz ), caso o padrão venha a ter novos elementos em uma futura versão
+	* Leandro Brito - Inclusao array de impostos, sempre serEo ultimo elemento do ParamIxb ( nfesefaz ), caso o padrão venha a ter novos elementos em uma futura versão
 */
 Local aCst			:= ParamIxb[ 21 ] 
 Local aIcms			:= ParamIxb[ 22 ] 
@@ -123,13 +124,15 @@ Local aPisAlqZ		:= ParamIxb[ 32 ]
 Local aCofAlqZ		:= ParamIxb[ 33 ] 
 Local aCsosn		:= ParamIxb[ 34 ] 
 
+Local cMensSer      := ""
+Local cNumSeq       := ""
 
 //Tratamentos customizados
 cNota   := aNota[2]
 cSerie  := aNota[1]
 
 If AllTrim(aNota[4]) == "1"
-	cEntSai := "S" //Saúa
+	cEntSai := "S" //Saúa
 Else
 	cEntSai := "E" //Entrada
 EndIf
@@ -170,7 +173,7 @@ If cEntSai == "E" //Nf de Entrada
 
 	For nI:=1 To Len(aProd)
 		
-		//RRP - 19/08/2013 - Verificando a nota se EDevolução ou Beneficiamento
+		//RRP - 19/08/2013 - Verificando a nota se EDevolução ou Beneficiamento
 		If !(SF1->F1_TIPO) $ "DB"
 			cSeek := xFilial("SD1")+cNota+cSerie+SA2->A2_COD+SA2->A2_LOJA+aProd[nI][2]+aInfoItem[nI][4]
 		Else
@@ -200,7 +203,7 @@ EndIf
 
 //Nf de Saida - RRP - 29/01/2014 - Customização para todos os clientes
 If cEntSai == "S"
-	//Retirada as empresas abaixo, pois jEpossuem a Tag xPed em suas customizações.
+	//Retirada as empresas abaixo, pois jEpossuem a Tag xPed em suas customizações.
 	If !(cEmpAnt) $ "EF/U6/3R/ED/I7"
 
 		//Informações do Produto
@@ -917,7 +920,7 @@ ElseIf cCodEmp == "R7"
 
 		lAgrupaIt := AllTrim( GetNewPar( "MV_P_AGRP" , "S" ) ) == "S"  //** Leandro Brito - 12/02/2018 - Agrupamento do itens mesmo codigo na NFS
 		
-		//posiciona no SA1, pois estEdisposicionado. 
+		//posiciona no SA1, pois estEdisposicionado. 
 		SA1->(DbSetOrder(1))
 		SA1->(DbSeek(xFilial("SA1")+SF2->F2_CLIENTE+SF2->F2_LOJA))
 		
@@ -1324,9 +1327,13 @@ ElseIf cEmpAnt == "OU"
 			If SD2->(DbSeek(xFilial("SD2")+cNota+cSerie+SA1->A1_COD+SA1->A1_LOJA+aProd[nI][2]+aInfoItem[nI][4]))
 				If !Empty(SD2->D2_LOTECTL)
 					If !Empty(aProd[nI][25])
-						aProd[nI][25] += " "
+						// Início - 01/09/2020 - Wederson L. Santana - Tratamento especpifico Unilevel
+			            cInfAd:= aProd[nI][25] 
+			            aProd[nI][25] := "NF: "+cNota+" SERIE: "+Replicate("0",3-Len(AllTrim(cSerie)))+Alltrim(cSerie)+" "+cInfAd
+			            // Fim - 01/09/2020 - Wederson L. Santana - Tratamento especpifico Unilevel 
+					Else
+                        aProd[nI][25] := "NF: "+cNota+" SERIE: "+Replicate("0",3-Len(AllTrim(cSerie)))+Alltrim(cSerie)+" Lote: "+Alltrim(SD2->D2_LOTECTL)
 					EndIf
-					aProd[nI][25] += "Lote: "+Alltrim(SD2->D2_LOTECTL)
 				EndIf	
 			EndIf			
 		Next
@@ -1351,7 +1358,74 @@ ElseIf cEmpAnt == "OU"
 		RestArea(aArea)
 
 	EndIf
-				
+
+//Marici
+ElseIf cCodEmp == "X2"
+
+	If cEntSai == "S" //Nf de Saida
+
+       For nI:=1 To Len(aProd)
+	   		If lUsaEnd
+          		SB1->(dbSetOrder(1))
+		  		If SB1->(dbSeek(xFilial("SB1")+aProd[nI][2]))
+				   If SB1->B1_LOCALIZ =="S"
+                      cMensSer :=""
+
+					  //C6_FILIAL, C6_NUM, C6_ITEM, C6_PRODUTO, R_E_C_N_O_, D_E_L_E_T_
+					  SC6->(dbSetOrder(1))
+					  If SC6->(dbSeek(xFilial("SC6")+aInfoItem[nI][1]+aInfoItem[nI][2]+aProd[nI][2]))
+                         If aNota[2]+aNota[1] == SC6->C6_NOTA+SC6->C6_SERIE
+                            If! Empty(SC6->C6_NUMSERI)
+                                cMensSer :=SC6->C6_NUMSERI
+							EndIf
+						 EndIf
+					  EndIf 
+                      
+					  If Empty(cMensSer)
+					     SD2->(dbSetOrder(8))
+					     If SD2->(dbSeek(xFilial("SD2")+aInfoItem[nI][1]+aInfoItem[nI][2]))
+					        cNumSeq:= AllTrim(SD2->D2_NUMSEQ)
+					     EndIf	 
+					     //DB_FILIAL, DB_PRODUTO, DB_DOC, DB_SERIE, DB_CLIFOR, DB_LOJA, DB_SERVIC, DB_TAREFA, DB_ATIVID, R_E_C_N_O_, D_E_L_E_T_
+                         SDB->(dbSetOrder(7))
+					     If SDB->(dbSeek(xFilial("SDB")+SB1->B1_COD+aNota[2]+aNota[1]))
+                            While !SDB->(Eof()) .And.xFilial("SDB")+SB1->B1_COD+aNota[2]+aNota[1] == SDB->DB_FILIAL+SDB->DB_PRODUTO+SDB->DB_DOC+SDB->DB_SERIE
+                               
+							      If cNumSeq == AllTrim(SDB->DB_NUMSEQ)
+							      	If SDB->DB_ESTORNO <> "S" .And.! Empty(SDB->DB_NUMSERI) 
+								    	 cMensSer+= Iif(Empty(cMensSer),"","-")+AllTrim(SDB->DB_NUMSERI)
+							      	EndIf
+								  EndIf	  
+                                  SDB->(dbSkip())
+						    End
+					     EndIf
+                      EndIf
+
+					  If! Empty(cMensSer)
+                          aProd[nI][25] += " Num. de serie: "+cMensSer
+					  EndIf
+
+                   EndIf 
+		  		EndIf 
+	   		EndIf
+
+       		SC6->(dbSetOrder(4))
+	   		If SC6->(dbSeek(xFilial("SC6")+aNota[2]+aNota[1]))
+		  		If! Empty(SC6->C6_XXREMOP) 
+			  		SC2->(dbSetOrder(1))
+			  		If SC2->(dbSeek(xFilial("SC2")+SC6->C6_XXREMOP))	   
+			     		SB1->(dbSetOrder(1))
+				 		If SB1->(dbSeek(xFilial("SB1")+SC2->C2_PRODUTO)) 
+				   			//NCM produto NF pai.
+           		    		aProd[nI][5]  := SB1->B1_POSIPI
+							aProd[nI][25] += " Remessa OP: "+SC2->C2_NUM   
+						EndIf    
+			  		EndIf 	   
+           		EndIf 
+	   		EndIf
+        Next 
+	EndIf
+	 
 //Intralox
 ElseIf cCodEmp == "U6"
 
@@ -2269,8 +2343,8 @@ ElseIf cCodEmp == "2C" //"4M"
 					SF4->(DbSetOrder(1))
 					If SF4->(DbSeek(xFilial("SF4")+aInfoItem[nI][3]))			
 						
-						//Tratamento para nota de saúa do armazem.
-						//Essa nota Eapenas para fins fiscais e portanto não atualiza estoque.
+						//Tratamento para nota de saúa do armazem.
+						//Essa nota Eapenas para fins fiscais e portanto não atualiza estoque.
 						//Porém por solicitação da Anvisa, possui tratamento customizado para impressão do lote.
 						If Alltrim(SF4->F4_ESTOQUE) == "N"
 
@@ -2284,7 +2358,7 @@ ElseIf cCodEmp == "2C" //"4M"
 							EndIf
 						
 						//Tratamento para nota de venda ao consumidor final.
-						//O item a seguir Eum componente e portanto não faz parte de um kit. 
+						//O item a seguir Eum componente e portanto não faz parte de um kit. 
 						Else
 							
 							aProd[nI][25] := aProd[nI][19]	
@@ -2379,7 +2453,7 @@ ElseIf cEmpAnt == "5F"
 
 	EndIf
 	
-	//Informações complementares do produto para notas de Saúas ou Entradas					
+	//Informações complementares do produto para notas de Saúas ou Entradas					
 	aArea:= SB5->(GetArea())
 
 	For nI:=1 To Len(aProd)
@@ -2437,7 +2511,7 @@ ElseIf cEmpAnt == "9N"
 
 	EndIf
 	
-	//RRP - 25/10/2013 - Informações complementares do produto para notas de Saúas ou Entradas. Chamado 015243.				
+	//RRP - 25/10/2013 - Informações complementares do produto para notas de Saúas ou Entradas. Chamado 015243.				
 	aArea:= SB5->(GetArea())
 
 	For nI:=1 To Len(aProd)
@@ -2598,7 +2672,7 @@ ElseIf cCodEmp == "TM"
 
 	endif   
 
-	//RRP - 29/08/2013 - Informações complementares do produto para notas de Saúas ou Entradas					
+	//RRP - 29/08/2013 - Informações complementares do produto para notas de Saúas ou Entradas					
 	aArea:= SB5->(GetArea())
 
 	For nI:=1 To Len(aProd)
@@ -2690,7 +2764,7 @@ ElseIf cCodEmp == "GX"//MERIT
 		RestArea(aArea)
 	EndIf
 	
-	//Informações complementares do produto para notas de Saúas ou Entradas
+	//Informações complementares do produto para notas de Saúas ou Entradas
 	aAreaB5:= SB5->(GetArea())
 						
 	For nI:=1 To Len(aProd)
@@ -3242,7 +3316,7 @@ ElseIf cCodEmp == "RY"
 //Caso a empresa nao tenha nenhum tratamento feito acima.
 Else
 
-	//RRP - 29/08/2013 - Informações complementares do produto para notas de Saúas ou Entradas					
+	//RRP - 29/08/2013 - Informações complementares do produto para notas de Saúas ou Entradas					
 	aArea:= SB5->(GetArea())
 
 	For nI:=1 To Len(aProd)
@@ -3314,7 +3388,7 @@ RETURN aRet
 ±±³          ³ o padrao do FisGetEnd                                             ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³ Obs.     ³ Esta funcao so pode ser usada quando ha um posicionamento de      ³±±
-±±³          ³ registro, pois serEverificado o ENDNOT do registro corrente      ³±±
+±±³          ³ registro, pois serEverificado o ENDNOT do registro corrente      ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³ Uso      ³ SIGAFIS-Copia do NFeSefaz                                         ³±±
 ±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±

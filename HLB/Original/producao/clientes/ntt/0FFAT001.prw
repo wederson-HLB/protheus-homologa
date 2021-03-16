@@ -7,10 +7,10 @@
 Funcao      : 0FFAT001
 Parametros  : 
 Retorno     : 
-Objetivos   : Impressão de Recibo de pagamento
+Objetivos   : Impressao de Recibo de pagamento
 Autor       : Renato Rezende
 Data/Hora   : 01/12/2014
-Módulo		: Faturamento
+Mï¿½dulo		: Faturamento
 Cliente		: NTT / 0F
 */
 *-------------------------*
@@ -21,7 +21,7 @@ Private cNotaDe		:= ""
 Private cNotaAte	:= ""
 Private cSerie		:= ""
 
-//Verifica se está na empresa NTT
+//Verifica se esta na empresa NTT
 IF cEmpAnt $ "0F" 
 	//Criando Pergunte
 	CriaPerg()
@@ -34,10 +34,10 @@ IF cEmpAnt $ "0F"
 	cNotaAte	:= mv_par02
 	cSerie		:= mv_par03
     
-	//Gerando consulta dos parâmetros selecionados
+	//Gerando consulta dos parametros selecionados
 	Processa({|| GeraConsulta() })
 Else
-	MsgInfo("Rotina não implamentada para empresa!","HLB BRASIL")
+	MsgInfo("Rotina nï¿½o implamentada para empresa!","HLB BRASIL")
 	Return .F.
 EndIf
 
@@ -47,10 +47,10 @@ Return .T.
 Funcao      : CriaRecibo
 Parametros  : Nenhum
 Retorno     : Nenhum
-Objetivos   : Carrega os dados para impressão do Recibo
+Objetivos   : Carrega os dados para impressao do Recibo
 Autor     	: Renato Rezende  	 	
 Data     	: 01/12/2014
-Módulo      : Faturamento.
+Mï¿½dulo      : Faturamento.
 Cliente     : NTT
 */
 *-----------------------------*
@@ -69,9 +69,9 @@ If File(cLocal+"totvsprinter\recibo.pdf")
 	FErase(cLocal+"totvsprinter\recibo.pdf")	
 EndIf
 
-//Relatório 
+//Relatorio 
 oRecibo:= FWMSPrinter():New("Recibo", IMP_PDF, lAdjustToLegacy,, lDisableSetup, , , , , , .F., )
-//Define orientação de página do relatório como retrato
+//Define orientacao de pagina do relatorio como retrato
 oRecibo:SetPortrait()
 
 SQL->(DbGoTop())
@@ -104,7 +104,7 @@ Retorno     : Nenhum
 Objetivos   : Imprimi o Recibo na tela
 Autor     	: Renato Rezende  	 	
 Data     	: 01/12/2014
-Módulo      : Faturamento.
+Mï¿½dulo      : Faturamento.
 Cliente     : NTT
 */
 *--------------------------------------------*
@@ -120,21 +120,21 @@ Local cTexto	:= ""
 Local cMenFixa	:= ""
 
 //Fontes
-//Fonte Courier New é Monospace, ou seja, todos os caracteres contém o mesmo tamanho.
+//Fonte Courier New  Monospace, ou seja, todos os caracteres contem o mesmo tamanho.
 oFont1 := TFont():New('Courier New',,-16,,.T.)
 oFont2 := TFont():New('Courier New',,-14,,.F.)
 
-//Inicia a impressão de uma nova página
+//Inicia a impressao de uma nova pï¿½gina
 oRecibo:StartPage()
 
-//Inicia a Impressão do Arquivo PDF.
+//Inicia a Impressao do Arquivo PDF.
 If File("FAT_LGRL"+cEmpAnt+".bmp")
 	oRecibo:SayBitmap(nLin,nCol+250,"FAT_LGRL"+cEmpAnt+".bmp",177,44)
 EndIf
 
-//Início do Recibo
+//Inicio do Recibo
 nLin += 80
-oRecibo:Say(nLin,nCol,"São Paulo, "+Day2Str(StoD(aDadosRec[2]))+" de "+MesExtenso(Month2Str(StoD(aDadosRec[2])))+" de "+Alltrim(Str(Year(StoD(aDadosRec[2])))),oFont2)
+oRecibo:Say(nLin,nCol,"Sao Paulo, "+Day2Str(StoD(aDadosRec[2]))+" de "+MesExtenso(Month2Str(StoD(aDadosRec[2])))+" de "+Alltrim(Str(Year(StoD(aDadosRec[2])))),oFont2)
 nLin += 60
 oRecibo:Say(nLin,nCol,PADC("RECIBO - R$ "+Alltrim(TRANSFORM((aDadosRec[4]),"@E 99,999,999,999.99")),57),oFont1)
 nLin += 15
@@ -146,12 +146,12 @@ cTexto:= "Recebemos da Empresa "+ UPPER(Alltrim(aDadosRec[6]))
 If !Empty(aDadosRec[7])
 	cTexto+= " (CNPJ.:"+Alltrim(TRANSFORM((aDadosRec[7]),"@R 99.999.999/9999-99"))+")"
 EndIf
-cTexto+= ", a importância supra de R$"+Alltrim(TRANSFORM((aDadosRec[4]),"@E 99,999,999,999.99"))+" ("+Alltrim(Extenso(aDadosRec[4]))+")"
+cTexto+= ", a importancia supra de R$"+Alltrim(TRANSFORM((aDadosRec[4]),"@E 99,999,999,999.99"))+" ("+Alltrim(Extenso(aDadosRec[4]))+")"
 //Mensagem do Pedido de Venda. 
 If !Empty(Alltrim(aDadosRec[5]))
 	cTexto+= ", "+Alltrim(aDadosRec[5])	
 EndIf
-cTexto+= ". Valor referente à Locação de Equipamento com o vencimento para o dia: " 
+cTexto+= ". Valor referente a Locacao de Equipamento com o vencimento para o dia: " 
 cTexto+= DtoC(StoD(aDadosRec[3]))+", conforme a Portaria SF 74/2003."
 
 //Imprimindo o Texto quebrando por linha
@@ -165,7 +165,7 @@ nLin += 45
 oRecibo:Say(nLin,nCol,"Para maior clareza, firmamos o presente recibo.",oFont2)
 nLin += 120
 
-//WFA - 13/02/2019 - Alteração da assinatura para a série R. Ticket: 2911.
+//WFA - 13/02/2019 - Alteracao da assinatura para a serie R. Ticket: 2911.
 If Alltrim(aDadosRec[9]) == 'R'
 	oRecibo:Say(nLin,nCol,"Valter Santos de Carvalho",oFont2)
 	nLin += 15
@@ -176,9 +176,9 @@ Else
 	oRecibo:Say(nLin,nCol,"Diretor Presidente.",oFont2) //JSS - 14/01/2015 Alterado de "Country Manager Brazil." para "Diretor Presidente." chamado 031395
 EndIf
 nLin += 15
-oRecibo:Say(nLin,nCol,"NTT do Brasil Telecomunicações Ltda.",oFont2)
+oRecibo:Say(nLin,nCol,"NTT do Brasil Telecomunicacoes Ltda.",oFont2)
 
-//Lei da transparência
+//Lei da transparï¿½ncia
 If aDadosRec[8] == "F" //Tipo do Cliente
 	SF2->(DbSetOrder(1))                                                                                                  
  	If SF2->(DbSeek(xFilial("SF2")+SQL->F2_DOC+SQL->F2_SERIE+SQL->F2_CLIENTE+SQL->F2_LOJA))
@@ -193,7 +193,7 @@ EndIf
 nLin += 120
 oRecibo:Say(nLin,nCol,cMenFixa,oFont2)
 
-//Indica o fim da página.
+//Indica o fim da pagina.
 oRecibo:EndPage()
  
 Return .T.
@@ -202,10 +202,10 @@ Return .T.
 Funcao      : GeraConsulta
 Parametros  : Nenhum
 Retorno     : Nenhum
-Objetivos   : Gera consulta para criação do Recibo
+Objetivos   : Gera consulta para criacao do Recibo
 Autor     	: Renato Rezende  	 	
 Data     	: 01/12/2014
-Módulo      : Faturamento.
+Mï¿½dulo      : Faturamento.
 Cliente     : NTT
 */
 *---------------------------------*
@@ -213,7 +213,7 @@ Cliente     : NTT
 *---------------------------------*
 Local cQuery := ""
 
-//Alias SQL está em uso
+//Alias SQL esta em uso
 If Select("SQL") > 0
 	SQL->(DbCloseArea())
 EndIf
@@ -241,16 +241,17 @@ If !EMPTY(Alltrim(cNotaAte))
 EndIf
 If !EMPTY(Alltrim(cSerie))
 	cQuery += "   AND SF2.F2_SERIE = '"+cSerie+"'" + CRLF
+	cQuery += " ORDER BY F2_DOC " + CRLF // Vitor EZ4 - inclusao em 04/03/2020
 EndIf
 
 TCQuery cQuery ALIAS "SQL" NEW
 
 SQL->(DbGoTop())
-//Verificando se gerou resultado para os parâmetros selecionados
+//Verificando se gerou resultado para os parï¿½metros selecionados
 If SQL->(!EOF()) .OR. SQL->(!BOF()) 
 	CriaRecibo("SQL")
 Else
-	Alert("Não foi encontrado registros. Por favor, verifique o filtro!")
+	Alert("Nao foi encontrado registros. Por favor, verifique o filtro!")
 	Return .F.
 EndIf
 
@@ -263,7 +264,7 @@ Retorno     : Nenhum
 Objetivos   : Cria o Pergunte 0FFAT1 no SX1
 Autor     	: Renato Rezende  	 	
 Data     	: 01/12/2014
-Módulo      : Faturamento.
+Modulo      : Faturamento.
 Cliente     : NTT
 */
 *-------------------------------*

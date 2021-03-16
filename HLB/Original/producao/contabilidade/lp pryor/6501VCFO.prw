@@ -49,7 +49,7 @@ _cTes1 := "08P/49P/48P/46O/"	                                            				 //
 
 _cfop3 := "1351/2351/1352/2352/1354/2354/1355/2355/1356/2356/"                               // COMPRA SERV.TRANSP   
                                                                                                                      
-_cfop4 := "/1556/2556/1653/2653/1922/1551/2551/1406/2406/1407/2407/"            	         // COMPRA MAT. CONSUMO 
+_cfop4 := "/1556/2556/1653/2653/1922/2922/1551/2551/1406/2406/1407/2407/1202"            	         // COMPRA MAT. CONSUMO 
 
 _cfop5 := "3101/3102/1117/"	                                                       		     // IMPORT.P/COMERC     
 
@@ -66,15 +66,32 @@ If EMPTY(SD1->D1_CONHEC)
 	!(SM0->M0_CODIGO $ 'JO/UY/SU') .OR. SF1->F1_TIPO $ 'D'
 		_valResult:=0     
 
-   // Paulo Silva = Chamado: #12087	
+    // Paulo Silva - EZ4 = Chamado: #12087	
        ELSEIF (ALLTRIM(SD1->D1_CF) $ _cfop7) .AND. (SM0->M0_CODIGO $ 'T4')
-    	_valResult:= SD1->D1_TOTAL		
+    	_valResult:= SD1->D1_TOTAL	
+		
+	// PAULO SILVA - EZ4 - SOLARIS RETENCAO DE IMPOSTOS 11/03/2020
+      ELSEIF (ALLTRIM(SD1->D1_CF) $ '1949/2949/3949/2933/1933/3933') .AND. SM0->M0_CODIGO $ 'HH/HJ'
+    //	_valResult:= SD1->D1_TOTAL-(SD1->D1_VALISS+SD1->D1_VALIRR+SD1->D1_VALINS)-SD1->D1_VALDESC
+	    _valResult:= SD1->D1_TOTAL
+	
+	// PAULO SILVA - EZ4 - Notas de Servicos - COGNIZANTE - S2 CH#21340 - RETENCAO DE IMPOSTOS 26/03/2020 (VALIDADO POR RAFAEL AZARIAS)
+      ELSEIF (ALLTRIM(SD1->D1_CF) $ '1353/2353/3353/1933/2933/3933/1923/2923/3923/1949/2949/3949/') .AND. SM0->M0_CODIGO $ 'S2'
+   	    _valResult:= SD1->D1_TOTAL
+
+    // PAULO SILVA - EZ4 - 19/01/2020  - #20752
+      ELSEIF (ALLTRIM(SD1->D1_TES) $ '2XT/2XS/2VO/2WM/2W9/3CW') .AND. SM0->M0_CODIGO $ 'HH/HJ'
+    //  _valResult:= SD1->D1_TOTAL		
+        _valResult:= (SD1->D1_TOTAL+SD1->D1_DESPESA+SD1->D1_VALFRE+SD1->D1_SEGURO+SD1->D1_VALIPI)-SD1->D1_VALDESC 
 
 	  ELSEIF SM0->M0_CODIGO == 'MN'                                        ///Alterado por Jo?.Silva
     	_valResult:= SD1->D1_TOTAL   
     	
       ELSEIF SM0->M0_CODIGO == 'EG' .AND. SD1->D1_TES == '2TM'   			//CAS - 24-01-2018 - Ticket #13281 - Ajuste nos lan?mentos padr?s que estavam errados.
-    	_valResult:= (SD1->D1_CUSTO)     		
+    	_valResult:= (SD1->D1_CUSTO)
+		   
+      ELSEIF SM0->M0_CODIGO == 'JO' .AND. SD1->D1_TES == '1RY'   			//PAULO SILVA - EZ4 - 07/04/2020 - Ticket #23045 - Ajuste nos lancamentos padrao que estavam errados. //VALIDADO JACQUELINE - MONSTER
+    	_valResult:= SD1->D1_TOTAL   		
      
       ELSEIF (ALLTRIM(SD1->D1_CF) $ '1551') .AND. SM0->M0_CODIGO == 'RW'   //solicitação Rodrigo Justo - A100ROW - Chamado 001019
     	_valResult:= (SD1->D1_CUSTO - SD1->D1_VALIMP5 - SD1->D1_VALIMP6)  
@@ -101,6 +118,8 @@ If EMPTY(SD1->D1_CONHEC)
 			//HMO - 16/08/2018 - Tratamento para Exeltis - ticket 42906.	
 			ElseIf cEmpAnt == 'LG' .AND. SD1->D1_TES == '1QG'
 				_valResult:= (SD1->D1_TOTAL)	 
+			ElseIf cEmpAnt == 'X2' //CAS - 14-12-2020 Ajuste para antender a empresa X2-Marici
+				_valResult:= (SD1->D1_TOTAL+SD1->D1_ICMSRET-SD1->D1_VALICM-SD1->D1_VALIMP5-SD1->D1_VALIMP6-SD1->D1_ICMSCOM)	
 			Else
 				_valResult:= (SD1->D1_TOTAL-SD1->D1_VALICM-SD1->D1_VALIMP5-SD1->D1_VALIMP6-SD1->D1_ICMSCOM-SD1->D1_VALIPI-SD1->D1_ICMSRET)
 			EndIf
@@ -112,8 +131,7 @@ If EMPTY(SD1->D1_CONHEC)
 	     _valResult:= SD1->D1_CUSTO + SD1->D1_VALICM
 	  
 	  //AOA - 22/04/2015 - Resolver chamado 025757
-	  ELSEIF  (ALLTRIM(SD1->D1_CF) $ _cfop4) .AND. SM0->M0_CODIGO $ '7F/JO/K1/50/HL/O5/OD/WA/BJ/9J/8Z/G2/N5/28/BI/MM/7N/S2/VW/XC/10/OU/EI/FG/H9/RY/NN/K2/BT/9X/IN/GN/4Z/SS/M1/RF/RT/ZJ/MR/ZR/MA/MB/S1/JV/40/ED/QU/7I/LB/JP/R7/DW/AT/26/SC/S6/2E/6Q/XR/7M/6T/TP/D8/7G/41/TM/UZ/HH/HJ/M7/QN/0F'		//CAS - 04/06/2019 - TAXID(abater o desconto)
-    
+	  ELSEIF  (ALLTRIM(SD1->D1_CF) $ _cfop4) .AND. SM0->M0_CODIGO $ '7F/JO/K1/50/HL/O5/OD/WA/BJ/9J/8Z/G2/N5/28/BI/MM/7N/S2/VW/XC/10/OU/EI/FG/H9/RY/NN/K2/BT/9X/IN/GN/4Z/SS/M1/RF/RT/ZJ/MR/ZR/MA/MB/S1/JV/40/ED/QU/7I/LB/JP/R7/DW/AT/26/SC/S6/2E/6Q/XR/7M/6T/TP/D8/7G/41/TM/UZ/HH/HJ/M7/QN/0F/8V/V6/V7/X3'		//CAS - 04/06/2019 - TAXID(abater o desconto)
          _valResult:= (SD1->D1_TOTAL+SD1->D1_DESPESA+SD1->D1_VALFRE+SD1->D1_SEGURO+SD1->D1_VALIPI)-SD1->D1_VALDESC       
 
       ELSEIF  ((ALLTRIM(SD1->D1_CF) $ _cfop1) .OR. (SD1->D1_TES$_cTes1)) 

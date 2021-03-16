@@ -7,13 +7,13 @@
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³ Programa  ³ 40FIN001().PRW ³ Autor ³               ³ Data ³ 21/09/2011 ³±±
+±±?Programa  ?40FIN001().PRW ?Autor ?              ?Data ?21/09/2011 ³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Descricao ³ Impressao de Boleto Bancario do Banco Itau      com Codigo ³±±
-±±³           ³ de Barras, Linha Digitavel e Nosso Numero.                 ³±±
-±±³           ³ Baseado no Fonte BOLITAU .                                 ³±±
+±±?Descricao ?Impressao de Boleto Bancario do Banco Itau      com Codigo ³±?
+±±?          ?de Barras, Linha Digitavel e Nosso Numero.                 ³±?
+±±?          ?Baseado no Fonte BOLITAU .                                 ³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso       ³ FINANCEIRO    asdf                                         ³±±
+±±?Uso       ?FINANCEIRO    asdf                                         ³±?
 ±±ÀÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
@@ -84,13 +84,13 @@ Return Nil
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³ Funcao    ³ MONTAREL()  ³ Autor ³                  ³ Data ³ 21/09/2011 ³±±
+±±?Funcao    ?MONTAREL()  ?Autor ?                 ?Data ?21/09/2011 ³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Descricao ³ Impressao de Boleto Bancario do Banco Santander com Codigo ³±±
-±±³           ³ de Barras, Linha Digitavel e Nosso Numero.                 ³±±
-±±³           ³ Baseado no Fonte BOLSANT de 01/08/2002 de Raimundo Pereira.³±±
+±±?Descricao ?Impressao de Boleto Bancario do Banco Santander com Codigo ³±?
+±±?          ?de Barras, Linha Digitavel e Nosso Numero.                 ³±?
+±±?          ?Baseado no Fonte BOLSANT de 01/08/2002 de Raimundo Pereira.³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso       ³ FINANCEIRO                                                 ³±±
+±±?Uso       ?FINANCEIRO                                                 ³±?
 ±±ÀÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
@@ -249,13 +249,19 @@ While xFilial("SE1") == SE1->E1_FILIAL .AND. SE1->E1_PREFIXO == MV_PAR01 .AND. S
 	DbSelectArea("SE1")
 	dbGoTo(_nRecSE1)
 	
-	CB_RN_NN := Ret_cBarra(aDadosBanco[1],aDadosBanco[3],aDadosBanco[4],aDadosBanco[5],cNroDoc,(E1_VALOR-_nVlrAbat),E1_VENCREA,aDadosBanco[6])
+	If SE1->E1_CLIENTE = "005699" .And. SE1->E1_LOJA = "01"
+		nSaldo 	:= (SE1->E1_SALDO - SE1->E1_IRRF )																//CAS - 26/02/2021 Ajuste para retornar o Valor Liquido no Boleto
+	Else
+		nSaldo 	:= ((E1_SALDO - _nVlrAbat-E1_DECRESC)+E1_ACRESC)												//CAS - 26/02/2021 Ajuste para retornar o Valor Liquido no Boleto
+	EndIf
+
+	CB_RN_NN := Ret_cBarra(aDadosBanco[1],aDadosBanco[3],aDadosBanco[4],aDadosBanco[5],cNroDoc,nSaldo,E1_VENCREA,aDadosBanco[6])	//CAS - 26/02/2021 Ajuste para retornar o Valor Liquido no Boleto
 	
 	aDadosTit := {	AllTrim(E1_NUM)+AllTrim(E1_PARCELA),;	        // [1] Numero do Titulo
 	E1_EMISSAO,;						                			// [2] Data da Emissao do Titulo
 	Date(),;								                		// [3] Data da Emissao do Boleto
 	E1_VENCREA,;										            // [4] Data do Vencimento
-	(E1_SALDO - _nVlrAbat),;					                	// [5] Valor do Titulo
+	nSaldo,;									                	// [5] Valor do Titulo											//CAS - 26/02/2021 Ajuste para retornar o Valor Liquido no Boleto
 	CB_RN_NN[3],;	                                                // [6] Nosso Numero (Ver Formula para Calculo)
 	E1_PREFIXO,;													// [7] Prefixo da NF
 	E1_TIPO}														// [8] Tipo do Titulo
@@ -281,13 +287,13 @@ RETURN nil
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³ Funcao    ³ IMPRESS()   ³ Autor ³ Flavio Novaes    ³ Data ³ 03/02/2005 ³±±
+±±?Funcao    ?IMPRESS()   ?Autor ?Flavio Novaes    ?Data ?03/02/2005 ³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Descricao ³ Impressao de Boleto Bancario do Banco Santander com Codigo ³±±
-±±³           ³ de Barras, Linha Digitavel e Nosso Numero.                 ³±±
-±±³           ³ Baseado no Fonte TBOL001 de 01/08/2002 de Raimundo Pereira.³±±
+±±?Descricao ?Impressao de Boleto Bancario do Banco Santander com Codigo ³±?
+±±?          ?de Barras, Linha Digitavel e Nosso Numero.                 ³±?
+±±?          ?Baseado no Fonte TBOL001 de 01/08/2002 de Raimundo Pereira.³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso       ³ FINANCEIRO                                                 ³±±
+±±?Uso       ?FINANCEIRO                                                 ³±?
 ±±ÀÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
@@ -345,7 +351,7 @@ oPrint:Say (0300,0100,aDatSacado[1],oFont10)				// [1] Nome
 oPrint:Say (0250,1060,"Vencimento",oFont8)
 oPrint:Say (0300,1060,STRZERO(day(aDadosTit[4],2),2)+"/"+STRZERO(month(aDadosTit[4],2),2)+"/"+STRZERO(year(aDadosTit[4],4),4),oFont10)
 oPrint:Say (0250,1510,"Valor do Documento",oFont8)
-oPrint:Say (0300,1550,AllTrim(Transform(nValor,"@E 999,999,999.99")),oFont10)
+oPrint:Say (0300,1550,AllTrim(Transform(aDadosTit[5],"@E 999,999,999.99")),oFont10)						//CAS - 26/02/2021 Ajuste para retornar o Valor Liquido no Boleto
 oPrint:Say (0400,0100,"Recebi(emos) o bloqueto/título",oFont10)
 oPrint:Say (0450,0100,"com as características acima.",oFont10)
 oPrint:Say (0350,1060,"Data",oFont8)
@@ -362,7 +368,7 @@ oPrint:Line(0350,1500,0150,1500) //--
 oPrint:Line(0550,1900,0150,1900)
 oPrint:Say (0150,1910,"(  )Mudou-se",oFont8)
 oPrint:Say (0190,1910,"(  )Ausente",oFont8)
-oPrint:Say (0230,1910,"(  )Não existe nº indicado",oFont8)
+oPrint:Say (0230,1910,"(  )Não existe n?indicado",oFont8)
 oPrint:Say (0270,1910,"(  )Recusado",oFont8)
 oPrint:Say (0310,1910,"(  )Não procurado",oFont8)
 oPrint:Say (0350,1910,"(  )Endereço insuficiente",oFont8)
@@ -422,7 +428,7 @@ oPrint:Say (_nLin+1010,0805,"R$",oFont10)
 oPrint:Say (_nLin+0980,1005,"Quantidade",oFont8)
 oPrint:Say (_nLin+0980,1555,"Valor",oFont8)
 oPrint:Say (_nLin+0980,1910,"Valor do Documento",oFont8)
-cString   := AllTrim(Transform(nValor,"@E 999,999,999.99"))
+cString   := AllTrim(Transform(aDadosTit[5],"@E 999,999,999.99"))									//CAS - 26/02/2021 Ajuste para retornar o Valor Liquido no Boleto
 nCol   	  := 1900+(374-(len(cString)*22))
 oPrint:Say (_nLin+1010,nCol,cString,oFont10)
 oPrint:Say (_nLin+1050,0100,"Instruções (Todas informações deste bloqueto são de exclusiva responsabilidade do Beneficiário)",oFont8)
@@ -503,7 +509,7 @@ oPrint:Say (_nLin+2300,0805,"R$",oFont10)
 oPrint:Say (_nLin+2270,1005,"Quantidade",oFont8)
 oPrint:Say (_nLin+2270,1555,"Valor",oFont8)
 oPrint:Say (_nLin+2270,1910,"Valor do Documento",oFont8)
-cString   := AllTrim(Transform(nValor,"@E 999,999,999.99"))
+cString   := AllTrim(Transform(aDadosTit[5],"@E 999,999,999.99"))									//CAS - 26/02/2021 Ajuste para retornar o Valor Liquido no Boleto
 nCol   	  := 1900+(374-(len(cString)*22))
 oPrint:Say (_nLin+2300,nCol,cString,oFont10)
 oPrint:Say (_nLin+2340,0100,"Instruções (Todas informações deste bloqueto são de exclusiva responsabilidade do Beneficiário)",oFont8)
@@ -537,25 +543,25 @@ MSBAR("INT25"  ,27.8,1.5,CB_RN_NN[1],oPrint,.F.,,,,1.4,,,,.F.)
 //MSBAR("INT25"  ,13.8,0.4,CB_RN_NN[1],oPrint,.F.,,,,1.4,,,,.F.)
 
 /*
-±±³Parametros³ 01 cTypeBar String com o tipo do codigo de barras           ³±± 
-±±³          ³ 				"EAN13","EAN8","UPCA" ,"SUP5"   ,"CODE128"     ³±±
-±±³          ³ 				"INT25","MAT25,"IND25","CODABAR","CODE3_9"     ³±±
-±±³          ³ 				"EAN128"                                       ³±±
-±±³          ³ 02 nRow		Numero da Linha em centimentros                ³±±
-±±³          ³ 03 nCol		Numero da coluna em centimentros			   ³±±
-±±³          ³ 04 cCode		String com o conteudo do codigo                ³±±
-±±³          ³ 05 oPr		Obejcto Printer                                ³±±
-±±³          ³ 06 lcheck	Se calcula o digito de controle                ³±±
-±±³          ³ 07 Cor 		Numero  da Cor, utilize a "common.ch"          ³±±
-±±³          ³ 08 lHort		Se imprime na Horizontal                       ³±±
-±±³          ³ 09 nWidth	Numero do Tamanho da barra em centimetros      ³±±
-±±³          ³ 10 nHeigth	Numero da Altura da barra em milimetros        ³±±
-±±³          ³ 11 lBanner	Se imprime o linha em baixo do codigo          ³±±
-±±³          ³ 12 cFont		String com o tipo de fonte                     ³±±
-±±³          ³ 13 cMode		String com o modo do codigo de barras CODE128  ³±±
-±±³          ³ 14 lPrint	Logico que indica se imprime ou nao            ³±±
-±±³          ³ 15 nPFWidth	Numero do indice de ajuste da largura da fonte ³±±
-±±³          ³ 16 nPFHeigth Numero do indice de ajuste da altura da fonte  ³±± 
+±±³Parametros?01 cTypeBar String com o tipo do codigo de barras           ³±?
+±±?         ?				"EAN13","EAN8","UPCA" ,"SUP5"   ,"CODE128"     ³±?
+±±?         ?				"INT25","MAT25,"IND25","CODABAR","CODE3_9"     ³±?
+±±?         ?				"EAN128"                                       ³±?
+±±?         ?02 nRow		Numero da Linha em centimentros                ³±?
+±±?         ?03 nCol		Numero da coluna em centimentros			   ³±?
+±±?         ?04 cCode		String com o conteudo do codigo                ³±?
+±±?         ?05 oPr		Obejcto Printer                                ³±?
+±±?         ?06 lcheck	Se calcula o digito de controle                ³±?
+±±?         ?07 Cor 		Numero  da Cor, utilize a "common.ch"          ³±?
+±±?         ?08 lHort		Se imprime na Horizontal                       ³±?
+±±?         ?09 nWidth	Numero do Tamanho da barra em centimetros      ³±?
+±±?         ?10 nHeigth	Numero da Altura da barra em milimetros        ³±?
+±±?         ?11 lBanner	Se imprime o linha em baixo do codigo          ³±?
+±±?         ?12 cFont		String com o tipo de fonte                     ³±?
+±±?         ?13 cMode		String com o modo do codigo de barras CODE128  ³±?
+±±?         ?14 lPrint	Logico que indica se imprime ou nao            ³±?
+±±?         ?15 nPFWidth	Numero do indice de ajuste da largura da fonte ³±?
+±±?         ?16 nPFHeigth Numero do indice de ajuste da altura da fonte  ³±?
 */
 
 oPrint:EndPage ()
@@ -564,13 +570,13 @@ RETURN Nil
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³ Funcao    ³ MODULO10()  ³ Autor ³ Flavio Novaes    ³ Data ³ 03/02/2005 ³±±
+±±?Funcao    ?MODULO10()  ?Autor ?Flavio Novaes    ?Data ?03/02/2005 ³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Descricao ³ Impressao de Boleto Bancario do Banco Santander com Codigo ³±±
-±±³           ³ de Barras, Linha Digitavel e Nosso Numero.                 ³±±
-±±³           ³ Baseado no Fonte TBOL001 de 01/08/2002 de Raimundo Pereira.³±±
+±±?Descricao ?Impressao de Boleto Bancario do Banco Santander com Codigo ³±?
+±±?          ?de Barras, Linha Digitavel e Nosso Numero.                 ³±?
+±±?          ?Baseado no Fonte TBOL001 de 01/08/2002 de Raimundo Pereira.³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso       ³ FINANCEIRO                                                 ³±±
+±±?Uso       ?FINANCEIRO                                                 ³±?
 ±±ÀÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
@@ -602,13 +608,13 @@ RETURN(D)
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³ Funcao    ³ MODULO11()  ³ Autor ³ Flavio Novaes    ³ Data ³ 03/02/2005 ³±±
+±±?Funcao    ?MODULO11()  ?Autor ?Flavio Novaes    ?Data ?03/02/2005 ³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Descricao ³ Impressao de Boleto Bancario do Banco Santander com Codigo ³±±
-±±³           ³ de Barras, Linha Digitavel e Nosso Numero.                 ³±±
-±±³           ³ Baseado no Fonte TBOL001 de 01/08/2002 de Raimundo Pereira.³±±
+±±?Descricao ?Impressao de Boleto Bancario do Banco Santander com Codigo ³±?
+±±?          ?de Barras, Linha Digitavel e Nosso Numero.                 ³±?
+±±?          ?Baseado no Fonte TBOL001 de 01/08/2002 de Raimundo Pereira.³±?
 ±±ÃÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso       ³ FINANCEIRO                                                 ³±±
+±±?Uso       ?FINANCEIRO                                                 ³±?
 ±±ÀÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
@@ -639,17 +645,17 @@ ENDIF
 RETURN(D)
 
 /*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Programa  ³Ret_cBarra³ Autor ³ Microsiga             ³ Data ³ 13/10/03 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³ IMPRESSAO DO BOLETO LASE DO ITAU COM CODIGO DE BARRAS      ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³ Especifico para Clientes Microsiga                         ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ?
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±?
+±±³Programa  ³Ret_cBarra?Autor ?Microsiga             ?Data ?13/10/03 ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±?
+±±³Descri‡…o ?IMPRESSAO DO BOLETO LASE DO ITAU COM CODIGO DE BARRAS      ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±?
+±±³Uso       ?Especifico para Clientes Microsiga                         ³±?
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±?
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß?
 /*/
 Static Function Ret_cBarra(cBanco,cAgencia,cConta,cDacCC,cNroDoc,nValor,dVencto,cCarteira)
 //Static Function Ret_cB    (cBanco,cAgencia,cConta,cDacCC,cCarteira,cNroDoc,nValor)
@@ -721,15 +727,15 @@ cRN := substr(cCampo1,1,5)+"."+substr(cCampo1,6,5)+space(2)+ substr(cCampo2,1,5)
 Return({cCB,cRN,cNN})
 
 /*/
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun‡…o    ³ AjustaSx1    ³ Autor ³ Microsiga            	³ Data ³ 13/10/03 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³ Verifica/cria SX1 a partir de matriz para verificacao          ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³ Especifico para Clientes Microsiga                    	  		³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±?
+±±³Fun‡…o    ?AjustaSx1    ?Autor ?Microsiga            	?Data ?13/10/03 ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±?
+±±³Descri‡…o ?Verifica/cria SX1 a partir de matriz para verificacao          ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±?
+±±³Uso       ?Especifico para Clientes Microsiga                    	  		³±?
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±?
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 /*/
 Static Function AjustaSX1(cPerg, aPergs)
@@ -854,7 +860,7 @@ If nOpcA == 1
 EndIf
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Valida Banco     ³
+//?Valida Banco     ?
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 Static Function VALIDBCO()
 Local lRetorno := .T.

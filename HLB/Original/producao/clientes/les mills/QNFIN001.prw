@@ -148,7 +148,9 @@ LOCAL aDadosEmp := {SM0->M0_NOMECOM,;								   								//[1]Nome da Empresa
 LOCAL aDadosTit
 LOCAL aDadosBanco
 LOCAL aDatSacado
-LOCAL aBolText  	:= {"10% de multa + 0,1% ao dia.",;
+//LOCAL aBolText  	:= {"10% de multa + 0,1% ao dia.",;			//CAS - 30/07/2020 Como estava antes, e as duas linhas abaixo como ficou depois
+//						""}
+LOCAL aBolText  	:= {"",;
 						""}
 LOCAL aBMP      	:= aBitMap
 LOCAL i         	:= 1

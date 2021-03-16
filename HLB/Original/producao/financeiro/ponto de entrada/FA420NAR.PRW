@@ -33,7 +33,8 @@ USER FUNCTION FA420NAR()
 		//MSGINFO("Criar arquivo","Cria Arquivo")
 		
 		IF SEE->EE_P_ACCES == "1"
-			cArqSaida := cValToChar(SM0->M0_CODIGO)+"_PE_"+ DTOS(date()) + "_" + STRTRAN(TIME(), ":","") +"."+SEE->EE_EXTEN // novo nome do arquivo de saída.
+			//CAS - 04/11/2019 Adicionado no nome do arquivo de saida os conteudos dos campos SEE->EE_CODIGO+SEE->EE_CONTA
+			cArqSaida := cValToChar(SM0->M0_CODIGO)+"_PE_"+ALLTRIM(SEE->EE_CODIGO)+"_"+ALLTRIM(SEE->EE_CONTA)+AllTrim(SEE->EE_DVCTA)+"_"+DTOS(date()) + "_" + STRTRAN(TIME(), ":","") +"."+SEE->EE_EXTEN // novo nome do arquivo de saída.
 
 			DbSelectArea("Z0D")
 			Z0D->(DbSetOrder(2))

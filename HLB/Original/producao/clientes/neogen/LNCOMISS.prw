@@ -1,4 +1,4 @@
-#include "rwmake.ch"        
+#include "rwmake.ch"       
 #IFNDEF WINDOWS
     #DEFINE PSAY SAY
 #ENDIF       
@@ -7,13 +7,13 @@
 Funcao      : COMISSLN
 Parametros  : Nenhum
 Retorno     : Nenhum
-Objetivos   : Impress„o relatÛrio de comissıes
-Autor       : Tiago Luiz MendonÁa
+Objetivos   : ImpressÔøΩo relatÔøΩrio de comissÔøΩes
+Autor       : Tiago Luiz MendonÔøΩa
 Data/Hora   : 08/07/10
 TDN         : 
-Revis„o     : Tiago Luiz MendonÁa 
+RevisÔøΩo     : Tiago Luiz MendonÔøΩa 
 Data/Hora   : 07/02/2012
-MÛdulo      : Faturamento.
+MÔøΩdulo      : Faturamento.
 */ 
 
 *----------------------------*
@@ -28,7 +28,7 @@ SetPrvt("NOMEPROG,NLASTKEY,CPERG,NPAGINA,NIVEL,CSAVSCR1")
 SetPrvt("CSTRING,CABEC1,CABEC2,WNREL,TREGS,M_MULT")
 
 If !(cEmpAnt $ "LN/99")
-   MsgAlert("Rotina n„o disponivel para essa empresa","AtenÁ„o")
+   MsgAlert("Rotina nÔøΩo disponivel para essa empresa","AtenÔøΩÔøΩo")
    Return .F.
 EndIf  
       
@@ -50,8 +50,8 @@ tamanho:="G"
 nTipo  := 0
 m_pag  := 1
 lin    := 100
-cTitulo :="Comissıes por Vendedor "
-cDesc1 :="Relatorio de Comissıes por Periodo"
+cTitulo :="ComissÔøΩes por Vendedor "
+cDesc1 :="Relatorio de ComissÔøΩes por Periodo"
 cDesc2 :=""
 cDesc3 :=""
 aOrd   := {}
@@ -90,6 +90,9 @@ aCampos := {   {"VENDEDOR"  ,"C",06,0 } ,;
                
 //cNome := CriaTrab(aCampos,.t.)
 //RRP - 08/03/2019 - Ajuste para gerar em DBF o relatorio
+
+//CAS - 18/02/2020
+/*
 cNome  := CriaTrab(Nil,.F.)
 dbCreate(cNome,aCampos,"DBFCDXADS" ) 
 dbUseArea(.T.,"DBFCDXADS",cNome,"WORK",.F.,.F.)
@@ -100,7 +103,24 @@ cIndex:=CriaTrab(Nil,.F.)
 IndRegua("WORK",cIndex,"EMISSAO+NOTA+SERIE",,,"Selecionando Registro...")
 DbSetIndex(cIndex+OrdBagExt())
 DbSetOrder(1)
-                                                                             	
+*/
+
+//CAS - 18/02/2020 ------------------------------------------------------------------------------------
+//-------------------
+//Cria√ß√£o do objeto
+//-------------------
+oTempTable := FWTemporaryTable():New( "WORK" )
+
+oTemptable:SetFields( aCampos )
+oTempTable:AddIndex("indice1", {"EMISSAO","NOTA","SERIE"} )
+
+//------------------
+//Cria√ß√£o da tabela
+//------------------
+oTempTable:Create()
+
+
+//CAS - 18/02/2020 ------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------
 // Variaveis utilizadas para Impressao do Cabecalho e Rodape
@@ -127,7 +147,7 @@ If !(lOk)
 EndIf        
 
 If !(Alltrim(cPass)=="sales") .Or.  Empty(alltrim(cPass))  .And. lOK
-    MsgStop("Senha inv·lida","NEOGEN") 
+    MsgStop("Senha invÔøΩlida","NEOGEN") 
     Return .F.
 EndIf
 
@@ -171,6 +191,12 @@ Return .T.
 Local cChave:="" 
 Local nParcelas:=0
 
+Local oFWMsExcel                                    //CAS - 18/02/2020
+Local oExcel                                        //CAS - 18/02/2020
+Local cArquivo    := GetTempPath()+'zCusImp.xml'    //CAS - 18/02/2020
+Local cPlanImp :="Comissao Neogen"                  //CAS - 18/02/2020
+Local cTitPlan :="Relatorio Custos"                 //CAS - 18/02/2020
+
 cTitulo := cTitulo + ", de "+dtoc(mv_par01) + " a "+dtoc(mv_par02)
 
 dDataIni  := mv_par01
@@ -181,7 +207,7 @@ cVendFim  := mv_par04
 cFil:=CFILANT       
 
 If Empty(cVendIni) .And. Empty(cVendFim)
-    MsgAlert("Necess·rio informar vendedor.","AtenÁ„o")
+    MsgAlert("NecessÔøΩrio informar vendedor.","AtenÔøΩÔøΩo")
    Return .F.
 EndIf
                     
@@ -189,7 +215,7 @@ MontaQry()
 QRB->(DbGoTop())
                   
 If QRB->(Eof())
-  MsgAlert("Sem dados para consulta, revise os par‚metros.","AtenÁ„o")
+  MsgAlert("Sem dados para consulta, revise os parÔøΩmetros.","AtenÔøΩÔøΩo")
   QRB->(DbCloseArea())
   WORK->(DbCloseArea())
   Return .F.
@@ -197,14 +223,14 @@ EndIf
      
 Do while QRB->(!Eof())  
                    
-   // ExeceÁıes para TES
+   // ExeceÔøΩÔøΩes para TES
       
    //If !(QRB->D2_TES $ cTES)
    //   QRB->(DbSkip())
    //   loop
    //Endif 
    
-	//RRP - 19/06/2013 - Verificar se s„o notas de saÌda de devoluÁ„o. 
+	//RRP - 19/06/2013 - Verificar se sÔøΩo notas de saÔøΩda de devoluÔøΩÔøΩo. 
    If Select("TempSD1A") > 0
 		TempSD1A->(DbCloseArea())	               
 	EndIf
@@ -225,7 +251,7 @@ Do while QRB->(!Eof())
  		QRB->(DbSkip())
 		loop
 	Endif
- 	//RRP - 19/06/2013 - Final da VerificaÁ„o.
+ 	//RRP - 19/06/2013 - Final da VerificaÔøΩÔøΩo.
  	
    IF  QRB->F2_VEND1 <> ' ' //.And. !Empty(SC5->C5_COMIS1)
          
@@ -330,11 +356,9 @@ EndDo
  
 Roda(nCntImpr,cRodaTxt,Tamanho)  
 
-dbSelectArea("WORK")
-DbCloseArea("WORK") 
-
 If mv_par05=1     
 
+   /* CAS - 18/02/2020 ---------------------------------------------------------------------------------------
    cArqOrig := "\SYSTEM\"+cNome+".DBF"
    cPath     := AllTrim(GetTempPath())                                                   
    CpyS2T( cArqOrig , cPath, .T. )
@@ -348,18 +372,83 @@ If mv_par05=1
     
    Else 
    
-      Alert("Excel n„o instalado") 
+      Alert("Excel nÔøΩo instalado") 
       
-   EndIf
+   EndIf CAS - 18/02/2020 -------------------------------------------------------------------------------------
+   */
 
+
+    //Criando o objeto que ir√° gerar o conte√∫do do Excel
+    oFWMsExcel := FWMSExcel():New()         
+    
+    //Aba 01 - Teste
+    oFWMsExcel:AddworkSheet(cPlanImp) //N√£o utilizar n√∫mero junto com sinal de menos. Ex.: 1-
+        //Criando a Tabela
+        oFWMsExcel:AddTable(cPlanImp,cTitPlan)
+        //Criando Colunas
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"VENDEDOR",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"NOME",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"PEDIDO",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"NOTA",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"SERIE",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"EMISSAO",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"BAIXA",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"PARCELA",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"CODIGO",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"DESCLIENTE",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"CIDADE",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"ESTADO",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"VLRTOT",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"VLRSEMIMP",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"COMISS",1)
+        oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"VLRCOMISS",1)
+         
+        Work->(dbGoTop())
+        Do while Work->(!Eof()) 
+
+            //Criando as Linhas 
+
+            oFWMsExcel:AddRow(cPlanImp,cTitPlan,{;
+                                                                    Alltrim(Work->VENDEDOR) ,;
+                                                                    Alltrim(Work->NOME) ,;
+                                                                    Work->PEDIDO,;
+                                                                    Work->NOTA,;
+                                                                    Work->SERIE,;
+                                                                    work->EMISSAO,;
+                                                                    work->BAIXA,;
+                                                                    work->PARCELA,;
+                                                                    Work->CODIGO,;
+                                                                    Work->DESCLIENTE,;
+                                                                    Work->CIDADE,;
+                                                                    Work->ESTADO ,;
+                                                                    TRANSFORM(Work->VLRTOT ,"@E 9,999,999.99"),;
+                                                                    TRANSFORM(Work->VLRSEMIMP ,"@E 9,999,999.99"),;
+                                                                    TRANSFORM(Work->COMISS  ,"@E 9,999,999.99"),;
+                                                                    TRANSFORM(Work->VLRCOMISS ,"@E 9,999,999.99");
+            })
+
+            Work->(dbskip())
+         EndDo      
+        
+    //Ativando o arquivo e gerando o xml  
+    oFWMsExcel:Activate()
+    oFWMsExcel:GetXMLFile(cArquivo)
+         
+    //Abrindo o excel e abrindo o arquivo xml
+    oExcel := MsExcel():New()             //Abre uma nova conex√£o com Excel
+    oExcel:WorkBooks:Open(cArquivo)     //Abre uma planilha
+    oExcel:SetVisible(.T.)                 //Visualiza a planilha
+    oExcel:Destroy()                        //Encerra o processo do gerenciador de tarefas
 
 EndIf
  
 dbSelectArea("QRB")
 DbCloseArea("QRB") 
 
-Erase &cNome+".DBF"
+dbSelectArea("WORK")       //CAS - 18/02/2020
+DbCloseArea("WORK")        //CAS - 18/02/2020
 
+//Erase &cNome+".DBF"      //CAS - 18/02/2020
 
 Return
 

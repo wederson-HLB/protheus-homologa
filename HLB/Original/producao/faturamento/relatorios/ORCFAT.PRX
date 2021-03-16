@@ -1,0 +1,247 @@
+#include "rwmake.ch"        // incluido por el asistente de conversión del AP6 IDE en 31/07/02
+#include "orcfat.ch"
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ OrcFat   ³ Autor ³ Eduardo Riera         ³ Data ³ 22/12/97 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Demonstrativo de Orcamento                                 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ Especifico para Clientes Microsiga                         ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+User Function ORCFAT()        // incluido por el asistente de conversión del AP6 IDE en 31/07/02
+SetPrvt("CBTXT,CBCONT,NORDEM,TAMANHO,LIMITE,CIMPRI")
+SetPrvt("NTOTAL,TITULO,CDESC1,CDESC2,CDESC3,ARETURN")
+SetPrvt("NOMEPROG,CPERG,NLASTKEY,LCONTINUA,NLIN,WNREL")
+SetPrvt("CSTRING,NQTD,M_PAG")
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Define Variaveis Ambientais                                  ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+cbTxt		:= ""
+cbCont	:= ""
+nOrdem 	:= 0
+Tamanho	:= "G" 
+Limite	:= 220
+cImpri   := ""
+nTotal   := 0
+Titulo := PadC(OemToAnsi(STR0001),74)
+cDesc1 := PadC(OemToAnsi(STR0002),74)
+cDesc2 := PadC(OemToAnsi(STR0003),74)
+cDesc3 := PadC(OemToAnsi(""),74)
+
+aReturn	:= { OemToAnsi(STR0004), 1,OemToAnsi(STR0005), 1, 2, 1,"",1 }
+NomeProg	:= "ORCFAT" 
+cPerg		:= ""
+nLastKey	:= 0 
+lContinua:= .T.
+nLin 		:= 1
+wnrel 	    := "ORCFAT"
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas, busca o padrao da Nfiscal           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//Pergunte(cPerg,.F.)
+cString:="SCK"
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Envia controle para a funcao SETPRINT                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+wnrel:=SetPrint(cString,wnrel,cPerg,Titulo,cDesc1,cDesc2,cDesc3,.F.,,,,,.F.)
+If ( nLastKey == 27 .Or. LastKey() == 27 )
+   Return(.F.)
+Endif
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica Posicao do Formulario na Impressora                 ³          
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+SetDefault(aReturn,cString)
+If ( nLastKey == 27 .Or. LastKey() == 27 )
+   Return(.F.)
+Endif
+
+RptStatus({|| RptDetail()})// Substituido por el asistente de conversión del AP6 IDE en 31/07/02 ==> RptStatus({|| Execute(RptDetail())})
+
+
+// Substituido por el asistente de conversión del AP6 IDE en 31/07/02 ==> Static Function RptDetail
+Static Function RptDetail()
+Local aRelImp     := MaFisRelImp("MT100",{"SF2","SD2"})
+Local nItem       := 0
+Local cLogo       := "\anexos\LogoCascade.png"
+Local nCntImpr    := 1 
+Local cRodaTxt    := oemtoansi("Rodapé")
+Local cCabec1     := ""
+Local cCabec2     := ""
+//         1         2         3         4         5         6         7         8         9        10        11          12        13        14        15        16        17        18
+//1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+//* xxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                  999,999,999.99 999,999,999.99 999,999,999,999.99 *
+//                  xxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                    9,999,999.99   9,999,999.99   9,999,999,999.99 *
+//* Produto         Descricao                                                           Quantidade    Preco Venda              Total *
+//
+//*                 Componente      Descricao do Componente                                                                          *                   
+
+            //         1         2         3         4         5         6         7         8         9        10        11          12        13        14        15        16        17        18      19        20
+            //12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+cCabec2     :="Produto           Descricao                                                   Quantidade  Preco Venda            Total  Base ICMS   Valor ICMS   Base IPI     Valor IPI  Base ICMS Sol  Valor ICMS Sol.  Valor Difal    Vr Bruto"
+
+dbSelectArea("SCJ")
+dbSetOrder(1)
+
+dbSelectArea("SA1")
+dbSetOrder(1)
+dbSeek(xFilial()+SCJ->CJ_CLIENTE+SCJ->CJ_LOJA)
+
+dbSelectArea("SE4")
+dbSetOrder(1)
+dbSeek(xFilial()+SCJ->CJ_CONDPAG)
+
+MaFisIni(SA1->A1_COD,;		  // 1-Codigo Cliente/Fornecedor
+		 SA1->A1_LOJA,;		  // 2-Loja do Cliente/Fornecedor
+		 "C",;		          // 3-C:Cliente , F:Fornecedor
+		 "N",;				  // 4-Tipo da NF
+		 SA1->A1_TIPO,;		  // 5-Tipo do Cliente/Fornecedor
+			aRelImp,;		  // 6-Relacao de Impostos que suportados no arquivo
+			,;				  // 7-Tipo de complemento
+			,;				  // 8-Permite Incluir Impostos no Rodape .T./.F.
+			"SB1",;			  // 9-Alias do Cadastro de Produtos - ("SBI" P/ Front Loja)
+			"MATA461")
+
+cCabec1:= PadC(OemToAnsi(STR0006)+SCJ->CJ_NUM,Limite-2)
+
+cabec(titulo,ccabec1,ccabec2,nomeprog,tamanho,15,,,,cLogo)
+
+nLin += 8
+cImpri := OemToAnsi(STR0007)+SA1->A1_COD+"/"+SA1->A1_LOJA+" - "+SA1->A1_NOME
+@ nLin,000 PSAY "*"+PadR(cImpri,Limite-2)+"*"
+nLin += 1
+cImpri := OemToAnsi(STR0008)+SCJ->CJ_CONDPAG+" - "+SE4->E4_DESCRI
+@ nLin,000 PSAY "*"+PadR(cImpri,Limite-2)+"*"
+nLin += 1
+cImpri := OemToAnsi(STR0009)+AllTrim(TransForm(SCJ->CJ_DESC1,X3Picture("CJ_DESC1")))+" + "+;
+								AllTrim(TransForm(SCJ->CJ_DESC2,X3Picture("CJ_DESC2")))+" + "+;
+								AllTrim(TransForm(SCJ->CJ_DESC3,X3Picture("CJ_DESC3")))+" + "+;
+								AllTrim(TransForm(SCJ->CJ_DESC4,X3Picture("CJ_DESC4")))
+nLin += 1
+@ nLin,000 PSAY "*"+PadR(cImpri,Limite-2)+"*"
+nLin += 1
+
+dbSelectArea("SCK")
+dbSetOrder(1)
+dbSeek(xFilial("SCK")+SCJ->CJ_NUM,.T.)
+
+While ( !Eof() .And. SCK->CK_FILIAL == xFilial("SCK") .And. ;
+			SCK->CK_NUM == SCJ->CJ_NUM )
+	If ( nLin > 80 )
+		nLin := 0
+	    cabec(titulo,ccabec1,ccabec2,nomeprog,tamanho,15,,,,cLogo)
+	    @ nLin,0 PSAY __PrtThinLine()					
+    Endif
+
+   	nLin := nLin + 1
+	@ nLin,000 PSAY SCK->CK_PRODUTO
+	@ nLin,017 PSAY SubStr(SCK->CK_DESCRI,1,30)
+	@ nLin,078 PSAY SCK->CK_QTDVEN          PICTURE TM(SCK->CK_QTDVEN,10,2)
+	@ nLin,092 PSAY SCK->CK_PRCVEN          PICTURE TM(SCK->CK_PRCVEN,10,2)
+	@ nLin,107 PSAY SCK->CK_VALOR           PICTURE TM(SCK->CK_VALOR ,12,2)
+
+	nTotal := nTotal + SCK->CK_VALOR
+
+    nItem ++					
+	MaFisAdd(SCK->CK_PRODUTO,; 		  // 1-Codigo do Produto ( Obrigatorio )
+			 SCK->CK_TES,;			  // 2-Codigo do TES ( Opcional )
+			 SCK->CK_QTDVEN,;		  // 3-Quantidade ( Obrigatorio )
+			 SCK->CK_PRCVEN,;		  // 4-Preco Unitario ( Obrigatorio )
+			 0,; 						      // 5-Valor do Desconto ( Opcional )
+			 "",;		                  // 6-Numero da NF Original ( Devolucao/Benef )
+			 "",;		                  // 7-Serie da NF Original ( Devolucao/Benef )
+			 0,;			      	      // 8-RecNo da NF Original no arq SD1/SD2
+			 0,;						  		  // 9-Valor do Frete do Item ( Opcional )
+			 0,;						  		  // 10-Valor da Despesa do item ( Opcional )
+			 0,;            			  		  // 11-Valor do Seguro do item ( Opcional )
+			 0,;						  		  // 12-Valor do Frete Autonomo ( Opcional )
+			 SCK->CK_VALOR,;                   // 13-Valor da Mercadoria ( Obrigatorio )
+			 0,;								  // 14-Valor da Embalagem ( Opiconal )
+			 0,;		     					  // 15-RecNo do SB1
+			 0) 
+    
+	@ nLin,119 PSay Transform(MaFisRet(nItem,"IT_BASEICM")	,"@E 999,999.99")
+ 	@ nLin,132 PSay Transform(MaFisRet(nItem,"IT_VALICM")	,"@E 999,999.99")
+    @ nLin,144 PSay Transform(MaFisRet(nItem,"IT_BASEIPI")	,"@E 999,999.99")
+    @ nLin,158 PSay Transform(MaFisRet(nItem,"IT_VALIPI")	,"@E 999,999.99") 
+	@ nLin,173 PSay Transform(MaFisRet(nItem,"IT_BASESOL")	,"@E 999,999.99")
+	@ nLin,189 PSay Transform(MaFisRet(nItem,"IT_VALSOL")	,"@E 999,999.99")
+	@ nLin,202 psay Transform(MaFisRet(nItem,"IT_DIFAL")    ,"@E 999,999.99")
+	@ nLin,215 PSay Transform(MaFisRet(nItem,"IT_TOTAL")	,"@E 999,999.99")
+
+	nLin := nLin + 1			
+	
+	dbSelectArea("SCL")
+	dbSetOrder(1)
+	dbSeek(xFilial("SCL")+SCK->CK_NUM+SCK->CK_ITEM,.T.)
+
+	While  ( !Eof() .And. xFilial("SCL") == SCL->CL_FILIAL .And. ;
+					SCL->CL_NUM == SCK->CK_NUM .And.;
+					SCL->CL_ITEMORC == SCK->CK_ITEM )
+		If ( nLin > 80 )
+			nLin := 0
+			cabec(titulo,cabec1,cabec2,nomeprog,tamanho,15,,,,cLogo)
+	        @ nLin,0 PSAY __PrtThinLine()			
+		EndIf
+		nLin := nLin + 1			
+		@ nLin,000 PSAY "----->"
+		@ nLin,019 PSAY SCL->CL_PRODUTO
+		@ nLin,035 PSAY SubStr(SCL->CL_DESCRI,1,30)
+		dbSelectArea("SB1")
+		dbSetOrder(1)
+		dbSeek(xFilial("SB1")+SCL->CL_PRODUTO)
+		dbSelectArea("SF4")
+		dbSetOrder(1)
+		dbSeek(xFilial("SF4")+SCK->CK_TES)
+		
+		nQtd := SCL->CL_QUANT*SCK->CK_QTDVEN
+		@ nLin,084 PSAY nQtd              PICTURE TM(nQtd,12,2)
+
+		dbSelectArea("SCL")
+		dbSkip()
+	EndDo
+	nLin ++
+    nCntImpr ++
+	dbSelectArea("SCK")
+	dbSkip()	
+EndDo			
+nLin := nLin + 1	
+@ nLin,0 PSAY __PrtThinLine()	
+nLin := nLin + 1
+
+@ nLin,000 PSAY OemToAnsi(STR0013)
+@ nLin,100 PSAY nTotal PICTURE TM(nTotal,18,2)
+
+nLin := nLin + 1
+@ nLin,0 PSAY __PrtThinLine()	
+nLin := nLin + 1
+
+Roda(nCntImpr,cRodaTxt,Tamanho)
+
+Set Device to Screen 
+Set Printer To
+dbCommitAll()
+DbSelectArea("SCJ")
+DbSetOrder(1)
+DbSelectArea("SCK")
+DbSetOrder(1)
+DbSelectArea("SCL")
+DbSetOrder(1)
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Se impressao em Disco, chama Spool.                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If aReturn[5] == 1
+	ourspool(wnrel)
+Endif
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Libera relatorio para Spool da Rede.                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+MS_FLUSH()
+Return(.T.)

@@ -2,11 +2,11 @@
 #Include "TopConn.Ch"
 
 /*
-Função.................: GTCTB006
-Objetivo...............: Manutenção De\Para Plano de Contas x Plano de Contas Referencial
+Funï¿½ï¿½o.................: GTCTB006
+Objetivo...............: Manutenï¿½ï¿½o De\Para Plano de Contas x Plano de Contas Referencial
 Autor..................: Leandro Diniz de Brito ( LDB ) - BRL Consulting
 Data...................: 05/06/2015
-Observações............:
+Observaï¿½ï¿½es............:
 */
 *----------------------------------*
 User Function GTCTB006
@@ -15,13 +15,13 @@ Local oDlg
 Local oDlg2
 
 Local nOption  := 0
-Local bOk      := { || If( oNewGetDados:TudoOK() .And. MsgYesNo( 'Confirma gravação?' ) , ( nOption := 1 , oDlg:End() ) , ) }
+Local bOk      := { || If( oNewGetDados:TudoOK() .And. MsgYesNo( 'Confirma gravaÃ§Ã£o?' ) , ( nOption := 1 , oDlg:End() ) , ) }
 
 Local bCancel  := { || nOption := 0 , oDlg:End() }
 Local oNewGetDados
 
 Local nStyle
-Local aAlter      := { "CVD_CTAREF" , "CVD_ENTREF" , "CVD_CUSTO" , "CVD_TPUTIL" , "CVD_CLASSE" , "CVD_NATCTA" , "CVD_CTASUP" }
+Local aAlter      := { "CVD_VERSAO", "CVD_CTAREF" , "CVD_ENTREF" , "CVD_CUSTO" , "CVD_TPUTIL" , "CVD_CLASSE" , "CVD_NATCTA" , "CVD_CTASUP" }
 
 Local oGetConta
 Local oFont1  := TFont():New( 'Courier New' ,, -16 , .T. )
@@ -35,7 +35,7 @@ Local nOpcTela
 Local aBotoes   	:= { { "VERNOTA" , { || oDlg2:End() , nOpcTela := 1 , lExclui := .T. } , "Exclui De\Para" } }
 Local aBotoes2   	:= { { "VERNOTA" , { || Processa( { || ImportaXLS( oNewGetDados ) } , 'Importando Dados da planilha Excel ...' ) } , "Importa XLS" } , { "VERNOTA" , { || Processa( { || ExportaXLS() } , 'Exportando Dados para Excel ...' )  } , "Exporta XLS" } }
 
-Private aYesFields  := { "CVD_CONTA" , "CT1_DESC01" , "CVD_CODPLA" , "CVD_CTAREF" , "CVD_ENTREF" , "CVN_DSCCTA" ,  "CVD_CUSTO" , "CVD_TPUTIL" , "CVD_CLASSE" , "CVD_NATCTA" , "CVD_CTASUP" }
+Private aYesFields  := { "CVD_CONTA" , "CT1_DESC01" , "CVD_CODPLA" ,"CVD_VERSAO", "CVD_CTAREF" , "CVD_ENTREF" , "CVN_DSCCTA" ,  "CVD_CUSTO" , "CVD_TPUTIL" , "CVD_CLASSE" , "CVD_NATCTA" , "CVD_CTASUP" }  //CAS - 28-04-2020 Adicionado o campo CVD_VERSAO
 Private cCvdCodPla  := Space( Len( CVN->CVN_CODPLA ) )
 Private aCols := {}
 
@@ -63,7 +63,7 @@ MsgRun( 'Aguarde... Carregando plano referencial ...' , '' , { || LoadAcols() } 
 
 aSort( aCols ,,, { | x , y | x[ 1 ] < y[ 1 ]  } )
 
-Define MSDialog oDlg Title 'Amarração Plano de Contas x Plano Referencial - ' + If( lExclui , 'EXCLUSAO' , 'MANUTENCAO' ) From aSizeDlg[ 7 ] , aSizeDlg[ 1 ] TO aSizeDlg[ 6 ] , aSizeDlg[ 5 ] Of oMainWnd Pixel
+Define MSDialog oDlg Title 'Amarraï¿½ï¿½o Plano de Contas x Plano Referencial - ' + If( lExclui , 'EXCLUSAO' , 'MANUTENCAO' ) From aSizeDlg[ 7 ] , aSizeDlg[ 1 ] TO aSizeDlg[ 6 ] , aSizeDlg[ 5 ] Of oMainWnd Pixel
 
 oNewGetDados := MsNewGetDados():New( 0, 0, 0, 0, nStyle, 'u_Gt006lok' , /*cTudoOk*/, /*cIniCpos*/, aAlter /*aAlter*/, /*nFreeze*/ , /*nMax*/, 'u_Gt006FOk()' , /*cSuperDel*/, /*cDelOk*/, oDlg , aHeader, aCols , /*uChange]*/, /*cTela*/ )
 oNewGetDados:ForceRefresh()
@@ -79,8 +79,8 @@ EndIf
 Return
 
 /*
-Função........: GravaCols
-Objetivo......: Função generica para gravar acols criado pela função FillGetDados em uma tabela
+Funï¿½ï¿½o........: GravaCols
+Objetivo......: Funï¿½ï¿½o generica para gravar acols criado pela funï¿½ï¿½o FillGetDados em uma tabela
 Autor.........: Leandro Diniz de Brito ( LDB ) - BRL Consulting
 Data..........: 05/06/2015
 */
@@ -178,11 +178,11 @@ EndIf
 Return( .T. )
 
 /*
-Função.................: Gt006FOk
+Funï¿½ï¿½o.................: Gt006FOk
 Objetivo...............: Validacao de campo no grid de dados
 Autor..................: Leandro Diniz de Brito ( LDB ) - BRL Consulting
 Data...................: 05/06/2015
-Observações............:
+Observaï¿½ï¿½es............:
 */
 *--------------------------------------------*
 User Function Gt006FOk
@@ -234,11 +234,11 @@ EndIf
 Return( .T. )
 
 /*
-Função.................: LoadAcols
+Funï¿½ï¿½o.................: LoadAcols
 Objetivo...............: Carrega aCols para MSNewGetdados
 Autor..................: Leandro Diniz de Brito ( LDB ) - BRL Consulting
 Data...................: 05/06/2015
-Observações............:
+Observaï¿½ï¿½es............:
 */
 *--------------------------------------------*
 Static Function LoadAcols
@@ -306,7 +306,9 @@ While CVD->( !Eof() .And. CVD->CVD_FILIAL + CVD->CVD_CODPLA == xFilial( 'CVD' ) 
 			If AllTrim( aHeader[ i ][ 2 ] ) == 'CT1_DESC01'
 				aCols[ Len( aCols ) ][ i ] := Posicione( 'CT1' , 1 , xFilial( 'CT1' ) + CVD->CVD_CONTA , 'CT1_DESC01' )	
 			ElseIf AllTrim( aHeader[ i ][ 2 ] ) == 'CVN_DSCCTA'
-				aCols[ Len( aCols ) ][ i ] := Posicione( 'CVN' , 2 , xFilial( 'CVN' ) + CVD->CVD_CODPLA + CVD->CVD_CTAREF , 'CVN_DSCCTA' )				
+				aCols[ Len( aCols ) ][ i ] := Posicione( 'CVN' , 2 , xFilial( 'CVN' ) + CVD->CVD_CODPLA + CVD->CVD_CTAREF , 'CVN_DSCCTA' )	
+			ElseIf AllTrim( aHeader[ i ][ 2 ] ) == 'CVD_VERSAO'																					//CAS - 28-04-2020 Adicionado tratamento para o CVD_VERSAO
+				aCols[ Len( aCols ) ][ i ] := Posicione( 'CVN' , 2 , xFilial( 'CVN' ) + CVD->CVD_CODPLA + CVD->CVD_CTAREF , 'CVN_VERSAO' )		//CAS - 28-04-2020 Adicionado tratamento para o CVD_VERSAO
 			ElseIf AllTrim( aHeader[ i ][ 2 ] ) == 'CVD_REC_WT'
 				aCols[ Len( aCols ) ][ i ] := CVD->( Recno() ) 			
 			Else
@@ -322,7 +324,7 @@ EndDo
 
 
 /*
-** Carrego CT1 sem amarração com o plano referencial  ( CVD )
+** Carrego CT1 sem amarraï¿½ï¿½o com o plano referencial  ( CVD )
 */
 
 If !lExclui
@@ -356,11 +358,11 @@ EndIf
 Return
 
 /*
-Função.................: ExportaXLS	
+Funï¿½ï¿½o.................: ExportaXLS	
 Objetivo...............: Exporta Grid de Dados para Excel
 Autor..................: Leandro Diniz de Brito ( LDB ) - BRL Consulting
 Data...................: 18/03/2016
-Observações............:
+Observaï¿½ï¿½es............:
 */
 *--------------------------------------------*
 Static Function ExportaXLS	
@@ -430,11 +432,11 @@ oExcel1:SetVisible(.T.)
 Return
 
 /*
-Função.................: ImportaXLS	
+Funï¿½ï¿½o.................: ImportaXLS	
 Objetivo...............: Importar Dados para Grid
 Autor..................: Leandro Diniz de Brito ( LDB ) - BRL Consulting
 Data...................: 18/03/2016
-Observações............:
+Observaï¿½ï¿½es............:
 */
 *--------------------------------------------*
 Static Function ImportaXLS( oNewGetDados )	
@@ -458,7 +460,7 @@ If Empty( cPlanilha )
 	Return
 EndIf
 
-If !MsgYesNo( 'Confirma importação da planilha ?' )
+If !MsgYesNo( 'Confirma importaï¿½ï¿½o da planilha ?' )
 	Return
 EndIf     
 
@@ -529,7 +531,7 @@ While !Ft_FEof()
     aAux := {}
     
     /*
-    	* Validação Conta Contabil
+    	* Validaï¿½ï¿½o Conta Contabil
     */  
     If Empty( cConta ) 
 		Ft_FSkip()
@@ -541,55 +543,55 @@ While !Ft_FEof()
 	EndIf     
 	
     /*
-    	* Validação Conta Referencial
+    	* Validaï¿½ï¿½o Conta Referencial
     */  
     If !Empty( cCtaRef ) .And. CVN->( DbSetOrder( 2 ) , !DbSeek( xFilial() + cCvdCodPla+cCtaRef) )    //CAS - 17-05-2019 Ajuste no Indice: DbSetOrder(2) || + cCvdCodPla+cCtaRef
 		Aadd( aAux , { StrZero( nLinha  , 4 ) , 'Conta Referencial invalida.' } )    
 	EndIf	
 	
     /*
-    	* Validação Entidade
+    	* Validaï¿½ï¿½o Entidade
     */  
     If !Empty( cEntRef ) .And. Empty( Tabela( "GP" , cEntRef , .F. ) )
 		Aadd( aAux , { StrZero( nLinha  , 4 ) , 'Codigo da Entidade invalido.' } )    
 	EndIf	
 	
     /*
-    	* Validação Classe da Conta
+    	* Validaï¿½ï¿½o Classe da Conta
     */  
     If !Empty( cClasse ) .And. !cClasse $  '1,2'
 		Aadd( aAux , { StrZero( nLinha  , 4 ) , 'Classe da conta invalida.' } )    
 	EndIf			 
 	
     /*
-    	* Validação Natureza da Conta
+    	* Validaï¿½ï¿½o Natureza da Conta
     */  
     If !Empty( cNatCta ) .And. !cNatCta $  '01,02,03,04,05,09'
 		Aadd( aAux , { StrZero( nLinha  , 4 ) , 'Natureza da conta invalida.' } )    
 	EndIf 
 	
     /*
-    	* Validação Centro Custo
+    	* Validaï¿½ï¿½o Centro Custo
     */  
     If !Empty( cCusto ) .And. CTT->( !DbSeek( xFilial() + cCusto ) )  
 		Aadd( aAux , { StrZero( nLinha  , 4 ) , 'Centro de Custo invalido.' } )    
 	EndIf	 	
 	
     /*
-    	* Validação Tipo de Utilização
+    	* Validaï¿½ï¿½o Tipo de Utilizaï¿½ï¿½o
     */  
     If !Empty( cTpUtil ) .And. !cTpUtil $  'F,S,A'
-		Aadd( aAux , { StrZero( nLinha  , 4 ) , 'Tipo de Utilização nao informado ou invalido.' } )    
+		Aadd( aAux , { StrZero( nLinha  , 4 ) , 'Tipo de Utilizaï¿½ï¿½o nao informado ou invalido.' } )    
 	EndIf	
 	
 	/*
-		** Somente atualiza se todos os principais campos forem preenchidos, caso contrario a linha será ignorada .
+		** Somente atualiza se todos os principais campos forem preenchidos, caso contrario a linha serï¿½ ignorada .
 	*/
 	If Empty( aAux ) .And. !Empty( cConta ) .And. !Empty( cCtaRef ) .And. !Empty( cEntRef ) .And. ;
 		 !Empty( cClasse ) .And. !Empty( cNatCta )  .And. !Empty( cTpUtil ) 
 
 		/*
-			* Busca no aCols a Conta Contabil para atualização
+			* Busca no aCols a Conta Contabil para atualizaï¿½ï¿½o
 		*/
 		If ( nPos := Ascan( oNewGetDados:aCols , { | x | AllTrim( x[ nPosConta ] ) == AllTrim( cConta ) } ) ) > 0 
 			GDFieldPut ( 'CVD_CTAREF' , cCtaRef, nPos , oNewGetDados:aHeader, oNewGetDados:aCols ) 		
@@ -616,7 +618,7 @@ Ft_Fuse()
 
 If !Empty( aDadosLog )
 
-	Define MsDialog oDlg Title 'Log Importação Planilha ECD' From 1 , 1 TO 400 , 600 Of oMainWnd Pixel
+	Define MsDialog oDlg Title 'Log Importaï¿½ï¿½o Planilha ECD' From 1 , 1 TO 400 , 600 Of oMainWnd Pixel
 
 		oLbx := TWBrowse():New( ,,,,, { 'Linha da Planilha', 'Descricao do Erro                   ' } ,, oDlg ,,,,,,,,,,,, .F. ,, .T. )
    		oLbx:Align := CONTROL_ALIGN_ALLCLIENT

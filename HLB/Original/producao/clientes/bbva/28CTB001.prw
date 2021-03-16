@@ -8,7 +8,7 @@ Função.............: 28CTB001
 Objetivo...........: Gerar arquivo texto contendo lançamentos contabeis para o sistema AutBank
 Autor..............: Leandro Diniz de Brito ( BRL Consulting )
 Data...............: 28/03/2016
-Observações........:
+Observações........:   
 */                  
 
 Static cDirDest
@@ -21,7 +21,7 @@ Local cDescription	:= 'Esta rotina permite gerar arquivo texto contendo os lança
 Local oProcess
 Local bProcesso
 
-Private aRotina 	:= MenuDef()
+Private aRotina 	:= {}//MenuDef()
 Private cPerg 	 	:= '28CTB001'
 
 Private dDtIni 		:= CtoD( '' )

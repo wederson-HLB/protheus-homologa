@@ -189,8 +189,7 @@ Objetivos   : Atualização do Dicionario SX2.
 *-------------------------*
 Local cTexto := ""
 Local aCampos:= {}
-Local i:= 1 
-Local j:= 1 
+Local i
 
 //Verifica se a Tabela CTG está compartilhada.
 DbSelectArea("SX2")
@@ -215,13 +214,13 @@ If SX2->(DbSeek("CTG"))
 					If CQD->CQD_FILIAL <> '01' 
 						CQD->(RecLock('CQD', .F.))
 						CQD->(DbDelete())
-						CQD->(MSUnlock())   
-						cTexto += "- Tabela CTG(C)/CQD(E), Campo CQD_FILIAL <> 01 - deletado para CQD"+SM0->M0_CODIGO+"0!"+" - "+CQD->CQD_CALEND+CHR(13)+CHR(10)   
+						CQD->(MSUnlock())     
+						cTexto += "- Tabela CTG(C)/CQD(E), Campo CQD_FILIAL <> 01 - deletado para CQD"+SM0->M0_CODIGO+"0!"+" - "+CQD->CQD_CALEND+CHR(13)+CHR(10)
 					ElseIf CQD->CQD_FILIAL == '01' 
 						CQD->(RecLock('CQD', .F.))
 						CQD->CQD_FILIAL := ''
-						CQD->(MSUnlock())   						 
-						cTexto += "- Tabela CTG(C)/CQD(E) ,Campo CQD_FILIAL = 01 - foi limpo para CQD"+SM0->M0_CODIGO+"0!"+" - "+CQD->CQD_CALEND+CHR(13)+CHR(10)   						
+						CQD->(MSUnlock())   
+						cTexto += "- Tabela CTG(C)/CQD(E) ,Campo CQD_FILIAL = 01 - foi limpo para CQD"+SM0->M0_CODIGO+"0!"+" - "+CQD->CQD_CALEND+CHR(13)+CHR(10)						
 					EndIf
 		
 					CQD->(DbSkip())

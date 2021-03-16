@@ -172,7 +172,7 @@ EndIf
 If nOpcao == 3 .OR. nOpcao == 4 //Inclusão e Classificação 
 	If Alltrim(SF4->F4_DUPLIC)=="S" 						//CAS - 22-11-2017 - Tratamento somente para quando gerar Financeiro. #4714
 		If SD1->(FieldPos("D1_P_NUMFL"))>0
-			nNumFL := SD1->D1_P_NUMFL 
+			nNumFL := SD1->D1_P_NUMFL
 		EndIf
 		If !Empty(nNumFL)
 		   If SE2->(FieldPos("E2_P_NUMFL"))>0			                                                

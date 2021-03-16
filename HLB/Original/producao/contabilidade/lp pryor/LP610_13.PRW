@@ -30,7 +30,23 @@ If SF4->F4_ISS == "S" .OR. ALLTRIM(SD2->D2_SERIE) == "ND"
          ENDIF
       Else 
          vConta:=""
-      EndIf   
+      EndIf
+
+	// PAULO SILVA - EZ4 EMPRESA - FAIR - CH#23525
+   ElseIf AllTrim(SM0->M0_CODIGO)    $ "10"
+ 	  If ALLTRIM(SD2->D2_CODISS) 	 $ "02800" 
+      	vconta := "31113003"       
+      ElseIf ALLTRIM(SD2->D2_CODISS) $ "02919" 
+	   	vconta := "31113006"   
+      ElseIf ALLTRIM(SD2->D2_CODISS) $ "03115" 
+	   	vconta := "31113005"	   	
+      ElseIf ALLTRIM(SD2->D2_CODISS) $ "05762" 
+	   	vconta := "31113005" 
+         ENDIF
+      ELSE
+        vConta:="   "
+      ENDIF
+      
    ElseIf AllTrim(SM0->M0_CODIGO) $ "JB"   //CAS - 21/06/2017 - Inserido bloco da "JB" para solucionar o chamado 040143 (Mudar conta para 31111002).
       If Alltrim(SD2->D2_CF) $ cCfop
          IF SA1->A1_EST $ "EX"
@@ -57,7 +73,7 @@ If SF4->F4_ISS == "S" .OR. ALLTRIM(SD2->D2_SERIE) == "ND"
       vconta := SB1->B1_CONTA
   //JSS - 05/12/2014 - Ajusta para solucionar o caso 022874.    
    ElseIf AllTrim(SM0->M0_CODIGO)    $ "4Z"
- 	  If ALLTRIM(SD2->D2_CODISS) 	 $ "05762" 
+ 	  If ALLTRIM(SD2->D2_CODISS) 	    $ "05762" 
       	vconta := "311130011"       
       ElseIf ALLTRIM(SD2->D2_CODISS) $ "02917" 
 	   	vconta := "311130012"   
@@ -68,7 +84,8 @@ If SF4->F4_ISS == "S" .OR. ALLTRIM(SD2->D2_SERIE) == "ND"
       ElseIf ALLTRIM(SD2->D2_CODISS) $ "03115" 
 	   	vconta := "31114002"  
 	  EndIf
-   Else  
+   Else 
+
       If Alltrim(SD2->D2_CF) $ cCfop
          IF SA1->A1_EST$"EX"
 			If AllTrim(SM0->M0_CODIGO) $ "AW"
@@ -87,6 +104,5 @@ If SF4->F4_ISS == "S" .OR. ALLTRIM(SD2->D2_SERIE) == "ND"
          vConta:="   "
       ENDIF
    EndIf
-EndIf
-			 
+	 
 Return(vConta)

@@ -80,10 +80,7 @@ If Pergunte(cPerg,.T.)
 	//Início - Wederson L. Santana --> 18/09/2020
     cFilDe     := mv_par18
     cFilAte    := mv_par19
-
-    If MsgYesNo("Deseja imprimir o complemento do histórico ?","Complemento do histórico contábil.")
-	   nCompHis   := 1
-	EndIf    
+	//nCompHis   := mv_Par20
 	//nCliFor    := mv_Par21
 	//Fim - Wederson L. Santana --> 18/09/2020
 
@@ -404,11 +401,10 @@ dbUseArea(.T.,"TOPCONN", TCGENQRY(,,cQryCT2),"TMPCT2",.F.,.T.)
 
 		cHist := AllTrim(TMPCT2->HIST)
 		//Busca o histórico
-		If nCompHis > 0
-			cHist += getHist(xFilial("CT2")+TMPCT2->(DTLANC+SubStr(DOC,1,15)),;
+		cHist += getHist(xFilial("CT2")+TMPCT2->(DTLANC+SubStr(DOC,1,15)),;
 								AllTrim(TMPCT2->SEQUEN),;
 								AllTrim(TMPCT2->SEQLAN))
-	    EndIf	
+	    	
 		//Grava o arquivo temporário.
 	   	//REL->(DbAppend())
 		RecLock("REL", .T.)		

@@ -2,7 +2,7 @@
 #Include "Tbiconn.Ch"
 #Include "topconn.Ch"
 #Include "Shell.Ch"
-#Include "Ap5Mail.ch" 
+#Include "Ap5Mail.ch"
 
 Static aLog	:= {}
 
@@ -24,7 +24,7 @@ Local cPerg  		:= "KPXMLIMP1"
 Local cFunction		:= "KXMLIMP"
 Local cTitle		:= "ImportaÁ„o de XML"
 Local bProcess		:= { |oSelf| ImportarNf(oSelf) }                   
-Local cDescription	:= "Esta rotina irùEgerar notas de entrada/saida de produtos e serviÁos com base na importaÁ„o de XML."
+Local cDescription	:= "Esta rotina irÅEgerar notas de entrada/saida de produtos e serviÁos com base na importaÁ„o de XML."
 Local cArqNtx 		:= CriaTrab( NIL, .F. )
 
 Private lVldTes		:= .F.
@@ -46,8 +46,8 @@ Private aLogXml := {}
 IndRegua( "SA5", cArqNtx, "A5_FILIAL+A5_FORNECE+A5_LOJA+A5_CODPRF", , , "Selec.registros..." )
 
 PutSx1(cPerg,"01","Pasta Origem dos XML Prod/Serv","","","mv_ch1","C",99,0,1,"G",""								,""	 ,"","S","mv_par01",""			,"","","",""				,"","",""		,"","","","","","","","",{"Informe a pasta de origem dos"	,"arquivos de XML de Produtos "	,"e ServiÁos."},{},{})
-PutSx1(cPerg,"02","Buscar Produtos nas NF Entrada","","","mv_ch2","N",01,0,2,"C",""								,""	 ,"","" ,"mv_par02","Produtos" ,"","","","Prod. X Fornec."	,"","","Ambos"	,"","","","","","","","",{"Informe como serùEa busca dos"	,"produtos nas NF de Entrada: "	,"- Cadastro de Produtos (SB1)","- Produto X Fornecedor (SA5)","- Ambos (SB1 e depois SA5)  "},{},{})
-PutSx1(cPerg,"03","Mostra Erro?"				  ,"","","mv_ch3","N",01,0,2,"C",""								,""	 ,"","" ,"mv_par03","Sim"		,"","","",""				,"","",""		,"","","","","","","","",{"Na IntegraÁ„o serùEexibido o "	,"erro por Nota Fiscal"	,"","",""},{},{})
+PutSx1(cPerg,"02","Buscar Produtos nas NF Entrada","","","mv_ch2","N",01,0,2,"C",""								,""	 ,"","" ,"mv_par02","Produtos" ,"","","","Prod. X Fornec."	,"","","Ambos"	,"","","","","","","","",{"Informe como serÅEa busca dos"	,"produtos nas NF de Entrada: "	,"- Cadastro de Produtos (SB1)","- Produto X Fornecedor (SA5)","- Ambos (SB1 e depois SA5)  "},{},{})
+PutSx1(cPerg,"03","Mostra Erro?"				  ,"","","mv_ch3","N",01,0,2,"C",""								,""	 ,"","" ,"mv_par03","Sim"		,"","","",""				,"","",""		,"","","","","","","","",{"Na IntegraÁ„o serÅEexibido o "	,"erro por Nota Fiscal"	,"","",""},{},{})
 PutSx1(cPerg,"04","TES?"				  		  ,"","","mv_ch4","C",03,0,0,"C","Vazio().or.Existcpo('SF4')"	,"SF4","","" ,"mv_par04",""	  		,"","","",""				,"","",""		,"","","","","","","","",{"TES utilizada na NF."			,""						,"","",""},{},{})
 PutSx1(cPerg,"05","CondiÁ„o Pagamento?"			  ,"","","mv_ch5","C",03,0,0,"C","Existcpo('SE4')"				,"SE4","","" ,"mv_par05",""	  		,"","","",""				,"","",""		,"","","","","","","","",{"Cond. Pag. utilizada na NF."		,""						,"","",""},{},{})
 PutSx1(cPerg,"06","Natureza?"					  ,"","","mv_ch6","C",10,0,0,"C","Vazio().or.Existcpo('SED')"	,"SED","","" ,"mv_par06",""	  		,"","","",""				,"","",""		,"","","","","","","","",{"Natureza utilizada na NF."		,""			 			,"","",""},{},{}) 
@@ -193,7 +193,7 @@ If Len(aNFS)+Len(aNF) > 0
 		Return
 	EndIf
 Else
-	MsgAlert("N„o HùEDocumentos XML para Importar !")
+	MsgAlert("N„o HÅEDocumentos XML para Importar !")
 	Return
 EndIf
 
@@ -624,10 +624,10 @@ If Len(aNF)>0
 						EndIf
 					Else
 						If lExibErro
-							MsgStop('PrùEnota ja cadastrada:'+CRLF+'"'+aNF[02]+'"')
+							MsgStop('PrÅEnota ja cadastrada:'+CRLF+'"'+aNF[02]+'"')
 						EndIf
 						If Valtype(oRegua)=="O"
-							oRegua:SaveLog("PrùEnota de serviÁo:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" ja cadastrada.")
+							oRegua:SaveLog("PrÅEnota de serviÁo:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" ja cadastrada.")
 						EndIf
 					EndIf
 				EndIf
@@ -1076,7 +1076,7 @@ If nTipo==1
 	@ 02,02 TO (oPanel1:NCLIENTHEIGHT/2)-2,(oPanel1:NCLIENTWIDTH/2)-2 OF oPanel1 PIXEL
 	
 	@ 06,05	Say "Classifique as notas abaixo conforme suas caracteristicas originais."	OF oPanel1 PIXEL
-	@ 18,05 Say "Obs: Os documentos de saida sem TES ser„o geradas prùEnotas."			OF oPanel1 PIXEL
+	@ 18,05 Say "Obs: Os documentos de saida sem TES ser„o geradas prÅEnotas."			OF oPanel1 PIXEL
 	
 	
 	oGets:=MSNewGetDados():New(34,5,128,315,2,.T.,.T.,,,,,,,,oPanel2,aHeader,aCols)
@@ -1143,7 +1143,7 @@ Else
 	@ 02,02 TO (oPanel1:NCLIENTHEIGHT/2)-2,(oPanel1:NCLIENTWIDTH/2)-2 OF oPanel1 PIXEL
 	
 	@ 06,05	Say "Classifique as notas abaixo conforme suas caracteristicas originais."	OF oPanel1 PIXEL
-	@ 18,05 Say "Obs: Os documentos de saida sem TES ser„o geradas prùEnotas."			OF oPanel1 PIXEL
+	@ 18,05 Say "Obs: Os documentos de saida sem TES ser„o geradas prÅEnotas."			OF oPanel1 PIXEL
 	
 	oGets:=MSNewGetDados():New(34,5,128,315,2,.T.,.T.,,,,,,,,oPanel2,aHeader,aCols)
 	oGets:oBrowse:Align 	:= CONTROL_ALIGN_ALLCLIENT
@@ -1400,7 +1400,7 @@ Else
 	    Else  		
 		
 			//aAdd(aNF,oNFe:_EMIT:_CNPJ:TEXT)										//->> 04 - CNPJ FORNECEDOR
-			//MSM - 26/11/14 - Alterado pois a posiÁ„o 4 jùEexiste
+			//MSM - 26/11/14 - Alterado pois a posiÁ„o 4 jÅEexiste
 			aNF[4]:=oNFe:_EMIT:_CNPJ:TEXT	//->> 04 - CNPJ FORNECEDOR
 			
 			SA2->(dbSetOrder(3))
@@ -1451,7 +1451,7 @@ Else
 			If !SA2->(dbSeek(xFilial("SA2")+PadR(Upper(oNFe:_DEST:_XNOME:TEXT),Len(SA2->A2_NOME))))
 				//aAdd(aNF,oNFe:_DEST:_CNPJ:TEXT)									//->> 04 - CNPJ FORNECEDOR ESTRANGEIRO
 				
-				//MSM - 26/11/14 - Alterado pois a posiÁ„o 4 jùEexiste
+				//MSM - 26/11/14 - Alterado pois a posiÁ„o 4 jÅEexiste
 				aNF[4]:=oNFe:_DEST:_CNPJ:TEXT	//->> 04 - CNPJ FORNECEDOR ESTRANGEIRO
 				
 				aAdd( aNewForn, { 	" "																		,;	//------> 01 - E-mail
@@ -1470,7 +1470,7 @@ Else
 			Else	
 				//aAdd(aNF,SA2->A2_COD)									//->> 04 - CNPJ FORNECEDOR ESTRANGEIRO
 				
-				//MSM - 26/11/14 - Alterado pois a posiÁ„o 4 jùEexiste
+				//MSM - 26/11/14 - Alterado pois a posiÁ„o 4 jÅEexiste
 				aNF[4]:=SA2->A2_CGC	//->> 04 - CNPJ FORNECEDOR ESTRANGEIRO
 			EndIf 
 			
@@ -1716,10 +1716,10 @@ If aNF[1]=="ENTRADA"
 	If Empty(aNF[14])
 		If Empty(SA2->A2_NATUREZ)
 			If lExibErro
-				Aviso( 'AteÁ„o' , 'N„o hùEnatureza cadastrada para este fornecedor: ' + SA2->A2_COD + CRLF + CRLF , { 'Ok' } , 2 , 'Natureza N„o Cadastrada!' )
+				Aviso( 'AteÁ„o' , 'N„o hÅEnatureza cadastrada para este fornecedor: ' + SA2->A2_COD + CRLF + CRLF , { 'Ok' } , 2 , 'Natureza N„o Cadastrada!' )
 			EndIf
 			If Valtype(oRegua)=="O"
-				oRegua:SaveLog("Nota fiscal de produto:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" n„o importada."+" "+"N„o hùEnatureza cadastrada para este fornecedor")
+				oRegua:SaveLog("Nota fiscal de produto:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" n„o importada."+" "+"N„o hÅEnatureza cadastrada para este fornecedor")
 			EndIf
 			Return .F.
 		Else
@@ -1731,12 +1731,12 @@ If aNF[1]=="ENTRADA"
 	SF1->(dbSetOrder(1))
 	If SF1->(dbSeek(xFilial('SF1')+StrZero(Val(aNF[02]),9)+PadR(aNF[03],3)+SA2->(A2_COD+A2_LOJA)))
 		If lExibErro
-			Aviso( 'AtenÁ„o' , 'Impossivel importar o Documento, pois o mesmo jùEfoi cadastrado!' + CRLF + CRLF + ;
+			Aviso( 'AtenÁ„o' , 'Impossivel importar o Documento, pois o mesmo jÅEfoi cadastrado!' + CRLF + CRLF + ;
 			'Fornecedor: ' + SA2->(A2_COD+'/'+A2_LOJA+' '+A2_NOME) + CRLF + ;
-			'Doc./Serie: ' + cNumero+' / '+cSerie , { 'Ok' } , 2 , 'Documento jùEcadastrado!' )
+			'Doc./Serie: ' + cNumero+' / '+cSerie , { 'Ok' } , 2 , 'Documento jÅEcadastrado!' )
 		EndIf
 		If Valtype(oRegua)=="O"
-			oRegua:SaveLog("Nota fiscal de produto:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" jùEexiste.")
+			oRegua:SaveLog("Nota fiscal de produto:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" jÅEexiste.")
 		EndIf
 		Return .F.
 	EndIf
@@ -2076,12 +2076,12 @@ Else
 	SF2->(dbSetOrder(1))
 	If SF2->(dbSeek(xFilial('SF2')+cNumero+PadR(cSerie,3)))
 		If lExibErro
-			Aviso( 'AtenÁ„o' , 'Impossivel importar o Documento, pois o mesmo jùEfoi cadastrado!' + CRLF + CRLF + ;
+			Aviso( 'AtenÁ„o' , 'Impossivel importar o Documento, pois o mesmo jÅEfoi cadastrado!' + CRLF + CRLF + ;
 			'Cliente:    ' + SA1->(A1_COD+'/'+A1_LOJA+' '+A1_NOME) + CRLF + ;
-			'Doc./Serie: ' + cNumero+' / '+cSerie , { 'Ok' } , 2 , 'Documento jùEcadastrado!' )
+			'Doc./Serie: ' + cNumero+' / '+cSerie , { 'Ok' } , 2 , 'Documento jÅEcadastrado!' )
 		EndIf
 		If Valtype(oRegua)=="O"
-			oRegua:SaveLog("Nota fiscal de produto:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" jùEcadastrada.")
+			oRegua:SaveLog("Nota fiscal de produto:"+Alltrim(aNF[02])+"/"+Alltrim(aNF[03])+" jÅEcadastrada.")
 		EndIf
 		Return .F.
 	EndIf
@@ -2548,7 +2548,7 @@ oPanel2:Align := CONTROL_ALIGN_ALLCLIENT
 @ 02,02 TO (oPanel1:NCLIENTHEIGHT/2)-2,(oPanel1:NCLIENTWIDTH/2)-2 OF oPanel1 PIXEL
 
 @ 06,05	Say "Classifique as notas abaixo conforme suas caracteristicas originais."	OF oPanel1 PIXEL
-@ 18,05 Say "Obs: Os documentos de entrada sem TES ser„o geradas como PrùENotas."	OF oPanel1 PIXEL
+@ 18,05 Say "Obs: Os documentos de entrada sem TES ser„o geradas como PrÅENotas."	OF oPanel1 PIXEL
 
 @ 06,330 BitMap ResName "ENABLE"   				Size  10,10 OF oPanel1 PIXEL NOBORDER
 @ 06,342 Say "XML V·lido para Importar"			Size 120,10 OF oPanel1 PIXEL
@@ -2602,7 +2602,7 @@ If nOpcA==1
 			aNF[nY,23] := oGetNf:aCols[nX,18]
 			aNF[nY,22] := oGetNf:aCols[nX,21]
 			
-			//RRP - 19/03/2015 - Incluindo a conta cont·bil e natureza do cliente ou fornecedor que serùEcadastrado no array aNewClie
+			//RRP - 19/03/2015 - Incluindo a conta cont·bil e natureza do cliente ou fornecedor que serÅEcadastrado no array aNewClie
 			If Len(aNewClie)>0
 				//Comparando o CPF ou CNPJ
 				nPosiCli := aScan( aNewClie, { |x| alltrim(x[11]) == Alltrim(oGetNf:aCols[nX,5])})
@@ -3047,9 +3047,9 @@ If (lDigChv .and. cFormul == "N" .and. AllTrim(cEspecie) == "SPED") .Or. (lDigCh
 					Aviso("SPED",IIf(Empty(GetWscError(3)),GetWscError(1),GetWscError(3)),{"OK"},3)
 				EndIf
 				If len(Alltrim(cChaveNFE)) > 0 .and. len(Alltrim(cChaveNFE)) < 44
-					cMsgErro := "A chave informada ùEmenor que o permitido e impossibilita a consulta na Sefaz."
+					cMsgErro := "A chave informada ÅEmenor que o permitido e impossibilita a consulta na Sefaz."
 					If lMsg
-						If MsgNoYes("A chave informada ùEmenor que o permitido e impossibilita a consulta na Sefaz."+CRLF+CRLF+"Deseja APAGAR o conte˙do do campo para inserir uma nova chave?")
+						If MsgNoYes("A chave informada ÅEmenor que o permitido e impossibilita a consulta na Sefaz."+CRLF+CRLF+"Deseja APAGAR o conte˙do do campo para inserir uma nova chave?")
 							lRet := .F.  //Limpa o campo caso tenha uma chave menor
 						Else
 							lRet := .T.
@@ -3145,7 +3145,7 @@ If SF4->(DbSeek(xFilial("SF4")+cTes))
 	If SF4->F4_ESTOQUE == "S"         
                                 
  		If lMsg 
- 			MsgInfo("Essa TES atualiza estoque. O Xml serùEgravado como pedido!","HLB BRASIL")
+ 			MsgInfo("Essa TES atualiza estoque. O Xml serÅEgravado como pedido!","HLB BRASIL")
  		EndIf
  
  		lVldTes := .T.

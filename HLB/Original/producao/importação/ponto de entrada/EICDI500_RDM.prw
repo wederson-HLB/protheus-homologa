@@ -216,7 +216,7 @@ If SW7->(DbSeek(xFilial("SW7")+SW6->W6_HAWB))
 			     
 			//Testa se o item possui o mesmo codigo.
 			DbSelectArea("SW1")
-			//DbOrderNickName("SW1")
+			//DbOrderNickName("SW1") // TMS - esta linha estava comentada. declaração do nickname 12/12/2019
 			IF UPPER(Alltrim(SubStr(GetEnvServer(),1,3))) == "P11"
 				SW1->(DbSetOrder(5))//JVR
 			ELSE

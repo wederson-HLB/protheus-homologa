@@ -8883,7 +8883,7 @@ If ( Empty(cErro) .And. Empty(cAviso) .And. oXml <> Nil)
 	If XmlChildEx(oXml ,  "_CTEPROC") <> Nil
 		oXml := oXml:_CTEPROC
 	Else
-	    oXml := oXml:_RETCTECONSULTADFE:_CTEDFE:_PROCCTE 
+	    oXml := oXml:_RETCTECONSULTADFE:_CTEDFE:_PROCCTE
 	EndIf
 	
 	
@@ -11448,8 +11448,7 @@ FT_FUse(cArqTxt) // Abre o arquivo
 FT_FGOTOP()      // Posiciona no inicio do arquivo
 
 While !FT_FEof()
-	cLinha := FT_FReadln() 	//Le a linha
-	cLinha := StrTran(cLinha,'"','')			
+	cLinha := FT_FReadln()				//Le a linha
 	aLinha := separa(UPPER(cLinha),";")	//Sepera para vetor 
 	If "N1_" $ UPPER(aLinha[1]) .or. "N3_" $ UPPER(aLinha[1])
 		//Verifica se os campos base estão no arquivo
@@ -11570,7 +11569,6 @@ FT_FUse(cArqTxt)	// Abre o arquivo
 FT_FGOTO(nPos)		// Posiciona no inicio do arquivo
 While !FT_FEof()
    	cLinha := FT_FReadln()        // Le a linha
-	cLinha := StrTran(cLinha,'"','')	   
  	aLinha := separa(UPPER(cLinha),";")  // Sepera para vetor 
 	aAux := {}
 	For nK:=1 to len(aCampos1)

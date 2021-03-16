@@ -25,7 +25,9 @@ cQuery += " WHERE D_E_L_E_T_ <> '*' "
 cQuery += "AND C5_FILIAL = '01' "
 cQuery += "AND Substring(C5_NUM,1,1) NOT IN ('A','B','C','X','T','Z','S','#','*','D','.') "
 cQuery += "AND C5_NUM NOT IN ('091234') "
-cQuery += "AND R_E_C_N_O_ > 90000"
+cQuery += "AND R_E_C_N_O_ > 90000 "
+cQuery += "AND C5_NUM >='000000' "
+cQuery += "AND C5_NUM <='999999' "
             
 dbUseArea(.T., "TOPCONN", TcGenQry(,, cQuery), "SC5QRY", .F., .F.)
 

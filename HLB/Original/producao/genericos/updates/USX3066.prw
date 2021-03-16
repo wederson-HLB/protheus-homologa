@@ -210,10 +210,10 @@ Local aSX3:= {}
 //{SX3} - Campos
 //AADD(aSX3,{X3_ARQUIVO,X3_ORDEM,X3_CAMPO,X3_TIPO,X3_TAMANHO,X3_DECIMAL,X3_TITULO,X3_DESCRIC,X3_USADO,X3_NIVEL,X3_RESERV,X3_PROPRI,X3_BROWSE,X3_VISUAL,X3_CONTEXT,X3_PICTURE})
 
-AADD(aSX3,{'SD1','','D1_P_NUMFL','N','8','0','Num.ID','Numero ID','€€€€€€€€€€€€€€','1','þA','U','N','A','R','@N 99999999'})        
+AADD(aSX3,{'SD1','','D1_P_NUMFL','N','8','0','Num.Fluig','Numero Fluig','€€€€€€€€€€€€€€','1','þA','U','N','A','R','@N 99999999'})        
 AADD(aArqUpd,'SD1')
 
-AADD(aSX3,{'SE2','','E2_P_NUMFL','N','8','0','Num.ID','Numero ID','€€€€€€€€€€€€€€','1','þA','U','N','A','R','@N 99999999'})     
+AADD(aSX3,{'SE2','','E2_P_NUMFL','N','8','0','Num.Fluig','Numero Fluig','€€€€€€€€€€€€€€','1','þA','U','N','A','R','@N 99999999'})     
 AADD(aArqUpd,'SE2')
 
 //Incluindo a última ordem no campo de log.

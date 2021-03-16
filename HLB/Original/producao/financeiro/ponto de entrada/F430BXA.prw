@@ -21,13 +21,20 @@ Módulo      : Financeiro
     if cEmpAnt $ "DW" 
 		RecLock("SE5",.F.)
 			Replace SE5->E5_HISTOR With SE5->E5_TIPO + " " + SE5->E5_PREFIXO + " " + SE5->E5_NUMERO + " " + Posicione("SED",1,xFilial("SED")+alltrim(SE5->E5_NATUREZ),"ED_DESCRIC") 
-		SE5->(MsUnlock())
-	endif	
+		SE5->(MsUnlock())	
     
 	//AOA - 20/03/2017 - Alterar historico solaris
-	If cEmpAnt $ "HH/HJ" .AND. ALLTRIM(SE5->E5_TIPODOC) $ "VL"
+	ElseIf cEmpAnt $ "HH/HJ" .AND. ALLTRIM(SE5->E5_TIPODOC) $ "VL"
 		RecLock("SE5",.F.)
 			Replace SE5->E5_HISTOR With SE5->E5_NUMERO +" - "+ Posicione("SA2",1,xFilial("SA2")+SE5->E5_CLIFOR+SE5->E5_LOJA,"A2_NOME")
 		SE5->(MsUnlock())		
+	
+	//CAS - 02/02/2021 - Alterar historico para Baixas de Retorno de CNAB, para todas as empresas
+	Else
+		IF !EMPTY(SE5->E5_NUMERO)
+			RecLock("SE5",.F.)
+				Replace SE5->E5_HISTOR With SE5->E5_TIPO + " " + SE5->E5_NUMERO + " - " + Posicione("SED",1,xFilial("SED")+alltrim(SE5->E5_NATUREZ),"ED_DESCRIC") 
+			SE5->(MsUnlock())			
+		EndIf
 	EndIf
 Return

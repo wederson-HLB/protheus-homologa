@@ -101,6 +101,26 @@ USER FUNCTION USX3082(lDesc)
 			aAdd( aAltera, {"SX3",  2, SX3->X3_CAMPO, 'X3_CONTEXT', "R", SX3->X3_ARQUIVO} )
 		EndIf
 	Next i
+	
+	//CAS - 01/09/2020 - Ajuste para deixar os campos EE_DVAGE/EE_DVCTA editáveis
+	aUnidCpo := {"EE_DVAGE"}
+	For i:=1 To Len(aUnidCpo)
+		If SX3->(DbSeek( AVKEY(aUnidCpo[i],'X3_CAMPO') ))
+			//{Alias , Indice, Chave, Campo a ser alterado, conteudo, }
+			aAdd( aAltera, {"SX3",  2, SX3->X3_CAMPO, 'X3_USADO', cUsado, SX3->X3_ARQUIVO} )
+			aAdd( aAltera, {"SX3",  2, SX3->X3_CAMPO, 'X3_VISUAL', "A", SX3->X3_ARQUIVO} )
+			aAdd( aAltera, {"SX3",  2, SX3->X3_CAMPO, 'X3_CONTEXT', "R", SX3->X3_ARQUIVO} )
+		EndIf
+	Next i
+	aUnidCpo := {"EE_DVCTA"}
+	For i:=1 To Len(aUnidCpo)
+		If SX3->(DbSeek( AVKEY(aUnidCpo[i],'X3_CAMPO') ))
+			//{Alias , Indice, Chave, Campo a ser alterado, conteudo, }
+			aAdd( aAltera, {"SX3",  2, SX3->X3_CAMPO, 'X3_USADO', cUsado, SX3->X3_ARQUIVO} )
+			aAdd( aAltera, {"SX3",  2, SX3->X3_CAMPO, 'X3_VISUAL', "A", SX3->X3_ARQUIVO} )
+			aAdd( aAltera, {"SX3",  2, SX3->X3_CAMPO, 'X3_CONTEXT', "R", SX3->X3_ARQUIVO} )
+		EndIf
+	Next i
 
 	aUnidCpo := {"EE_CODEMP"}
 	For i:=1 To Len(aUnidCpo)

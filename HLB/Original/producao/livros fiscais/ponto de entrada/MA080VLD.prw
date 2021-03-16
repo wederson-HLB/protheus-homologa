@@ -1,18 +1,18 @@
 #include "Protheus.ch"    
 #INCLUDE "AP5MAIL.CH"
 /*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  MA080VLD     ºAutor  Adriane Sayuri Kamiya º Data ³ 08/13/10 º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³ Ponto de entrada na gravação da TES                        º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                        º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½
+ï¿½ï¿½ï¿½Programa  MA080VLD     ï¿½Autor  Adriane Sayuri Kamiya ï¿½ Data ï¿½ 08/13/10 ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¹ï¿½ï¿½
+ï¿½ï¿½ï¿½Desc.     ï¿½ Ponto de entrada na gravaï¿½ï¿½o da TES                        ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½          ï¿½                                                            ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¹ï¿½ï¿½
+ï¿½ï¿½ï¿½Uso       ï¿½ AP                                                        ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 *----------------------*
 User Function MA080VLD() 
@@ -40,7 +40,7 @@ Private cEmail := GetMV("MV_RELACNT")
 Private cPass  := GetMV("MV_RELPSW")
 Private lAuth  := GetMv("MV_RELAUTH")  
 
-//CAS - 21/02/2017 chamado 039087 - Removido o e-mail kareane.nascimento@hlb.com.br. Incluúo os e-mails priscila.santos/monalisa.martins/mariana.rodrigues
+//CAS - 21/02/2017 chamado 039087 - Removido o e-mail kareane.nascimento@hlb.com.br. Incluï¿½ï¿½o os e-mails priscila.santos/monalisa.martins/mariana.rodrigues
 Private cDe      := AllTrim(SuperGetMv("MV_RELFROM",.F., ""))//Email de origem
 Private cPara    := padr(	'carla.oliveira@hlb.com.br'+;
 							',diogo.braga@hlb.com.br'+;
@@ -55,15 +55,15 @@ Private cMsg     := ""
 Private cErro    := ""
 
 
-//RRP - 06/04/2018 - Validação se estEno ambiente produção ou homologação
+//RRP - 06/04/2018 - Validaï¿½ï¿½o se estï¿½Eno ambiente produï¿½ï¿½o ou homologaï¿½ï¿½o
 aArea := GetArea()  
-nConP1200 := TcLink( "MSSQL7/P12117_00","10.0.30.56",7891 )
+nConP1200 := TcLink( "MSSQL7/P12_00","172.16.16.152",7891 )  //CAS - 10/02/2020 Alterado dados da conexÃ£o evido a Atual.Release e servidor (MSSQL7/P12_00 e 172.16.16.152)
 If nConP1200 # 0
 
 	cQry :=" SELECT Z06_AMB FROM P12_00..Z06YY0 WHERE Z06_AMB LIKE '"+Left(cAmbiente,6)+"%' AND Z06_PROD = 'S' AND Z06_TES = 'S' "
 	
 	If TCSQLExec(cQry)<0
-		MsgInfo("Ocorreu um problema na busca das informações no Amb. Adm P12_00!Favor abrir um chamado!","HLB BRASIL")
+		MsgInfo("Ocorreu um problema na busca das informaï¿½ï¿½es no Amb. Adm P12_00!Favor abrir um chamado!","HLB BRASIL")
 		Return
 	EndIf
 
@@ -75,7 +75,7 @@ If nConP1200 # 0
 
 	Count to nRecCount
 
-	//Encerra a conexão
+	//Encerra a conexï¿½o
 	TCunLink(nConP1200)	
 
 	If nRecCount > 0
@@ -90,7 +90,7 @@ If nConP1200 # 0
 		cMsg += ' </td>'
 		 
 		cMsg += ' <tr>'
-		cMsg += " <td colspan='4'>A TES <em>"+M->F4_CODIGO+"</em> foi alterada pelo usuário <em>"+cUserName+"</em> na máquina <em> "+cCompName+"</em> no dia <em>"+dtoc(dData)+"</em> às <em>"+cHora+"</em> hrs.  "
+		cMsg += " <td colspan='4'>A TES <em>"+M->F4_CODIGO+"</em> foi alterada pelo usuï¿½rio <em>"+cUserName+"</em> na mï¿½quina <em> "+cCompName+"</em> no dia <em>"+dtoc(dData)+"</em> ï¿½s <em>"+cHora+"</em> hrs.  "
 		cMsg += " </td> "
 		cMsg += ' </tr>'
 		       
@@ -101,7 +101,7 @@ If nConP1200 # 0
 		                                
 		cMsg += ' <tr>'
 		cMsg += ' <td width="80" height="41" bgcolor="#fffaf0" bordercolor="#fffaf0" align = "center"><font face="times" color="black" size="3"><b>  Campo </b></font></td> '
-		cMsg += ' <td width="80" height="41" bgcolor="#fffaf0" bordercolor="#fffaf0" align = "center"><font face="times" color="black" size="3"><b>  Conteúdo Anterior </b></font></td>'
+		cMsg += ' <td width="80" height="41" bgcolor="#fffaf0" bordercolor="#fffaf0" align = "center"><font face="times" color="black" size="3"><b>  Conteï¿½do Anterior </b></font></td>'
 		cMsg += ' <td width="80" height="41" bgcolor="#fffaf0" bordercolor="#fffaf0" align = "center"><font face="times" color="black" size="3"><b> Alterado Para </b></font></td> '
 		cMsg += ' <td width="10" height="41" bgcolor="#fffaf0" bordercolor="#fffaf0" align = "center"><font face="times" color="black" size="3"><b>   </b></font></td>' 
 		cMsg += ' </tr>'
@@ -111,7 +111,7 @@ If nConP1200 # 0
 		SF4->(DbSeek(xFilial("SF4")+M->F4_CODIGO))
 		FOR i := 1 TO FCount()
 			cCampo := FIELDNAME(I)       
-			cAssunto :="Alteração da TES  "+M->F4_CODIGO+  "  no Ambiente "+ Upper(cAmbiente) + " - Empresa : " + SM0->M0_NOME
+			cAssunto :="Alteraï¿½ï¿½o da TES  "+M->F4_CODIGO+  "  no Ambiente "+ Upper(cAmbiente) + " - Empresa : " + SM0->M0_NOME
 			If SF4->(FieldPos(cCampo)) # 0
 				If SF4->&(cCampo) <>  M->&(cCampo)
 					lAlterouTES := .T.     
@@ -177,7 +177,7 @@ If nConP1200 # 0
 		cMsg     += '</Table><BR?>' +CRLF                                                   
 
 		If Empty(cServer) .And. Empty(cEmail) .And. Empty(cPass)
-			MsgAlert("Não foram definidos os parâmetros do server do Protheus para envio de e-mail",cTitulo)
+			MsgAlert("Nï¿½o foram definidos os parï¿½metros do server do Protheus para envio de e-mail",cTitulo)
 			Return
 		Endif    
 
@@ -198,15 +198,15 @@ STATIC FUNCTION ValidaEmail()
 Local lRet := .T.
 
 If Empty(cDe)
-   MsgInfo("Campo 'De' preenchimento obrigatório",cTitulo)
+   MsgInfo("Campo 'De' preenchimento obrigatï¿½rio",cTitulo)
    lRet:=.F.
 Endif
 If Empty(cPara) .And. lRet
-   MsgInfo("Campo 'Para' preenchimento obrigatório",cTitulo)
+   MsgInfo("Campo 'Para' preenchimento obrigatï¿½rio",cTitulo)
    lRet:=.F.
 Endif
 If Empty(cAssunto) .And. lRet
-   MsgInfo("Campo 'Assunto' preenchimento obrigatório",cTitulo)
+   MsgInfo("Campo 'Assunto' preenchimento obrigatï¿½rio",cTitulo)
    lRet:=.F.
 Endif
 
@@ -238,7 +238,7 @@ EndIf
 
 If !lResulConn
    GET MAIL ERROR cError
-   MsgAlert("Falha na conexão "+cError)
+   MsgAlert("Falha na conexï¿½o "+cError)
    Return(.F.)
 Endif
 

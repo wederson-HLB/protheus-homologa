@@ -31,10 +31,9 @@ if cEmpAnt $ "V5/FA/FC" .AND. UPPER(ALLTRIM(FUNNAME()))=="FINA200" .AND. SE1->E1
 		Replace SE1->E1_P_BANRI With SE1->E1_IDCNAB
 		Replace SE1->E1_IDCNAB With ''
 	SE1->(MsUnlock())
-endif
     
 //AOA - 17/03/2017 - Tratamento para SOLARIS, alteração no historico e grava ocorencia do retorno CNAB
-if cEmpAnt $ "HH/HJ" .AND. UPPER(ALLTRIM(FUNNAME()))=="FINA200"
+Elseif cEmpAnt $ "HH/HJ" .AND. UPPER(ALLTRIM(FUNNAME()))=="FINA200"
 	If ALLTRIM(SE5->E5_TIPODOC) $ "VL"
 		RecLock("SE5",.F.)
 			Replace SE5->E5_HISTOR With 'Rec. Cobrança Bancaria - '+SEB->EB_BANCO
@@ -52,7 +51,15 @@ if cEmpAnt $ "HH/HJ" .AND. UPPER(ALLTRIM(FUNNAME()))=="FINA200"
 			Replace SE1->E1_P_DTRET With Date()
 		SE1->(MsUnlock())
 	EndIf
-endif
+
+//CAS - 02/02/2021 - Alterar historico para Baixas de Retorno de CNAB, para todas as empresas	
+Else
+	IF !EMPTY(SE5->E5_NUMERO)
+		RecLock("SE5",.F.)
+			Replace SE5->E5_HISTOR With SE5->E5_TIPO + " " + SE5->E5_NUMERO + " - " + Posicione("SED",1,xFilial("SED")+alltrim(SE5->E5_NATUREZ),"ED_DESCRIC") 
+		SE5->(MsUnlock())
+	EndIf
+Endif
 
 //RSB - 10/10/2017 - Inclusão da mensagem da empresa Exeltis 
 //if cEmpAnt $ "LG" .AND. UPPER(ALLTRIM(FUNNAME()))=="FINA200"

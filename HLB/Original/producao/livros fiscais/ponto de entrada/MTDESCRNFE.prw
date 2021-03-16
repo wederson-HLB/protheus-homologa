@@ -902,6 +902,104 @@ ElseIF SM0->M0_CODIGO=="E4"		// Empresa DexBrasil
 	endif	
 	
 	DBSELECTAREA( cAlias )
+
+//INICIO ALTERACAO AKAMAI - PAULO SILVA - EZ4 . Chamado #22588
+ElseIF SM0->M0_CODIGO=="50"	
+	c_Serv	:= ""
+	MenPCC	:= ""
+	nValor	:= nValLiq:= 0
+	XPCC_COF := XPCC_CSLL := XPCC_PIS := 0
+	cIrrf		:= 0
+	nISS		:= 0
+	nInss		:= 0
+	xReter 	:= 0
+	nValLiq	:= 0
+	SF2->(DbSetOrder(1))
+	SF2->(DbSeek(xFilial("SF2")+SF3->F3_NFISCAL+SF3->F3_SERIE+SF3->F3_CLIEFOR+SF3->F3_LOJA))
+	SD2->(dbSetOrder(3))
+	SD2->(DbSeek(xFilial("SD2")+SF3->F3_NFISCAL+SF3->F3_SERIE))
+	SC6->(dbSetOrder(2))
+	SC6->(DbSeek(xFilial("SC6")+SD2->D2_COD+SD2->D2_PEDIDO+SD2->D2_ITEMPV))
+	SC5->(dbSetOrder(1))
+	SC5->(DbSeek(xFilial("SC5")+SC6->C6_NUM))
+	SE1->(DbSetOrder(1))
+	SE1->(DbSeek(xFilial("SE1")+SF2->F2_PREFIXO+SF2->F2_DUPL))
+	If! Empty(SF2->F2_PREFIXO+SF2->F2_DUPL)
+		Do While.Not.Eof().And.SF2->F2_PREFIXO+SF2->F2_DUPL == SE1->E1_PREFIXO+SE1->E1_NUM
+			IF Alltrim(SE1->E1_TIPO) == 'NF'
+				nValor:= SE1->E1_VALOR
+			EndIf
+			IF Alltrim(SE1->E1_TIPO) == 'IR-'
+				cIrrf := SE1->E1_VALOR
+			endif
+			IF SE1->E1_TIPO = 'PI-'
+				XPCC_PIS += SE1->E1_VALOR
+			endif
+			IF  SE1->E1_TIPO = 'CF-'
+				XPCC_COF += SE1->E1_VALOR
+			endif
+			IF  SE1->E1_TIPO = 'CS-'
+				XPCC_CSLL += SE1->E1_VALOR
+			endif
+			IF  SE1->E1_TIPO = 'IS-'
+				nISS += SE1->E1_VALOR
+			endif
+			IF  SE1->E1_TIPO = 'IN-'
+				nInss += SE1->E1_VALOR
+			endif
+			SE1->(DbSkip())
+		EndDo
+	Endif
+	cCompara := SF2->F2_DOC+SF2->F2_SERIE
+	nValLiq	:= SF2->F2_VALBRUT-(cIrrf+XPCC_PIS+XPCC_COF+XPCC_CSLL+nISS+nInss)
+	aServ    :={}
+	aVen 		:= {}
+	Descon 	:=0
+	SE1->(DbSetOrder(1))
+	SE1->(DbSeek(xFilial("SE1")+SF2->F2_PREFIXO+SF2->F2_DUPL))
+	If! Empty(SF2->F2_PREFIXO+SF2->F2_DUPL)
+		Do While.Not.Eof().And.SF2->F2_PREFIXO+SF2->F2_DUPL == SE1->E1_PREFIXO+SE1->E1_NUM
+			IF ALLTRIM(SE1->E1_TIPO) == 'NF'
+				Aadd(aVen,{ Dtoc(SE1->E1_VENCREA)})
+			ENDIF
+			SE1->(DbSkip())
+		EndDo
+	Endif
+	
+	SD2->(dbSetOrder(8))
+	SD2->(DbSeek(xFilial("SD2")+SC6->C6_NUM+SC6->C6_ITEM))
+	While SD2->D2_DOC+SD2->D2_SERIE == cCompara
+		SC6->(dbSetOrder(2))
+		SC6->(DbSeek(xFilial("SC6")+SD2->D2_COD+SD2->D2_PEDIDO+SD2->D2_ITEMPV))
+		Aadd(aServ,{SD2->D2_QUANT, subs(SC6->C6_DESCRI,1,30), SD2->D2_PRCVEN, SD2->D2_TOTAL})
+		Descon = Descon + SD2->D2_DESCON
+		//Retirado a msg de reter PCC, 	
+    	SD2->(dbSkip())
+	end
+	
+	nServ :=1 
+	//Ajuste para alinhamento das colunas.
+	c_Serv += "DESC.SERVICOS"+ "|"+aserv[nServ,2]
+	c_Serv += Alltrim(SC5->C5_MENNOTA)+ "|"
+	
+    //tratamento para considerar a mensagem padrão do pedido de venda, no corpo da nota de serviço,
+	SD2->(dbSetOrder(3))
+	SD2->(DbSeek(xFilial("SD2")+SF3->F3_NFISCAL+SF3->F3_SERIE))
+	SC6->(dbSetOrder(2))
+	SC6->(DbSeek(xFilial("SC6")+SD2->D2_COD+SD2->D2_PEDIDO+SD2->D2_ITEMPV))
+	SC5->(dbSetOrder(1))
+	SC5->(DbSeek(xFilial("SC5")+SC6->C6_NUM))
+	
+	if !empty(SC5->C5_MENPAD)
+		cMsgPad:=FORMULA(SC5->C5_MENPAD)
+		if valtype(cMsgPad)=="C"
+			c_Serv +=" |"+alltrim(cMsgPad)
+		endif
+	endif	
+	
+	DBSELECTAREA( cAlias )
+//TERMINO ALTERACAO AKAMAI	
+
 	
 ElseIF SM0->M0_CODIGO=="DT"  // Empresa DUN
 

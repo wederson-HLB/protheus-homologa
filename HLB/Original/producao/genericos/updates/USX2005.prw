@@ -288,7 +288,8 @@ aSX2 := AClone(aTabAutCon)
 
 aAdd(aSX6, {""	   ,"MV_TAFAMBR","C"	,"Identificação do ambiente do Reinf: 1 - Produção; ","Identificación entorno de Reinf: 1 - Producción; "  ,"Reinf environment identifier: 1 - Production; " ,"2 - Produção Restrita - Dados Reais;  " 			   ,"2 - Producc. Restricta - Datos reales;        " ,"2 - Restricted Production - Actual Data; " ,"3 - Produção Restrita - Dados Fictícios. "    ,"3 - Producc Restrista - Datos ficticios. " 			,"3 - Restricted Production - Fictional Data."  ,"1"	    ,"1"	    ,"1"		,"S"	   ,"S"		,""	   	  ,""	   ,"1"		  ,""		 ,"" })
 aAdd(aSX6, {""	   ,"MV_TAFVLRE","C"	,"Versão do Layout Reinf.                           ","Versión del Layout Reinf.                        "  ,"Version of Reinf. Layout                      " ,"Utilizado para a criação do nameSpace dos eventos " ,"Se usa para crear el nameSpace de los eventos " ,"Used to create nameSpace of events       " ,"e validações de estrutura no módulo SIGATAF." ,"y validaciones de estructura en el módulo SIGATAF." ,"and structure validations in module SIGATAF." ,"1_04_00"  ,"1_04_00"	,"1_04_00"	,"S"	   ,"S"		,""	   	  ,""	   ,"1_04_00" ,""		 ,"" })
-aAdd(aSX6, {""	   ,"MV_VAUTCON","N"	,"Versão das tabelas Autocontidas do TAF            ","Version de tablas Autocontenidas del TAF         "  ,"Version of Self-contained tables of TAF       " ,"													 " ,"											   " ,"											" ,"											" ,"											      " ,"											  " ,"1024.49"  ,"1024.49"	,"1024.49"	,"S"	   ,"S"		,""	   	  ,""	   ,          ,		     , })
+aAdd(aSX6, {""	   ,"MV_VAUTCON","N"	,"Versão das tabelas Autocontidas do TAF            ","Version de tablas Autocontenidas del TAF         "  ,"Version of Self-contained tables of TAF       " ,"													 " ,"											   " ,"											" ,"											" ,"											      " ,"											  " ,"1028.07"  ,"1028.07"	,"1028.07"	,"S"	   ,"S"		,""	   	  ,""	   ,          ,		     , })
+aAdd(aSX6, {""	   ,"MV_TAFTALI","C"	,"Indicar Top Alias da base de dados da tabela      ","Indicar Top Alias de la base de datos de la tabla"  ,"Enter Top Alias on tabel database ST1         " ,"ST1 (em dominio do ERP) para integraçao           " ,"ST1 (en dominio del ERP) para integracion     " ,"(in ERP domain) for integration          " ,"											" ,"											      " ,"											  " ,"P12125_01","P12125_01","P12125_01","S"	   ,"S"		,""	   	  ,""	   ,          ,		     , })
 
 ****************************************************************************************************************************************** 
 //<Chamada das funções para a deleção dos dicionários -- **NÃO MEXER** >
@@ -616,7 +617,19 @@ For i:=1 to len(aSX6)
 		if FieldPos("X6_DSCENG2")>0
 			SX6->X6_DSCENG2	:=aSX6[i][12]
 		endif
-		SX6->X6_CONTEUD	:=aSX6[i][13]
+		
+		//CAS - 10/01/2020 - Ajuste no MV_TAFTALI para mudar de "117" para "125"
+		If SX6->X6_VAR == "MV_TAFTALI"
+			If !Empty(SX6->X6_CONTEUD)
+				SX6->X6_CONTEUD	:= StrTran( SX6->X6_CONTEUD, "117", "125" )
+			Else
+				cAmbiente := Substr(GetEnvServer(),5,2)    						//P12_23
+				SX6->X6_CONTEUD	:= StrTran( aSX6[i][13], "01", cAmbiente )     	//P12125_01
+			EndIF
+		Else
+			SX6->X6_CONTEUD	:= aSX6[i][13]
+		EndIf
+		
 		SX6->X6_CONTSPA	:=aSX6[i][14]
 		SX6->X6_CONTENG	:=aSX6[i][15]
 		SX6->X6_PROPRI	:=aSX6[i][16]

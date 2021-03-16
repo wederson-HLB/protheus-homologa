@@ -7,7 +7,7 @@ Funcao      : GTCTB002
 Parametros  : 
 Retorno     : 
 Objetivos   : Relatorio Verba X Lançamentos.
-Autor       : Jean Victor Rocha
+Autor       : Jean Victor Rocha   
 Data/Hora   : 22/07/2013
 TDN         : 
 Revisão     : 

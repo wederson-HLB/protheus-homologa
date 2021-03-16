@@ -23,7 +23,6 @@ Cliente     : Mabra / Victaulic
 *---------------------------*
  User Function MA410MNU()
 *---------------------------*   
-Local nPosAlt
 
 //RRP - 23/07/2014 - Inclusão empresa Exeltis. Chamado 020283 
 If cEmpAnt $ ("JK/SU")  //Mabra/Exeltis 
@@ -63,17 +62,5 @@ If cEmpAnt $ "N6"
 	EndIf*/
 	aAdd(aRotina,{"Libera Pedido" ,"u_N6FAT010()"     ,0,3,0,NIL}) 	
 EndIF
-
-If cEmpAnt == "R7"
-   // Envio de documentos para o operador logístico - SFTP e WS.  
-   aadd(aRotina,{"Arquivos Operador Logístico - IDL","U_R7WSFATB()",0,7,0, nil} )
-EndIf
-
-If cEmpAnt == "X2"
-   nPosAlt:=Ascan(aRotina, {|x| Upper(AllTrim(x[1])) == "ALTERAR"})
-   If nPosAlt > 0
-      //aRotina[nPosAlt][2] := "u_X2FAT003()"
-   EndIf 
-EndIf 
 
 Return 

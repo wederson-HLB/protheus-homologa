@@ -6,15 +6,15 @@
 
 *=====================================================================================================================================*
 /*/{Protheus.doc} GTFIN039
-//TODO Fonte para tratamento de funчїes com retorno logico no processo de CNAB via ACCESSTAEG:
+//TODO Fonte para tratamento de funя┐╜я┐╜es com retorno logico no processo de CNAB via ACCESSTAEG:
 
-nOPCAO := 1 "U_ALTEMP()- VERIFICA SE O NOME DA EMPRESA J┴ TEVE ALTERA╟├O NA TELA DE PARAMETROS. (CHAMADO NO CAMPO)" 
-nOPCAO := 2 "U_VlCodBar(cCodBar) - FUN╟├O QUE VALIDA SE O C╙DIGO DE BARRAS OU A LINHA DIGITAVEL SE EST├O SENDO DIGITADOS CORRETAMENTE (CAMPOS E2_LINDIG E E2_CODBAR)" 
-nOPCAO := 3 "U_CPFILPOS() - FUN╟├O PARA VERIFICAR SE OS CAMPOS CUSTOMIZADOS EXISTEM, UTILIZADO NAS FUN╟╒ES QUE UTILIZAM ESSES CAMPOS"
-nOPCAO := 4 "U_EMAILREJ() - funчуo para receber os dados do tэtulo que foi rejeitado e enviar por email para o responsсvel da empresa/cliente.
-nOPCAO := 5 "U_ARQCNAB() - funчуo para exibir uma lista de arquivos CNAB que se encontram na pasta de retorno 
-    - nOPCAO := 6 "U_SELECARQ() - funчуo para validar se arquivo foi selecionado para processar retorno.
-    - nOPCAO := 7 "U_DETALARQ() - funчуo para abrir o relatєrio retorno CNAB e exibir os detalhes dos titulos se foram rejeitados ou incluidos  
+nOPCAO := 1 "U_ALTEMP()- VERIFICA SE O NOME DA EMPRESA Jя┐╜ TEVE ALTERAя┐╜я┐╜O NA TELA DE PARAMETROS. (CHAMADO NO CAMPO)" 
+nOPCAO := 2 "U_VlCodBar(cCodBar) - FUNя┐╜я┐╜O QUE VALIDA SE O Cя┐╜DIGO DE BARRAS OU A LINHA DIGITAVEL SE ESTя┐╜O SENDO DIGITADOS CORRETAMENTE (CAMPOS E2_LINDIG E E2_CODBAR)" 
+nOPCAO := 3 "U_CPFILPOS() - FUNя┐╜я┐╜O PARA VERIFICAR SE OS CAMPOS CUSTOMIZADOS EXISTEM, UTILIZADO NAS FUNя┐╜я┐╜ES QUE UTILIZAM ESSES CAMPOS"
+nOPCAO := 4 "U_EMAILREJ() - funя┐╜я┐╜o para receber os dados do tя┐╜tulo que foi rejeitado e enviar por email para o responsя┐╜vel da empresa/cliente.
+nOPCAO := 5 "U_ARQCNAB() - funя┐╜я┐╜o para exibir uma lista de arquivos CNAB que se encontram na pasta de retorno 
+    - nOPCAO := 6 "U_SELECARQ() - funя┐╜я┐╜o para validar se arquivo foi selecionado para processar retorno.
+    - nOPCAO := 7 "U_DETALARQ() - funя┐╜я┐╜o para abrir o relatя┐╜rio retorno CNAB e exibir os detalhes dos titulos se foram rejeitados ou incluidos  
 @author Leosanlim
 @since 02/01/2019
 @version 1.0
@@ -24,17 +24,17 @@ nOPCAO := 5 "U_ARQCNAB() - funчуo para exibir uma lista de arquivos CNAB que se 
 USER FUNCTION GTFIN039(nOPCAO,cDados)
 LOCAL lRet
 //*********************************************
-//INICIO VARIAVEIS DA FUN╟├O U_ALTEMP()
+//INICIO VARIAVEIS DA FUNя┐╜я┐╜O U_ALTEMP()
 LOCAL lRegistro
-//FIM VARIAVEIS DA FUN╟├O U_ALTEMP()
+//FIM VARIAVEIS DA FUNя┐╜я┐╜O U_ALTEMP()
 //*********************************************\\
-//INICIO VARIAVEIS DA FUN╟├O U_VlCodBar(cCodBar)
+//INICIO VARIAVEIS DA FUNя┐╜я┐╜O U_VlCodBar(cCodBar)
 Local nX
 Local cCampo
 LOCAL cCodBar 
-//FIM VARIAVEIS DA FUN╟├O U_VlCodBar(cCodBar)
-//INICIO VARIAVEIS DA FUN╟├O U_CPFILPOS()
-Local cMsgCpos := ""//"Um ou mais campos obrigatєrios nуo foram preenchidos:" + ENTER
+//FIM VARIAVEIS DA FUNя┐╜я┐╜O U_VlCodBar(cCodBar)
+//INICIO VARIAVEIS DA FUNя┐╜я┐╜O U_CPFILPOS()
+Local cMsgCpos := ""//"Um ou mais campos obrigatя┐╜rios nя┐╜o foram preenchidos:" + ENTER
 Local aCpos_Z0F
 Local aCpos_Z0D
 Local aCpos_SEE
@@ -45,13 +45,13 @@ Local aCpos_SE2
 Local aCpos_SEA
 Local aAreaSEE , aAreaSA1,aAreaSA2
 Local aAreaSE1, aAreaSE2, aAreaSEA
-//FIM VARIAVEIS DA FUN╟├O U_CPFILPOS()
+//FIM VARIAVEIS DA FUNя┐╜я┐╜O U_CPFILPOS()
 
-//INICIO VARIAVEIS DA FUN╟├O U_EMAILREJ()
+//INICIO VARIAVEIS DA FUNя┐╜я┐╜O U_EMAILREJ()
 LOCAL aSE2REJ    
 LOCAL cEmail := ""
 LOCAL cValTit := ""
-//FIM VARIAVEIS DA FUN╟├O U_EMAILREJ()
+//FIM VARIAVEIS DA FUNя┐╜я┐╜O U_EMAILREJ()
 
 //INICIO VARIAVEIS nOPCAO == 5 FUNCAO U_ARQCNAB
 LOCAL oDlg, oBrowse, oColumn, aCols :={}, cQuery := "",aFiles := {}
@@ -69,7 +69,7 @@ LOCAL cPergunt, cBanco, cAgencia, cConta, cSubCta
 
 
 /*************************
-INICIO DAS OP╟╒ES 
+INICIO DAS OPя┐╜я┐╜ES 
 *************************/
 DO CASE
     CASE nOPCAO == 1 //U_ALTEMP()
@@ -78,7 +78,7 @@ DO CASE
         lRegistro := Z0D->(dbSeek(xFilial("Z0D")+SEE->EE_CODIGO+SEE->EE_AGENCIA+SEE->EE_CONTA+SEE->EE_SUBCTA))
 
         IF lRegistro .AND. Z0D->Z0D_ALTERA == "1"
-            MSGINFO("CASO PRECISE ALTERAR NOVAMENTE, INFORME O ADMINISTRADOR","NOME DA EMPRESA JA TEVE UMA ALTERA╟├O!")
+            MSGINFO("CASO PRECISE ALTERAR NOVAMENTE, INFORME O ADMINISTRADOR","NOME DA EMPRESA JA TEVE UMA ALTERAя┐╜я┐╜O!")
             lRet := .F.
         ELSEIF !EMPTY(ALLTRIM(LEFT(M->EE_P_NOEMP,30)))
             M->EE_P_NOEMP := STRTRAN(ALLTRIM(LEFT(M->EE_P_NOEMP,30))," ","_")
@@ -109,7 +109,7 @@ DO CASE
                 // Codigo de barras de concessionarias 
                 cCampo:=Left(cCodBar,3)+SubStr(cCodBar,5)
                 If VldMod(cCampo,cCodBar)!=SubStr(cCodBar,4,1)
-                    Help(" ",1,"INVCDBAR",,'Codigo de Barras Invсlido.',1,0) //'Codigo de Barras Invсlido.'
+                    Help(" ",1,"INVCDBAR",,'Codigo de Barras Invя┐╜lido.',1,0) //'Codigo de Barras Invя┐╜lido.'
                     lRet := .F. // Invalido
                 Endif	
             Endif
@@ -121,7 +121,7 @@ DO CASE
             For nX := 1 To 3
                 cCampo := SubStr(cCodSemDv,If(nX==1,1,If(nX==2,10,20)),If(nX==1,9,10))
                 If Mod10(cCampo) != SubStr(cCodBar,If(nX==1,10,If(nX==2,21,32)),1)
-                    Help(" ",1,"INVCDBAR",,'Linha Digitсvel Invсlida.',1,0) //'Linha Digitсvel Invсlida.'
+                    Help(" ",1,"INVCDBAR",,'Linha Digitя┐╜vel Invя┐╜lida.',1,0) //'Linha Digitя┐╜vel Invя┐╜lida.'
                     lRet := .F.
                     Exit
                 Endif
@@ -129,7 +129,7 @@ DO CASE
             //Valido o digito verificador geral da linha digitada (pos. 33 da linha digitada)
             If lRet
                 If Dv_BarCode(cCodBar2)!=SubStr(cCodBar,33,1)			
-                    Help(" ",1,"INVCDBAR",,'Linha Digitсvel Invсlida.',1,0) //'Linha Digitсvel Invсlida.'
+                    Help(" ",1,"INVCDBAR",,'Linha Digitя┐╜vel Invя┐╜lida.',1,0) //'Linha Digitя┐╜vel Invя┐╜lida.'
                     lRet := .F.
                 Endif
             Endif
@@ -141,7 +141,7 @@ DO CASE
                 cCampo := SubStr(cCodSemDv,nX,11)
                 nPos :=  If(nX==1,12,If(nX==12,24,If(nX==23,36,48)))
                 If VldMod(cCampo,cCodBar) != SubStr(cCodBar,nPos,1)
-                    Help(" ",1,"INVCDBAR",,'Codigo de Barras Invсlido.',1,0) //'Codigo de Barras Invсlido.'
+                    Help(" ",1,"INVCDBAR",,'Codigo de Barras Invя┐╜lido.',1,0) //'Codigo de Barras Invя┐╜lido.'
                     lRet := .F.
                         Exit
                 Endif
@@ -224,8 +224,8 @@ DO CASE
 
 
         IF !lRet
-        cMsgCpos := "Um ou mais campos obrigatєrios nуo foram preenchidos:" + ENTER + cMsgCpos
-            Help("",1,"CAMPOS OBRIGAT╙RIOS",,cMsgCpos, 1, 0, NIL, NIL, NIL, NIL, NIL, {"Entre em contato com o Suporte e informe a mensagem!"})
+        cMsgCpos := "Um ou mais campos obrigatя┐╜rios nя┐╜o foram preenchidos:" + ENTER + cMsgCpos
+            Help("",1,"CAMPOS OBRIGATя┐╜RIOS",,cMsgCpos, 1, 0, NIL, NIL, NIL, NIL, NIL, {"Entre em contato com o Suporte e informe a mensagem!"})
         ENDIF
 
         RestArea(aAreaSEE)   // Retorna o ambiente anterior
@@ -237,23 +237,23 @@ DO CASE
 
     CASE nOPCAO == 4 //U_EMAILREJ()
     
-        /*▒▒├──────────┼────────────────────────────────────────────────────────────┤▒▒
-        ▒▒│Parametros│Parametros do array aSE2REJ:                                │▒▒
-        ▒▒│          │1. Z0F_PREFIX - Prefixo do titulo                           │▒▒
-        ▒▒│          │2. Z0F_NUM      Numero do Titulo                            │▒▒
-        ▒▒│          │3. Z0F_PARCEL   Parcela Titulo                              │▒▒
-        ▒▒│          │4. Z0F_TIPO     Tipo do titulo                              │▒▒
-        ▒▒│          │5. Z0F_FORCLI   Cod Fornecedor                              │▒▒
-        ▒▒│          │6. Z0F_NOMFC    Nome do Fornecedor                          │▒▒
-        ▒▒│          │7. Z0F_DTEMIS   Data de emissуo                             │▒▒
-        ▒▒│          │8. Z0F_DTVENC   Data Vencimento Real                        │▒▒
-        ▒▒│          │9. Z0F_VALOR    Valor do titulo                             │▒▒
-        ▒▒│          │10. Z0F_BANCO   Codigo do banco                             │▒▒
-        ▒▒│          │11. Z0F_DESCOC  Descricao ocorrencia                        │▒▒
-        ▒▒│          │12. Z0F_NUMBOR  Numero do Bordero                           │▒▒
-        ▒▒│          │13. Z0F_IDCNAB  Idcnab                                      │▒▒
-        ▒▒│          │14. Z0F_REFBAN  COD Ocorrencia                              │▒▒
-        ▒▒├──────────┼───────────────┬────────────────────────────────────────────┤▒▒*/
+        /*я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜─┤я┐╜я┐╜
+        я┐╜я┐╜я┐╜Parametrosя┐╜Parametros do array aSE2REJ:                                я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜1. Z0F_PREFIX - Prefixo do titulo                           я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜2. Z0F_NUM      Numero do Titulo                            я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜3. Z0F_PARCEL   Parcela Titulo                              я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜4. Z0F_TIPO     Tipo do titulo                              я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜5. Z0F_FORCLI   Cod Fornecedor                              я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜6. Z0F_NOMFC    Nome do Fornecedor                          я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜7. Z0F_DTEMIS   Data de emissя┐╜o                             я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜8. Z0F_DTVENC   Data Vencimento Real                        я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜9. Z0F_VALOR    Valor do titulo                             я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜10. Z0F_BANCO   Codigo do banco                             я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜11. Z0F_DESCOC  Descricao ocorrencia                        я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜12. Z0F_NUMBOR  Numero do Bordero                           я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜13. Z0F_IDCNAB  Idcnab                                      я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜          я┐╜14. Z0F_REFBAN  COD Ocorrencia                              я┐╜я┐╜я┐╜
+        я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜─┤я┐╜я┐╜*/
     
         aSE2REJ := cDados
         
@@ -285,7 +285,7 @@ DO CASE
         cEmail += '<table cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" width="500px">'
         cEmail += '<tr id="logo" height="150"><td valign="middle" align="left" >'
         cEmail += '<table cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" width="100%" height="150">'
-        cEmail += '<tr><td align="center" valign="middle"><img src="https://www.grantthornton.com.br/globalassets/1.-member-firms/global/logos/logo.png"></td><td align="center" valign="middle">&nbsp;</td></tr>'
+        cEmail += '<tr><td align="center" valign="middle"><img src="https://www.hlb.com.br/wp-content/uploads/sites/37/2019/05/hlb-brasil-site-1.png"></td><td align="center" valign="middle">&nbsp;</td></tr>'
         cEmail += '</table></td></tr>'
         cEmail += '<tr><td bgcolor="#4f2682">&nbsp;</td></tr>'
         cEmail += '<tr><td><table cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" width="100%" align="center">'
@@ -295,7 +295,7 @@ DO CASE
         cEmail += '</td></tr>'
         cEmail += '<tr><td align="center" height="40">&nbsp;</td></tr>'
         cEmail += '<tr><td align="center" height="40">'
-        cEmail += '<span style="font-size:18px;">Os titulos abaixo foram rejeitados pelo banco e foram liberados no sistema para manutenчуo!  </span><br><br>'
+        cEmail += '<span style="font-size:18px;">Os titulos abaixo foram rejeitados pelo banco e foram liberados no sistema para manutenя┐╜я┐╜o!  </span><br><br>'
         
         cEmail += '<table border="1" width="1200"  style="padding: 0"><tr>'
         cEmail += '<td width="200"><font face="Courier New" size="2"><b>Fornecedor</b></font></td>'
@@ -326,13 +326,13 @@ DO CASE
                
         oEmail           :=  DEmail():New()
         oEmail:cFrom   	:= 	AllTrim(GetMv("MV_RELFROM"))
-        oEmail:cTo		:=  AllTrim(SUPERGETMV("MV_P_00131",.F.,"log.accesstage@hlb.com.br"))   // Ex: "tiago.mendonca@pryor.com.br"                   
+        oEmail:cTo		:=  AllTrim(SUPERGETMV("MV_P_00131",.F.,"log.finnet@hlb.com.br"))   // Ex: "tiago.mendonca@pryor.com.br" //CAS - 01/07/2020 alteraчуo para o novo e-mail log.finnet@hlb.com.br                  
         oEmail:cSubject	:=	"Titulo Rejeitado na empresa (" +ALLTRIM(SM0->M0_NOME)+") 
       	
         oEmail:cBody   	:= 	cEmail
         //oEmail:cAnexos   :=  cFile
         lRet := oEmail:Envia()
-        //cText:="Geraчуo de Pedido"     
+        //cText:="Geraя┐╜я┐╜o de Pedido"     
         //MsgInfo("Pedido "+Alltrim(cNum)+" gerado com sucesso, enviado e-mail para o almoxerifado.","EUROsilicone")     
         //FErase(cFile) 	
     CASE nOPCAO == 5 //U_ARQCNAB()
@@ -346,8 +346,8 @@ DO CASE
 		aHeader := {{"Status", "Status", "@BMP", 01,0,.T.,,"C",,},;
 		{"Diretorio Cnab", "Diretorio", "", 99, 0, .T., , "C",,},;
 		{"Arquivo Cnab", "Arquivo", "", 35, 0, .T., , "C",,},;
-		{"Data Criaчуo", "Data", "@!", 10, 0, .T., , "C"},;
-		{"Hora Criaчуo", "Hora", "@!", 10, 0, .T., , "C"}}  
+		{"Data Criacao", "Data", "@!", 10, 0, .T., , "C"},;
+		{"Hora Criacao", "Hora", "@!", 10, 0, .T., , "C"}}  
 		cPergunt := cDados
 		cBanco   := IF(cPergunt == "AFI200",MV_PAR06,MV_PAR05)
 		cAgencia := IF(cPergunt == "AFI200",MV_PAR07,MV_PAR06)//IF(cPergunt == "AFI420",MV_PAR06,mv_agencia)
@@ -360,7 +360,16 @@ DO CASE
 			IF SEE->(dbSeek(xFilial("SEE")+cBanco+cAgencia+cConta+cSubCta))				
 				IF SEE->EE_RETAUT $ '2|3'
 					//aFiles := Directory(Alltrim(SEE->EE_DIRPAG)+"*.TXT")														//CAS 16-07-2019 Linha Antiga (BACKUP)
-					  aFiles := Directory(IF(cPergunt == "AFI200",Alltrim(SEE->EE_DIRREC),Alltrim(SEE->EE_DIRPAG))+"*.TXT")		//CAS 16-07-2019 Ajuste para verificar se vai pegar do Diretorio "A PAGAR" ou "A RECEBER"
+					//aFiles := Directory(IF(cPergunt == "AFI200",Alltrim(SEE->EE_DIRREC),Alltrim(SEE->EE_DIRPAG))+"*.TXT")		//CAS 16-07-2019 Ajuste para verificar se vai pegar do Diretorio "A PAGAR" ou "A RECEBER"
+					If cPergunt == "AFI200"
+					  	aFiles := Directory( Alltrim(SEE->EE_DIRREC)+SM0->M0_CODIGO+"_rr_*.TXT")
+					Else
+                        If ISINCALLSTACK("U_UFINA473")		//CAS - 18/01/2021 Ajuste para Extrato - Conciliaчуo Automсtica
+                            aFiles := Directory( Alltrim(SEE->EE_DIRPAG)+"EXT_"+SM0->M0_CODIGO+"_*.TXT")
+                        Else
+						    aFiles := Directory( Alltrim(SEE->EE_DIRPAG)+SM0->M0_CODIGO+"_pr_*.TXT")
+                        EndIF
+					EndIF
 					For i := 1 to len(aFiles)
 						//aadd(aCols,{.F.,Alltrim(SEE->EE_DIRPAG),aFiles[i,1],DTOS(aFiles[i,3]),aFiles[i,4]})					//CAS 16-07-2019 Linha Antiga (BACKUP)
 						  aadd(aCols,{.F.,IF(cPergunt == "AFI200",Alltrim(SEE->EE_DIRREC),Alltrim(SEE->EE_DIRPAG)),aFiles[i,1],DTOS(aFiles[i,3]),aFiles[i,4]})	//CAS 16-07-2019 Ajuste para verificar se vai pegar do Diretorio "A PAGAR" ou "A RECEBER"
@@ -389,7 +398,7 @@ DO CASE
 		oBrowse:DisableReport()
 		oBrowse:DisableSaveConfig()
 		oBrowse:SetDescription('Retorno CNAB')
-		oBrowse:SetDataArray() //define que serс com array
+		oBrowse:SetDataArray() //define que serя┐╜ com array
 		oBrowse:SetArray(aCols)
 
 		//-------------------------------------------------------------------//
@@ -413,9 +422,9 @@ DO CASE
 			oBrowse:SetColumns({oColumn}) //Adiciona a Coluna ao Browse
 		next
 
-		oBrowse:Activate() //Ativaчуo do Browse
+		oBrowse:Activate() //Ativaя┐╜я┐╜o do Browse
 
-		oDlg:Activate() //Ativaчуo da janela 
+		oDlg:Activate() //Ativaя┐╜я┐╜o da janela 
         
 
     CASE nOPCAO == 6 //U_SELECARQ() 
@@ -425,16 +434,20 @@ DO CASE
         for nCnt:=1 to len(aCols)
 			IF aCols[nCnt, 1]
 				/*cMsgMarc := ""
-                cMsgMarc +="<center><h1><font color='#ff0000'>Atenчуo!</font></h1></center><br>"
-                cMsgMarc +="Ao confirmar a seleчуo desse arquivo, a rotia de retorno ira realizar a baixa dos titulos confirmados,<br>"
-                cMsgMarc +="ou a liberaчуo dos titulos rejeitados.<br><br>"
+                cMsgMarc +="<center><h1><font color='#ff0000'>Atenя┐╜я┐╜o!</font></h1></center><br>"
+                cMsgMarc +="Ao confirmar a seleя┐╜я┐╜o desse arquivo, a rotia de retorno ira realizar a baixa dos titulos confirmados,<br>"
+                cMsgMarc +="ou a liberaя┐╜я┐╜o dos titulos rejeitados.<br><br>"
                 cMsgMarc +="<b>Arquivo: ( "+AllTrim(aCols[nCnt,3])+" ) <b><br><br>"
-                cMsgMarc +=" <b>Vocъ confirma a seleчуo desse arquivo?</b>"
+                cMsgMarc +=" <b>Vocя┐╜ confirma a seleя┐╜я┐╜o desse arquivo?</b>"
                 IF MSGYESNO(cMsgMarc)
                 */
-                    MV_PAR03 := AllTrim(aCols[nCnt,2])+AllTrim(aCols[nCnt,3])
-                    //MSGINFO("Existe arquivo selecionado "+AllTrim(aCols[nCnt,2])+AllTrim(aCols[nCnt,3]))
-                    lRet := .T.
+                IF ISINCALLSTACK("FINA740")
+                    MV_PAR04 := AllTrim(aCols[nCnt,2])+AllTrim(aCols[nCnt,3])
+                Else
+                	MV_PAR03 := AllTrim(aCols[nCnt,2])+AllTrim(aCols[nCnt,3])                
+                EndIF
+                //MSGINFO("Existe arquivo selecionado "+AllTrim(aCols[nCnt,2])+AllTrim(aCols[nCnt,3]))
+                lRet := .T.
                 //ENDIF
             ELSE         
                 cMsgMarc := "Nenhum arquivo CNAB foi selecionado!"
@@ -449,8 +462,8 @@ DO CASE
         aCols := cDados[1]
         nLin := cDados[2] 
         aPergF430 := {MV_PAR01,MV_PAR02,MV_PAR03,MV_PAR04,MV_PAR05,MV_PAR06,MV_PAR07,MV_PAR08,MV_PAR09,MV_PAR10,MV_PAR11,MV_PAR12}
-        cArqCFG := MV_PAR04          
-        cCamFile := AllTrim(aCols[nLin,2])+AllTrim(aCols[nLin,3]) 				//CAS 16-07-2019 Variсvel para guardar o Diretєrio e Arquivo do CNAB             
+        cArqCFG := IF(ISINCALLSTACK("FINA740"),MV_PAR05,MV_PAR04)     	// Carteira ?  1=Receber;2=Pagar		//CAS 		//cArqCFG := MV_PAR04         
+        cCamFile := AllTrim(aCols[nLin,2])+AllTrim(aCols[nLin,3]) 												//CAS 16-07-2019 Variя┐╜vel para guardar o Diretя┐╜rio e Arquivo do CNAB             
         
         // atualiza o pergunte do FINR650
 		aVet650 := {{mv_par01	, AllTrim(aCols[nLin,2])+AllTrim(aCols[nLin,3])	},; // 01 Arquivo de Entrada ?          	 
@@ -459,7 +472,7 @@ DO CASE
                     {mv_par04	, aPergF430[6]	},; // 04 Codigo da Agencia ?           
                     {mv_par05	, aPergF430[7]	},; // 05 Codigo da Conta ?             
                     {mv_par06	, aPergF430[8]	},; // 06 Codigo da SubConta ?          
-                    {mv_par07	, IF(cPergunt == "AFI200","1","2") },; // 07 Carteira ?  1=Receber;2=Pagar		//CAS 16-07-2019 Ajuste para verificar se o Relatєrio vai pegar do Contas "A PAGAR" ou "A RECEBER"
+                    {mv_par07	, IF(cPergunt == "AFI200","1","2") },; // 07 Carteira ?  1=Receber;2=Pagar		//CAS 16-07-2019 Ajuste para verificar se o Relatя┐╜rio vai pegar do Contas "A PAGAR" ou "A RECEBER"
                     {mv_par08	, CValToChar(aPergF430[10])	}}  // 08 Configuracao CNAB ?           
 
 		// atualiza as perguntas do FINR650 conforme os dados do arquivo de bancos
@@ -478,38 +491,45 @@ DO CASE
 				SX1->( MsUnlock() )
 		    EndIf
 		Next
-        //CHAMA A FUN╟├O DE RELAT╥RIO CNAB  
+        //CHAMA A FUNя┐╜я┐╜O DE RELATя┐╜RIO CNAB  
          
  		//CAS 16-07-2019 Trecho para alterar o X1_CNT01 e MV_PAR do Pergunte FIN650
        	SX1->( DbSeek(PadR("FIN650", Len(SX1->X1_GRUPO))))
 		aPergAux:= {}
 		Pergunte(PadR("FIN650", Len(SX1->X1_GRUPO)), .F.,, , , , @aPergAux)
 		aPergAux[1,8] := MV_PAR01 := cCamFile
+		aPergAux[2,8] := MV_PAR02 := cArqCFG
 		MV_PAR07 := IF(ISINCALLSTACK("FINA740"),1,2) 				// 07 Carteira ?  1=Receber;2=Pagar
 		__SaveParam("FIN650", aPergAux)   
 		//-------------------------------------------------------------------------
        
         FINR650()
-        //ABRE O PERGUNTE AFI430 PARA VOLTAR AO PADR├O 
-        Pergunte(Padr("AFI430",Len(SX1->X1_GRUPO)),    .F., Nil,    Nil,     Nil, .F.)
+        //ABRE O PERGUNTE AFI430 PARA VOLTAR AO PADRя┐╜O 
+        //Pergunte(Padr("AFI430",Len(SX1->X1_GRUPO)),    .F., Nil,    Nil,     Nil, .F.)  //CAS - 24/06/2020 Como estava antes
+        //CAS - 22/12/2020 - Adicionaro o IF do (ISINCALLSTACK("FINA740")) para AFI200 ou AFI430
+        IF(ISINCALLSTACK("FINA740"))
+            Pergunte(Padr("AFI200",Len(SX1->X1_GRUPO)),    .F., Nil,    Nil,     Nil, Nil)  //CAS - 24/06/2020 Ajustado o ultimo parametro com NIL para manter os dados do SX1 do FIN650
+        Else
+            Pergunte(Padr("AFI430",Len(SX1->X1_GRUPO)),    .F., Nil,    Nil,     Nil, Nil)  //CAS - 24/06/2020 Ajustado o ultimo parametro com NIL para manter os dados do SX1 do FIN650
+        EndIF
 
 ENDCASE
 RETURN lRet
 *=====================================================================================================================================*
 
 /*
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒╔══════════╤══════════╦═══════╤════════════════════╦══════╤═════════════╗▒▒
-▒▒║Rotina    │Dv_BarCode║Autor  │Claudio D. de Souza ║ Data │  14/12/01   ║▒▒
-▒▒╠══════════╪══════════╩═══════╧════════════════════╩══════╧═════════════╣▒▒
-▒▒║Desc.     │Calcula o digito verificador de um codigo de barras padrao  ║▒▒
-▒▒║          │Febraban.                                                   ║▒▒
-▒▒╠══════════╪════════════════════════════════════════════════════════════╣▒▒
-▒▒║Uso       │ CodBarVl2                                                  ║▒▒
-▒▒╚══════════╧════════════════════════════════════════════════════════════╝▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╗я┐╜я┐╜
+я┐╜я┐╜я┐╜Rotina    я┐╜Dv_BarCodeя┐╜Autor  я┐╜Claudio D. de Souza я┐╜ Data я┐╜  14/12/01   я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Desc.     я┐╜Calcula o digito verificador de um codigo de barras padrao  я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜Febraban.                                                   я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Uso       я┐╜ CodBarVl2                                                  я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╝я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
 */
 Static Function DV_BarCode( cBarCode )
 	*=====================================================================================================================================*
@@ -532,20 +552,20 @@ Return Str(cDig,1)
 *=====================================================================================================================================*
 
 /*
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒╔══════════╤══════════╦═══════╤════════════════════╦══════╤═════════════╗▒▒
-▒▒║Rotina    │Mod10     ║Autor  │Claudio D. de Souza ║ Data │  14/12/01   ║▒▒
-▒▒╠══════════╪══════════╩═══════╧════════════════════╩══════╧═════════════╣▒▒
-▒▒║Desc.     │Calcula o digito verificador de uma sequencia de numeros    ║▒▒
-▒▒║          │baseando-se no modulo 10. Utilizado para verificar o digito ║▒▒
-▒▒║          │em linhas digitaveis e codigo de barras de concessionarias  ║▒▒
-▒▒║          │de servicos publicos                                        ║▒▒
-▒▒╠══════════╪════════════════════════════════════════════════════════════╣▒▒
-▒▒║Uso       │ CodBarVl2                                                  ║▒▒
-▒▒╚══════════╧════════════════════════════════════════════════════════════╝▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╗я┐╜я┐╜
+я┐╜я┐╜я┐╜Rotina    я┐╜Mod10     я┐╜Autor  я┐╜Claudio D. de Souza я┐╜ Data я┐╜  14/12/01   я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Desc.     я┐╜Calcula o digito verificador de uma sequencia de numeros    я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜baseando-se no modulo 10. Utilizado para verificar o digito я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜em linhas digitaveis e codigo de barras de concessionarias  я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜de servicos publicos                                        я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Uso       я┐╜ CodBarVl2                                                  я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╝я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
 */
 Static Function Mod10( cNum )
 	*=====================================================================================================================================*
@@ -575,19 +595,19 @@ Return Str(nTot,1)
 *=====================================================================================================================================*
 
 /*
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒╔══════════╤══════════╦═══════╤════════════════════╦══════╤═════════════╗▒▒
-▒▒║Rotina    │VldMod    ║Autor  │Adrianne Furtado    ║ Data │  28/08/09   ║▒▒
-▒▒╠══════════╪══════════╩═══════╧════════════════════╩══════╧═════════════╣▒▒
-▒▒║Desc.     │Calcula o digito verificador de uma sequencia de numeros    ║▒▒
-▒▒║          │verificando qual o modulo do padrуo FEBRABAN deve ser       ║▒▒
-▒▒║          │utilizado                                                   ║▒▒
-▒▒╠══════════╪════════════════════════════════════════════════════════════╣▒▒
-▒▒║Uso       │ CodBarVl2                                                  ║▒▒
-▒▒╚══════════╧════════════════════════════════════════════════════════════╝▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╗я┐╜я┐╜
+я┐╜я┐╜я┐╜Rotina    я┐╜VldMod    я┐╜Autor  я┐╜Adrianne Furtado    я┐╜ Data я┐╜  28/08/09   я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Desc.     я┐╜Calcula o digito verificador de uma sequencia de numeros    я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜verificando qual o modulo do padrя┐╜o FEBRABAN deve ser       я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜utilizado                                                   я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Uso       я┐╜ CodBarVl2                                                  я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╝я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
 */
 Static Function VldMod( cNum , cCodBar)
 	*=====================================================================================================================================*
@@ -602,20 +622,20 @@ Return cRet
 *=====================================================================================================================================*
 
 /*
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒╔══════════╤══════════╦═══════╤════════════════════╦══════╤═════════════╗▒▒
-▒▒║Rotina    │Mod11     ║Autor  │Adrianne Furtado    ║ Data │  28/08/09   ║▒▒
-▒▒╠══════════╪══════════╩═══════╧════════════════════╩══════╧═════════════╣▒▒
-▒▒║Desc.     │Calcula o digito verificador de uma sequencia de numeros    ║▒▒
-▒▒║          │baseando-se no modulo 10. Utilizado para verificar o digito ║▒▒
-▒▒║          │em linhas digitaveis e codigo de barras de concessionarias  ║▒▒
-▒▒║          │de servicos publicos                                        ║▒▒
-▒▒╠══════════╪════════════════════════════════════════════════════════════╣▒▒
-▒▒║Uso       │ CodBarVl2                                                  ║▒▒
-▒▒╚══════════╧════════════════════════════════════════════════════════════╝▒▒
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╗я┐╜я┐╜
+я┐╜я┐╜я┐╜Rotina    я┐╜Mod11     я┐╜Autor  я┐╜Adrianne Furtado    я┐╜ Data я┐╜  28/08/09   я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Desc.     я┐╜Calcula o digito verificador de uma sequencia de numeros    я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜baseando-se no modulo 10. Utilizado para verificar o digito я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜em linhas digitaveis e codigo de barras de concessionarias  я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜          я┐╜de servicos publicos                                        я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╣я┐╜я┐╜
+я┐╜я┐╜я┐╜Uso       я┐╜ CodBarVl2                                                  я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜═╝я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
 */
 Static Function Mod11( cNum )
 	*=====================================================================================================================================*

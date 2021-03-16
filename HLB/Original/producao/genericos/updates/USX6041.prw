@@ -7,6 +7,8 @@ Parametros  : Nil
 Retorno     : Nil
 Objetivos   : Ajuste no Tipo e Conteudo do parametro MV_INTSFC, devido ao error.log no UPDDISTR (type mismatch on compare on SFCINTEGRA)
 			  Ajuste no parametro MV_TTS, para rodar o UPDDISTR
+			  Ajuste no SX3 para rodar o UPDDISTR, para os casos de "O tamanho no SX3 do campo CL1_CODCTA é dIferente do SXG"  P12_01 / P12_03
+
 Autor       : Cesar Alves
 Data/Hora   : 11/11/2019
 Revisão		:                    
@@ -211,7 +213,11 @@ Return(cTexto)
 *------------------------------*
  Static Function AltSX6(cTexto)
 *------------------------------*
-Local cTexto	:= ''
+Local cTexto  := ''
+Local aCampos := {}
+Local i := 0    
+Local cGrpSX3 := ""
+Local nTamSX3 := 0
 
 //Atualizando Parâmetro MV_TTS
 DbSelectArea("SX6")
@@ -224,7 +230,6 @@ If SX6->(DbSeek(xFilial("SX6")+"MV_TTS"))
 Else
 	cTexto += "Parâmetro MV_TTS não encontrado"+NL
 EndIf
-
 
 //Atualizando Parâmetro MV_INTSFC
 DbSelectArea("SX6")
@@ -239,6 +244,43 @@ Else
 	cTexto += "Parâmetro MV_INTSFC não encontrado"+NL
 EndIf
 
+
+//Ajuste no SX3 para rodar o UPDDISTR, para os casos de "O tamanho no SX3 dIferente do SXG"
+//If GetEnvServer() $ "P12_03/P12_10/P12_11/P12_12/P12_24"
+	aCampos := {"EYY_D1PROD","TY8_CODEPI","EE6_AGENTE","EE6_AGENT1","EE6_AGENT2","EE6_AGENT3","EE6_AGENT4","EE6_AGENT5","EE8_CODAGE","EE9_CODAGE","EEB_CODAGE","CL1_CODCTA","CL2_CTA","CL4_CODCTA","CL6_CONTA","CL7_CODCTA","CL2_CCUS","FK9_PRJPMS","TO0_APROVA","E5_SITUA","EIW_LOTECT","EEM_NRNF","YD_UNID","YD_UM","E2_HIST","E5_HISTOR","IG_HISMOV"}
+//ElseIF GetEnvServer() $ "P12_01/P12_02/P12_28"
+	//aCampos += {"CL1_CODCTA","CL2_CTA","CL4_CODCTA","CL6_CONTA","CL7_CODCTA","CL2_CCUS","FK9_PRJPMS","TO0_APROVA","E5_SITUA","EIW_LOTECT","EEM_NRNF","EIW_LOTECT"}
+//ElseIF GetEnvServer() == "P12_17"
+	//aCampos += {"YD_UNID","YD_UM"}
+//ElseIF GetEnvServer() == "P12_19"
+	//aCampos += {"E2_HIST","E5_HISTOR","IG_HISMOV"}
+//EndIF
+
+//Atualizando X3_GRPSXG
+For i:= 1 To Len(aCampos)
+	SX3->(DbSetOrder(2))
+	SX3->(DbGotop())
+	If SX3->(DbSeek(aCampos[i]))
+	 	nTamSX3 := SX3->X3_TAMANHO
+	 	cGrpSX3 := SX3->X3_GRPSXG 	    
+	 	cRecno  := SX3->(RECNO())
+
+		SXG->(DbSetOrder(1))
+		SXG->(DbGotop())
+		If SXG->(DbSeek(cGrpSX3))	
+	    	      
+	    	If nTamSX3 <> SXG->XG_SIZE                                    
+				SX3->(DbGoto(cRecno))
+	    			Reclock("SX3",.F.)
+						SX3->X3_GRPSXG:=""
+					SX3->(MsUnlock())
+					cTexto += "Alterado/Limpo o X3_GRPSXG(" +cValToChar(cGrpSX3)+ ") do campo "+aCampos[i]+" "+NL		
+	    	EndIF 
+
+	    EndIF                  
+		
+	EndIf	
+Next i
 
 Return(cTexto)
 

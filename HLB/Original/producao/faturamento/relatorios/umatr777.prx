@@ -8,12 +8,20 @@ Objetivos   : Alteração no fonte padrão do Pick-List para gerar um pedido por pá
 Autor       : Renato Rezende
 Data/Hora   : 10/06/2013
 */
+/*
+Funcao      : UMATR777
+Parametros  : Nenhum
+Retorno     : Nenhum
+Objetivos   : Alteração do leiaute do relatório. Mudança na impressão de retrato para paisagem, campos importantes não estavam sendo impressos.
+Autor       : Renato Rezende
+Data/Hora   : 23/12/2019
+*/
 *------------------------*
  User Function UMATR777 ()
 *------------------------*
 
 Local wnrel   := "MATR777"
-Local tamanho := "M"
+Local tamanho := "G"
 Local titulo  := "Pick-List  (Expedicao)" //OemToAnsi(STR0001)
 Local cDesc1  := "Emissao de produtos a serem separados pela expedicao, para"// OemToAnsi(STR0002)
 Local cDesc2  := "determinada faixa de pedidos." //OemToAnsi(STR0003)
@@ -104,9 +112,9 @@ li := 80
 //³ Definicao dos cabecalhos                                     ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 titulo := "PICK-LIST" //OemToAnsi(STR0007)
-// "Codigo          Desc. do Material              UM Quantidade  Amz Endereco       Lote      SubLote  Dat.de Validade Potencia"
-//            1         2         3         4         5         6         7         8         9        10        11        12        13
-//  0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
+// "Codigo          Desc. do Material                                                                                                        UM Quantidade  Amz Endereco       Lote      SubLote  Dat.de Validade Potencia"
+//            1         2         3         4         5         6         7         8         9        10        11        12        13         14        15        16        17        18        19        20        21    
+//  01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 #IFDEF TOP
 	cAliasNew:= GetNextAlias()
 	aStruSC9 := SC9->(dbStruct())
@@ -250,7 +258,7 @@ Return NIL
  Static Function C777ImpDet(cAliasNew,lQuery,nQtde,cEndereco,lEnd,titulo,cDesc1,cDesc2,cDesc3,tamanho)  
 *-----------------------------------------------------------------------------------------------------*
 
-Local cabec1 := "Codigo          Desc. do Material              UM Quantidade  Amz Endereco       Lote      SubLote  Validade   Potencia    Pedido"//OemToAnsi(STR0006)
+Local cabec1 := "Codigo          Desc. do Material              "+Space(90)+"UM Quantidade  Amz Endereco           Lote      SubLote  Validade  Potencia Pedido"//OemToAnsi(STR0006)
 Local cabec2 := ""
 Local cRodape:= "-----------------------------------------------Este pedido continua na próxima página-----------------------------------------------"
 
@@ -272,7 +280,7 @@ If li > 73 .OR. (cPedido <> (cAliasNew)->C9_PEDIDO .or. cPedido =="") .or. lFirs
 EndIf
 SB1->(dbSeek(xFilial("SB1")+(cAliasNew)->C9_PRODUTO))
 // ----
-@ li, 00 Psay (cAliasNew)->C9_PRODUTO	Picture "@!"
+/*@ li, 00 Psay (cAliasNew)->C9_PRODUTO	Picture "@!"
 @ li, 16 Psay Subs(SB1->B1_DESC,1,30)	Picture "@!"
 @ li, 47 Psay SB1->B1_UM   				Picture "@!"
 @ li, 50 Psay nQtde						Picture "@E 999,999.99"
@@ -283,6 +291,20 @@ SB1->(dbSeek(xFilial("SB1")+(cAliasNew)->C9_PRODUTO))
 @ li,101 Psay (cAliasNew)->C9_DTVALID	Picture PesqPict("SC9","C9_DTVALID")
 @ li,116 PSay (cAliasNew)->C9_POTENCI	Picture PesqPict("SC9","C9_POTENCI")
 @ li,123 Psay (cAliasNew)->C9_PEDIDO	Picture "@!"
+*/
+// Wederson - 23/12/2019.
+@ li,000 Psay (cAliasNew)->C9_PRODUTO	Picture "@!"
+@ li,016 Psay SB1->B1_DESC          	Picture "@!"
+@ li,137 Psay SB1->B1_UM   				Picture "@!"
+@ li,140 Psay nQtde						Picture "@E 999,999.99"
+@ li,152 Psay (cAliasNew)->C9_LOCAL
+@ li,156 Psay cEndereco
+@ li,171 Psay (cAliasNew)->C9_LOTECTL	Picture "@!"
+@ li,181 Psay (cAliasNew)->C9_NUMLOTE	Picture "@!"
+@ li,191 Psay (cAliasNew)->C9_DTVALID	Picture PesqPict("SC9","C9_DTVALID")
+@ li,204 PSay (cAliasNew)->C9_POTENCI	Picture PesqPict("SC9","C9_POTENCI")
+@ li,211 Psay (cAliasNew)->C9_PEDIDO	Picture "@!"
+
 li++
 //Se o pedido contém mais de 73 produtos imprimir a mensagem de continuação no rodapé
 If li == 74

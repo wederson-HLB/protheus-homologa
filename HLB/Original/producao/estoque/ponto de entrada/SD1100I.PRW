@@ -46,6 +46,26 @@ Private INCLUI := .F.
 Private ALTERA := .F.                        
 Private DELETA := .F.                        
 
+//--------------------------------------------------------------------------------------------
+//   Author: Marcio Martins Pereira - 27/12/2019
+//  Projeto: TAX-ID
+//  Observ.: A funcionalidade abaixo se aplica A TODAS AS EMPRESAS que utilizam a ferramenta
+//           TAX-ID, a rotina abaixo corrige o problema da diferença de 0,01 na contabilização
+//			 DEVERá SER EXECUTADO ANTES DE TODAS AS OUTRAS ROTINAS ABAIXO 
+// Chamados: 19653/20218
+//--------------------------------------------------------------------------------------------
+If  IsInCallStack("U_GTGEN047")
+	If SD1->D1_BASEIPI > 0 .And. SD1->D1_IPI > 0 
+		Reclock("SD1",.F.)
+		SD1->D1_VALIPI := ROUND(SD1->D1_BASEIPI*SD1->D1_IPI/100,2)
+		MsUnlock()	
+	Endif
+Endif
+//--------------------------------------------------------------------------------------------
+// Fim	
+//--------------------------------------------------------------------------------------------
+
+
 Do Case
 	Case cEmpAnt $ "EQ/ZN"
 		
@@ -215,7 +235,7 @@ Do Case
 
 		
 	End Case
-
+		
 Return
 	                        
 *----------------------------------------*

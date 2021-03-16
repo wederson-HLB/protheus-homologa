@@ -2,7 +2,7 @@
 
 
 /*
-FUNÇÃO		:   Update
+FUNï¿½ï¿½O		:   Update
 */
 
 *==============================*
@@ -14,7 +14,7 @@ U_Upd_Fabr('U_USX3081')
 RETURN .T.
 
 /*/{Protheus.doc} USX3081
-//TODO Inclusão
+//TODO Inclusï¿½o
 @author Alessandro Rodrigues/Daniel Lima
 @since 18/01/2018
 @version 1.0
@@ -65,7 +65,7 @@ USER FUNCTION USX3081(lDesc)
 	///////////////////////////////////////////////////////////////////
 
     /*=====================================================================================================================================*/
-	//Criação de pasta para a tabela SE2
+	//Criaï¿½ï¿½o de pasta para a tabela SE2
 	/*
 	cChaveXA := "SE2"
 	SXA->(DbSetOrder(1))
@@ -106,7 +106,7 @@ USER FUNCTION USX3081(lDesc)
 	dbSelectArea("SX3")
 	aSX3 := {}
 
-	//Criação de campos na tabela SEE
+	//Criaï¿½ï¿½o de campos na tabela SEE
 	cChave := "SEE"
 	SX3->(DbSetOrder(1))
 	SX3->(DbSeek( AVKEY(cChave,'X3_ARQUIVO') ))
@@ -278,13 +278,13 @@ USER FUNCTION USX3081(lDesc)
 
 
 
-	//CAMPO SE UTILIZA LAYOUT DA ACCESSTAGE OU NÃO
+	//CAMPO SE UTILIZA LAYOUT DA ACCESSTAGE OU Nï¿½O
 	cCampo := "EE_P_ACCES"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
 	//Campos|Alias||Ordem||Campo||Tipo||Tamanho||Decimal||Titulo||Titulo SPA||Titulo USA||Descricao||Descricao SPA||Descricao USA||Picture||Validacao||
-	//Usado||Relação||F3||Nivel||Reservado||Check||Trigger||Propri||Browse||Visual||Contexto||Obrigatorio||Valid User||Combo Box||Combo Box SPA||
+	//Usado||Relaï¿½ï¿½o||F3||Nivel||Reservado||Check||Trigger||Propri||Browse||Visual||Contexto||Obrigatorio||Valid User||Combo Box||Combo Box SPA||
 	//Combo Box USA||PictVar||Editar||Inici. Browse||GRPSXG||Folder||Pyme||CondSQL||ChkSQL||IdxSRV||Ortogra||IdxFLD||Tela||Agrup||PosLgt||MModal|
-	aAdd(aSX3,{cChave ,cOrdX3 ,cCampo,"C", 01,0,"Accesstage","","","Utiliza Accesstage","","","","U_GTFIN038(2,'')",cUsado,"","",;
+	aAdd(aSX3,{cChave ,cOrdX3 ,cCampo,"C", 01,0,"FEBRABAN","","","Utiliza Febraban","","","","U_GTFIN038(2,'')",cUsado,"","",;
 	1,cReserv,"","","U","S","A","R","","",c1S2N,c1S2N,c1S2N,,,,,"1","","","","","","","","","",""})
 
 	cCampo := "EE_P_NOEMP"
@@ -300,7 +300,7 @@ USER FUNCTION USX3081(lDesc)
 	               cUsado,"'A'","",0,cReserv,"","","U","S","A","R","","",cCombo,cCombo,cCombo,"","","","","1","S","","","","","","","","",""})
 	EndIf
 
-	cCombo := "1=Frente do Boleto de Pagamento;2=Verso do Boleto de Pagamento;3=Inst. Ficha Compensação"
+	cCombo := "1=Frente do Boleto de Pagamento;2=Verso do Boleto de Pagamento;3=Inst. Ficha Compensaï¿½ï¿½o"
 	cCampo := "EE_P_TPIMP"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
 	aAdd(aSX3,{"SEE",cOrdX3,cCampo,"C",1,0,"Tip.Impres","Tip.Impres","Tip.Impres","Tipo Impressao","Tipo Impressao","Tipo Impressao","@!","",;
@@ -309,13 +309,13 @@ USER FUNCTION USX3081(lDesc)
 
 	/************************************************************************************
 	************************************************************************************
-	INFORMAÇÕES DE PROTESTO E MULTA PARA CNAB A RECEBER
+	INFORMAï¿½ï¿½ES DE PROTESTO E MULTA PARA CNAB A RECEBER
 	************************************************************************************
 	*************************************************************************************/
 
-	//CÓDIGO PROTESTO
+	//Cï¿½DIGO PROTESTO
 	//EE_P_PROTE
-	cCombo := "1=Protestar Dias Corridos;2=Protestar Dias Úteis;3=Não Protestar;4=Protestar Fim Falimentar - Dias Úteis;5=Protestar Fim Falimentar - Dias Corridos;8=Negativação sem Protesto;9=Cancelamento Protesto Automático"
+	cCombo := "1=Protestar Dias Corridos;2=Protestar Dias ï¿½teis;3=Nï¿½o Protestar;4=Protestar Fim Falimentar - Dias ï¿½teis;5=Protestar Fim Falimentar - Dias Corridos;8=Negativaï¿½ï¿½o sem Protesto;9=Cancelamento Protesto Automï¿½tico"
 	cCampo := "EE_P_PROTE"
 	//If !SX3->(DbSeek(cCampo))
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
@@ -338,7 +338,7 @@ USER FUNCTION USX3081(lDesc)
 	//PERCENTUAL JUROS
 	cCampo := "EE_P_PERJR"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-	aAdd(aSX3,{"SEE",cOrdX3,cCampo,"N",5,2,"Perc Juros","Perc Juros","Perc Juros","Percentual Juros","Percentual Juros","Percentual Juros","@E 999.99","",;
+	aAdd(aSX3,{"SEE",cOrdX3,cCampo,"N",6,3,"Perc Juros","Perc Juros","Perc Juros","Percentual Juros","Percentual Juros","Percentual Juros","@E 999.99","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","","","","1","","","","","N","N","","","",""})
 
 	//CAMPO DE EMAIL PARA RECEBER AS OCORRENCIAS
@@ -386,14 +386,14 @@ USER FUNCTION USX3081(lDesc)
 	cCampo := "A1_P_CL_PA"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
 	aAdd(aSX3,{"SA1",cOrdX3,cCampo,"C",1,0,"Client/Param","Client/Param","Client/Param","Considera Cli/Param","Considera Cli/Param","Considera Cli/Param","","",;
-		cUsado,"'1'","",0,cReserv,"","","U","S","A","R","","",cCombo,cCombo,cCombo,"","","","","2","S","","","","","","","","",""})
+		cUsado,"'2'","",0,cReserv,"","","U","S","A","R","","",cCombo,cCombo,cCombo,"","","","","2","S","","","","","","","","",""})
 
 
 
 	//***************************************************************//
 	//*************** SX3- Campos Tributos CNAB *********************//
 	//***************************************************************//
-	//Criação de campos na tabela SE2
+	//Criaï¿½ï¿½o de campos na tabela SE2
 	cChave := "SE2"
 	SX3->(DbSetOrder(1))
 	SX3->(DbSeek( AVKEY(cChave,'X3_ARQUIVO') ))
@@ -424,7 +424,7 @@ USER FUNCTION USX3081(lDesc)
 		aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",4,0,"Cod. Recolhi","Cod. Recolhi","Cod. Recolhi","Cod. Recolhimento","Cod. Recolhimento","Cod. Recolhimento","","",;
 				   cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","IIF(!Empty(M->E2_P_TRIB),.T.,.F.)","","","","","","","","N","N","","","",""})
 	
-	cContrib := "01=CNPJ;02=CPF;03=PIS/PASEP;04=CEI;06=NB;07=Nº do Título;08=DEBCAD;09=REFERENCIA"
+	cContrib := "01=CNPJ;02=CPF;03=PIS/PASEP;04=CEI;06=NB;07=Nï¿½ do Tï¿½tulo;08=DEBCAD;09=REFERENCIA"
 	cCampo := "E2_P_TPCON"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
 	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",02,0,"Contribuinte","Contribuinte","Contribuinte","Tipo Contribuinte","Tipo Contribuinte","Tipo Contribuinte","","",;
@@ -437,13 +437,13 @@ USER FUNCTION USX3081(lDesc)
 
 	cCampo := "E2_P_NMCON"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",20,0,"Nom Contrib","Nom Contrib","Nom Contrib","Nome Contribuinte","Nome Contribuinte","Nome Contribuinte","","",;
+	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",30,0,"Nom Contrib","Nom Contrib","Nom Contrib","Nome Contribuinte","Nome Contribuinte","Nome Contribuinte","","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","IIF(!Empty(M->E2_P_TRIB),.T.,.F.)","","","","","","","","N","N","","","",""})
 
 
 	cCampo := "E2_P_COMPE"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"D",08,0,"Compet/Apur","Compet/Apur","Compet/Apur","Competência/Apuração","Competência/Apuração","Competência/Apuração","","",;
+	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"D",08,0,"Compet/Apur","Compet/Apur","Compet/Apur","Competï¿½ncia/Apuraï¿½ï¿½o","Competï¿½ncia/Apuraï¿½ï¿½o","Competï¿½ncia/Apuraï¿½ï¿½o","","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","IIF(!Empty(M->E2_P_TRIB),.T.,.F.)","","","","","","","","N","N","","","",""})
 
 /*******************************
@@ -523,12 +523,12 @@ INICIO IPVA/DPVAT/LICENCIAMENTO
 
 	cCampo := "E2_P_UFIPV"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",2,0,"UF","UF","UF","Unidade da Federação","Unidade da Federação","Unidade da Federação","@!","",;
+	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",2,0,"UF","UF","UF","Unidade da Federaï¿½ï¿½o","Unidade da Federaï¿½ï¿½o","Unidade da Federaï¿½ï¿½o","@!","",;
 	cUsado,"","12",1,cReserv,"","","U","N","A","R","","","","","","","IIF(M->E2_P_TRIB$'25/26/27',.T.,.F.)","","","","","","","","N","N","","","",""})
 
 	cCampo := "E2_P_CDMUN"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",5,0,"Cd.Municipio","Cd.Municipio","Cd.Municipio","Código do Municipio","Código do Municipio","Código do Municipio","","Vazio() .Or. ExistCpo('CC2',M->E2_P_UFIPV+M->E2_P_CDMUN)",;
+	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",5,0,"Cd.Municipio","Cd.Municipio","Cd.Municipio","Cï¿½digo do Municipio","Cï¿½digo do Municipio","Cï¿½digo do Municipio","","Vazio() .Or. ExistCpo('CC2',M->E2_P_UFIPV+M->E2_P_CDMUN)",;
 	cUsado,"","CC2SE2",1,cReserv,"","","U","N","A","R","","","","","","","IIF(M->E2_P_TRIB$'25/26/27',.T.,.F.)","","","","","","","","N","N","","","",""})
 
 	cCampo := "E2_P_PLACA"
@@ -536,16 +536,16 @@ INICIO IPVA/DPVAT/LICENCIAMENTO
 	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",10,0,"Placa","Placa","Placa","Placa","Placa","Placa","","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","IIF(M->E2_P_TRIB$'25/26/27',.T.,.F.)","","","","","","","","N","N","","","",""})
 
-	cParcela := "1=Parc.Unica C/Desconto;2=Parc.Unica S/Desconto;3=Parc.-Nº1;4=Parc.-Nº2;5=Parc.-Nº3;6=Parc.-Nº4;7=Parc.-Nº5;8=Parc.-Nº6"
+	cParcela := "1=Parc.Unica C/Desconto;2=Parc.Unica S/Desconto;3=Parc.-Nï¿½1;4=Parc.-Nï¿½2;5=Parc.-Nï¿½3;6=Parc.-Nï¿½4;7=Parc.-Nï¿½5;8=Parc.-Nï¿½6"
 	cCampo := "E2_P_OPPAG"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",1,0,"OP. Pagto","OP. Pagto","OP. Pagto","Opção de Pagamento","Opção de Pagamento","Opção de Pagamento","","",;
+	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",1,0,"OP. Pagto","OP. Pagto","OP. Pagto","Opï¿½ï¿½o de Pagamento","Opï¿½ï¿½o de Pagamento","Opï¿½ï¿½o de Pagamento","","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","",cParcela,cParcela,cParcela,"","IIF(M->E2_P_TRIB$'25',.T.,.F.)","","","","","","","","N","N","","","",""})
 
 	cRetirada := "1=Correio;2=DETRAN/CIRETRAN"
 	cCampo := "E2_P_OPRET"
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",1,0,"OP. Retirada","OP. Retirada","OP. Retirada","Opção de Retirada do CRVL","Opção de Retirada do CRVL","Opção de Retirada do CRVL","","",;
+	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",1,0,"OP. Retirada","OP. Retirada","OP. Retirada","Opï¿½ï¿½o de Retirada do CRVL","Opï¿½ï¿½o de Retirada do CRVL","Opï¿½ï¿½o de Retirada do CRVL","","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","",cRetirada,cRetirada,cRetirada,"","IIF(M->E2_P_TRIB$'26',.T.,.F.)","","","","","","","","N","N","","","",""})
 
 /***********************************
@@ -584,7 +584,7 @@ INICIO FGTS
 	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",9,0,"Lacre Soc.","Lacre Soc.","Lacre Soc.","Lacre Conect. Social","Lacre Conect. Social","Lacre Conect. Social","","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","IIF(M->E2_P_TRIB$'01',.T.,.F.)","","","","","","","","N","N","","","",""})
 	
-	cCampo := "E2_P_DGSOC" //(2)   - Dígito do Lacre do Conectividade Social
+	cCampo := "E2_P_DGSOC" //(2)   - Dï¿½gito do Lacre do Conectividade Social
 	IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
 	aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",2,0,"Dig. L. Soc.","Dig. L. Soc.","Dig. L. Soc.","Dig. Lac. Social","Dig. Lac. Social","Dig. Lac. Social","","",;
 	cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","IIF(M->E2_P_TRIB$'01',.T.,.F.)","","","","","","","","N","N","","","",""})
@@ -599,7 +599,7 @@ FIM FGTS
 	cCampo := "E2_LINDIG"
 	If !SX3->(DbSeek(cCampo))
 		IIf(! DbSeek(cCampo), cOrdX3 := cOrd := OrdemSX3(cOrd), cOrdX3 := SX3->X3_ORDEM)
-		aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",48,0,"Linha Dig.","Linha Dig.","Linha Dig.","Linha Digitável","Linha Digitável","Linha Digitável","","",;
+		aAdd(aSX3,{"SE2",cOrdX3,cCampo,"C",48,0,"Linha Dig.","Linha Dig.","Linha Dig.","Linha Digitï¿½vel","Linha Digitï¿½vel","Linha Digitï¿½vel","","",;
 	               cUsado,"","",,cReserv,"","","U","N","A","R","","","","","","","","","","1","","","","","N","N","","","",""})
 	EndIf
 
@@ -674,7 +674,7 @@ FIM FGTS
 	
 
 
-	//Criação de campos na tabela SA2
+	//Criaï¿½ï¿½o de campos na tabela SA2
 	cChave := "SA2"
 	SX3->(DbSetOrder(1))
 	SX3->(DbSeek( AVKEY(cChave,'X3_ARQUIVO') ))
@@ -725,7 +725,7 @@ FIM FGTS
 				cUsado,"","",1,cReserv,"","","U","N","A","R","","","","","","","","","","2","","","","N","","N","","","",""})
 
 
-	//Criação de campos na tabela SEA
+	//Criaï¿½ï¿½o de campos na tabela SEA
 	cChave := "SEA"
 	SX3->(DbSetOrder(1))
 	SX3->(DbSeek( AVKEY(cChave,'X3_ARQUIVO') ))
@@ -752,7 +752,7 @@ FIM FGTS
 
 	///////////////////////////////////////////////////////////////////
 	//***************************************************************//
-	//*************** SX1- Perguntas do usuário *********************//
+	//*************** SX1- Perguntas do usuï¿½rio *********************//
 	//***************************************************************//
 	///////////////////////////////////////////////////////////////////
 	/*=====================================================================================================================================*/
@@ -799,7 +799,7 @@ FIM FGTS
 	
 	///////////////////////////////////////////////////////////////////
 	//***************************************************************//
-	//*********** SIX - Índices das tabelas do sistema **************//
+	//*********** SIX - ï¿½ndices das tabelas do sistema **************//
 	//***************************************************************//
 	///////////////////////////////////////////////////////////////////
 	/*=====================================================================================================================================*/
@@ -816,18 +816,29 @@ FIM FGTS
 
 	///////////////////////////////////////////////////////////////////
 	//***************************************************************//
-	//*************** SX6 - Parâmetros do sistema *******************//
+	//*************** SX6 - Parï¿½metros do sistema *******************//
 	//***************************************************************//
 	///////////////////////////////////////////////////////////////////
 	/*=====================================================================================================================================*/
 
 	aSX6 := {}
-	//Parametros     |Filial|   |Variável|   |Tipo| |Descrição|                                             |Descrição E| |Descrição I| |Descrição|                                    |Descrição E| |Descrição I| |Descrição| |Descrição E| |Descrição I| |Conteúdo|                                |Connnteúdo E| |Conteúdo I| |Propriedade|  |PYME|  |X6_VALID| |X6_INIT|	|X6_DEFPOR|	|X6_DEFSPA|	|X6_DEFENG
-	aAdd(aSX6,       {xFilial(),"MV_P_00122" ,"L"   ,"Se a empresa é Corporativa (.T.) ou Cliente (.F.)"   ,""           ,""           ," cria diretório (corporativo) ou (cliente)"  ,""           ,""           ,""         ,""           ,""           ,".F."                                    ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
-	aAdd(aSX6,       {xFilial(),"MV_P_00130" ,"L"   ,"Se a empresa utiliza a rotina da Accesstage (.T.)"   ,""           ,""           ," se não (.F.)"  ,""           ,""           ,""         ,""           ,""           ,".F."                                    ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
-	aAdd(aSX6,       {xFilial(),"MV_P_00131" ,"C"   ,"Email para recebimento da ocorrencias CNAB retorn"   ,""           ,""           ,"nado via Accesstage"  ,""           ,""           ,""         ,""           ,""           ,""                                    ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
-	aAdd(aSX6,       {xFilial(),"MV_P_00132" ,"C"   ,"Endereço do servidor dos diretórios CNAB Accessta"   ,""           ,""           ,"ge"  ,""           ,""           ,""         ,""           ,""           ,"\\SRVDCASTAGE01\E$\ASTAGE\"                                    ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
-	//aAdd(aSX6,       {""    ,"EZ_SAPSWD"  ,"N"   ,"Sequencial tabela SWD para agrupamento de despesas"  ,""           ,""           ,""                                            ,""           ,""           ,""         ,""           ,""           ,"0000000000"                             ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
+	//Parametros     |Filial|   |Variï¿½vel|   |Tipo| |Descriï¿½ï¿½o|                                             |Descriï¿½ï¿½o E| |Descriï¿½ï¿½o I| |Descriï¿½ï¿½o|                                    |Descriï¿½ï¿½o E| |Descriï¿½ï¿½o I| |Descriï¿½ï¿½o| |Descriï¿½ï¿½o E| |Descriï¿½ï¿½o I| |Conteï¿½do|                                |Connnteï¿½do E| |Conteï¿½do I| |Propriedade|  |PYME|  |X6_VALID| |X6_INIT|	|X6_DEFPOR|	|X6_DEFSPA|	|X6_DEFENG
+	aAdd(aSX6,       {xFilial(),"MV_P_00122" ,"L"   ,"Se a empresa ï¿½ Corporativa (.T.) ou Cliente (.F.)"   ,""           ,""           ," cria diretï¿½rio (corporativo) ou (cliente)"  	,""           ,""           ,""         ,""           ,""           ,".F."                                    ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
+	aAdd(aSX6,       {xFilial(),"MV_P_00130" ,"L"   ,"Se a empresa utiliza a rotina da Accesstage (.T.)"   ,""           ,""           ," se nï¿½o (.F.)"  								,""           ,""           ,""         ,""           ,""           ,".F."                                    ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
+	aAdd(aSX6,       {xFilial(),"MV_P_00131" ,"C"   ,"Email para recebimento da ocorrencias CNAB retorn"   ,""           ,""           ,"nado via Accesstage"  							,""           ,""           ,""         ,""           ,""           ,"log.finnet@hlb.com.br"               	  ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })				//CAS - 10/09/2020 Adicionado o e-mail "log.finnet@hlb.com.br" no conteudo do parametro
+	aAdd(aSX6,       {xFilial(),"MV_P_00132" ,"C"   ,"Endereï¿½o do servidor dos diretï¿½rios CNAB Accessta"   ,""           ,""           ,"ge"  											,""           ,""           ,""         ,""           ,""           ,"\\SRVDCAPP04.ZION.LAN\FINNET\FINNET\"	  ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })				//CAS - 01/04/2020 \\SRVDCHOMAPP05.zion.lan\FINNET\FINNET\    -  CAS - 22/01/2020 Ajustado o caminho para \\SRVDCAPP04.PCS.LAN\FINNET\FINNET\   OSB: era \\SRVDCAPP04\e$\FINNET\ 
+	//aAdd(aSX6,       {""    ,"EZ_SAPSWD"  ,"N"   ,"Sequencial tabela SWD para agrupamento de despesas"  ,""           ,""           ,""                                            	,""           ,""           ,""         ,""           ,""           ,"0000000000"                             ,""          ,""          ,"U"           ,""     ,""        ,""       ,""         ,""         ,"" })
+
+	//CAS - 15/09/2020 Ajuste nos parametros para arredondar valor dos impostos do PCC
+	//Parametros     |Filial|   |Variï¿½vel|   |Tipo| |Descriï¿½ï¿½o|                                             |Descriï¿½ï¿½o E| 										 	|Descriï¿½ï¿½o I| 											|Descriï¿½ï¿½o|                                    			|Descriï¿½ï¿½o E| 											|Descriï¿½ï¿½o I| 											|Descriï¿½ï¿½o| 											|Descriï¿½ï¿½o E| 											|Descriï¿½ï¿½o I| 											|Conteï¿½do|      |Connnteï¿½do E| |Conteï¿½do I| |Propriedade|  |PYME|  |X6_VALID| |X6_INIT|	|X6_DEFPOR|	|X6_DEFSPA|	|X6_DEFENG
+	aAdd(aSX6,       {xFilial(),"MV_RNDCOF"  ,"L"   ,"Informe o critÃ©rio de arredondamento do COFINS de "   ,"Informe el critÃ©rio de rredondeo de COFINS de     "	,"Enter the roundoff criterion of COFINS withholding"	,"retenÃ§Ã£o. As opÃ§Ãµes validas sÃ£o: .T. arrendonda,  "	,"retencion. Las opciones validas son: .T. rrendonde"	,"Valid options are: .T.round off,                  "	,".F. trunca.                                       "	,".F. trunca.                                       "	,".F. truncate.                                     "	,".T."			,".T."			,".T."      ,"S"           ,"S"     ,""        ,""       ,""         ,""         ,"" })
+	aAdd(aSX6,       {xFilial(),"MV_RNDCSL"  ,"L"   ,"Informe o critÃ©rio de arredondamento da CSLL. As  "   ,"Informe el criterio de redondeo de la CSLL. Las   "	,"Enter the round criterion of CSLL. The valid      "	,"opÃ§Ãµes vÃ¡lidas sÃ£o: .T. arredonda, .F. trunca.    "	,"opciones vÃ¡lidas son: .T. redondea, .F. interrumpe"	,"options are: .T. round. .F. truncate.             "	,"                                                  "	,"                                                  "	,"                                                  "	,".T."			,".T."			,".T."      ,"S"           ,"S"     ,""        ,""       ,""         ,""         ,"" })
+	aAdd(aSX6,       {xFilial(),"MV_RNDPIS"  ,"L"   ,"Informe o critÃ©rio de arredondamento do PIS de    "   ,"Informe el criterio de redondeo del PIS de        "	,"Enter the round off criterion of PIS withholding  "	,"retenÃ§Ã£o. As opÃ§Ãµes validas sÃ£o: .T. arrendonda,  "	,"retencion. Las opciones validas son: .T.rendondea "	,"Valid options are: .T.round off,                  "	,".F. trunca.                                       "	,".F. trunca.                                       "	,".F. truncate.                                     "	,".T."			,".T."			,".T."      ,"S"           ,"S"     ,""        ,""       ,""         ,""         ,"" })
+	aAdd(aSX6,       {xFilial(),"MV_RNDSOBR" ,"L"   ,"Indica se no truncamento dos impostos, o valor    "   ,"Indica si, cuando se divida el valor del impuesto,"	,"It indicates whether in tax truncation, value     "	,"referente a terceira casa decimal (sobras)        "	,"el tercer decimal (sobras)                        "	,"referring to the third decimal place (surplus) are"	,"continuam a ser consideradas (.T.), ou nao (.F.)  "	,"aun se considerara (.T.), o no (.F.)              "	,"still considered (.T.) or not (.F.).              "	,".T."			,".T."			,".T."      ,"S"           ,"S"     ,""        ,""       ,""         ,""         ,"" })
+	//CAS - 11/02/2021 Ajuste nos parametros para arredondar valor dos impostos do ISS/INS/IRF
+	aAdd(aSX6,       {xFilial(),"MV_RNDISS"  ,"L"   ,"Controle para arredondamento de ISS onde .T. Ã©    "   ,"Control para redondeo de ISS donde .T. se         "	,"ISS round off controi, whose .T. means            "	,"arredondado e .F. nÃ£o Ã© arredondado               "	,"redondeara y .F. no se redondeara.                "	,"rounded off and .F. is not rounded off.           "	,"                                                  "	,"                                                  "	,"                                                  "	,".T."			,".T."			,".T."      ,"S"           ,"S"     ,""        ,""       ,""         ,""         ,"" })
+	aAdd(aSX6,       {xFilial(),"MV_RNDINS"  ,"L"   ,"Informe o critÃ©rio de arredondamento da INSS. As  "   ,"Informe el criterio de redondeo de INSS. Las      "	,"Enter round up criterion for INSS.                "	,"opÃ§Ãµes vÃ¡lidas sÃ£o: .T. arredonda, .F. trunca.    "	,"opciones validas son: .T. redondea, .F. omite.    "	,"Valid options:: .T. round, .F. breaks.            "	,"                                                  "	,"                                                  "	,"                                                  "	,".T."			,".T."			,".T."      ,"S"           ,"S"     ,""        ,""       ,""         ,""         ,"" })
+	aAdd(aSX6,       {xFilial(),"MV_RNDIRF"  ,"L"   ,"Informe o critÃ©rio de arredondamento da IRRF. As  "   ,"Informe el criterio de redondeo del IRRF. Las     "	,"Enter round criterion for IRRF.                   "	,"opÃ§Ãµes vÃ¡lidas sÃ£o: .T. arredonda, .F. trunca.    "	,"opciones validas son: .T. redondea, .F. omite.    "	,"Valid options:: .T. round, .F. breaks.            "	,"                                                  "	,"                                                  "	,"                                                  "	,".T."			,".T."			,".T."      ,"S"           ,"S"     ,""        ,""       ,""         ,""         ,"" })
 
 	/*=====================================================================================================================================*/
 
@@ -879,14 +890,14 @@ FIM FGTS
 
 	///////////////////////////////////////////////////////////////////
 	//***************************************************************//
-	//***********       SXB - Consulta padrão         ***************//
+	//***********       SXB - Consulta padrï¿½o         ***************//
 	//***************************************************************//
 	///////////////////////////////////////////////////////////////////
 	/*=====================================================================================================================================*/
 	SXB->(DbSetOrder(1))
 	aSXB := {}
 
-	//CONSULTA PADRÃO ESTADO E MUNICIPIO
+	//CONSULTA PADRï¿½O ESTADO E MUNICIPIO
 	        //{XB_ALIAS, XB_TIPO, XB_SEQ, XB_COLUNA,  XB_DESCRI,            XB_DESCSPA,           XB_DESCENG,           XB_CONTEM                     }
 	AADD(aSXB,{"CC2SE2", "1",     "01",   "DB",       "Municipio Tributos", "Municipio Tributos", "Municipio Tributos", "CC2"                         })
 	AADD(aSXB,{"CC2SE2", "2",     "01",   "01",       "Estado+Municipio",   "Estado+Municipio",   "Estado+Municipio",   ""                            })
@@ -899,17 +910,17 @@ FIM FGTS
 	AADD(aSXB,{"ARQCNB", "1",     "01",   "RE",       "Arquivo Cnab", "Arquivo Cnab", "Arquivo Cnab", "Z0F"                         })
 	AADD(aSXB,{"ARQCNB", "2",     "01",   "01",       "",   "",   "",   "U_GTFIN039(5,'AFI430')"                            })
 	AADD(aSXB,{"ARQCNB", "5",     "01",   "",         "",   "",   "",   ""             })
-	//CAS 16-07-2019 Incluído no Consulta Padrão(ARQCNR) para o grupo de perguntas do Contas a Receber(AFI200)
+	//CAS 16-07-2019 Incluï¿½do no Consulta Padrï¿½o(ARQCNR) para o grupo de perguntas do Contas a Receber(AFI200)
 	AADD(aSXB,{"ARQCNR", "1",     "01",   "RE",       "Arquivo Cnab", "Arquivo Cnab", "Arquivo Cnab", "Z0F"                         })
 	AADD(aSXB,{"ARQCNR", "2",     "01",   "01",       "",   "",   "",   "U_GTFIN039(5,'AFI200')"                            })
 	AADD(aSXB,{"ARQCNR", "5",     "01",   "",         "",   "",   "",   ""             })
 
 	If !SXB->(DbSeek("FIL"))
-		//CONSULTA PADRÃO BANCO FORNECEDOR
+		//CONSULTA PADRï¿½O BANCO FORNECEDOR
 		AADD(aSXB,{"FIL", "1",     "01",   "DB",       "C/C de fornecedores", "C/C de fornecedores", "C/C de fornecedores", "FIL"                                                  })
 		AADD(aSXB,{"FIL", "2",     "01",   "01",       "Fornecedor+Banco",    "Fornecedor+Banco",    "Fornecedor+Banco",    ""                                                     })
 		AADD(aSXB,{"FIL", "4",     "01",   "01",       "Conta",               "Conta",               "Conta",               "FIL_CONTA"                                            })
-		AADD(aSXB,{"FIL", "4",     "01",   "02",       "Agência",             "Agência",             "Agência",             "FIL_AGENCI"                                           })
+		AADD(aSXB,{"FIL", "4",     "01",   "02",       "Agï¿½ncia",             "Agï¿½ncia",             "Agï¿½ncia",             "FIL_AGENCI"                                           })
 		AADD(aSXB,{"FIL", "4",     "01",   "03",       "Banco",               "Banco",               "Banco",               "FIL_BANCO"                                            })
 		AADD(aSXB,{"FIL", "5",     "01",   "",         "",                    "",                    "",                    "FIL_BANCO"                                            })
 		AADD(aSXB,{"FIL", "5",     "02",   "",         "",                    "",                    "",                    "FIL_AGENCI"                                           })
@@ -928,7 +939,7 @@ FIM FGTS
 	/*=====================================================================================================================================*/
 	
 	//aMenu := {}
-	//AADD(aMenu,{"SIGAFIN","U_PADRAO","U_UFINA130"    ,""     ,"Parâmetros de Bancos"      ,"1"        ,{}     ,     .F.   ,"SIGAFIN"  , "6"     }) //incluir menu e items
+	//AADD(aMenu,{"SIGAFIN","U_PADRAO","U_UFINA130"    ,""     ,"Parï¿½metros de Bancos"      ,"1"        ,{}     ,     .F.   ,"SIGAFIN"  , "6"     }) //incluir menu e items
 	//AADD(aMenu,{"SIGAEIC","U_TESTE1","U_TESTE2"    ,             ,"Opcao 2"      ,"3"        ,{}     ,     .F.   ,"SIGAEIC"  , "5"     }) //incluir menu e items
 
 
@@ -938,7 +949,7 @@ FIM FGTS
 	*=====================================================================================================================================*
 
 /*/{Protheus.doc} OrdemSX3
-//TODO Descrição auto-gerada.
+//TODO Descriï¿½ï¿½o auto-gerada.
 @author Alessandro Rodrigues/Daniel Lima
 @since 18/01/2018
 @version 1.0

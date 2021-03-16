@@ -59,8 +59,8 @@ ElseIf SM0->M0_CODIGO $ "S8/S9" //WDF
 
 ElseIf cEmpAnt $ "9Y/TM"
          
-	//TLM - 30/06/2014 - Retirado TM desse workflow, tratamento será no orçamento, fonte MT416FIM
-	If Substr(GetEnvServer(),1,6)=="P11_16" .And. cEmpAnt=="TM" 
+	//TLM - 30/06/2014 - Retirado TM desse workflow, tratamento será no orçamento, fonte MT416FIM 	
+	If Substr(GetEnvServer(),1,6)=="P11_16" //.And. cEmpAnt=="TM" //CAS - 06/12/2019 - Comentado parte para Adicionar TM nesse workflow.
 		Return
 	EndIf
 	                             
@@ -106,7 +106,7 @@ ElseIf cEmpAnt $ "9Y/TM"
 	EndIf
 		
 	cEmail += '<p align="center">Essa mensagem foi gerada automaticamente e nao pode ser respondida.</p> '
-    cEmail += '<p align="center">www.grantthornton.com.br</p>'
+    cEmail += '<p align="center">www.hlb.com.br</p>'
     cEmail += '</body></html>'
 
 

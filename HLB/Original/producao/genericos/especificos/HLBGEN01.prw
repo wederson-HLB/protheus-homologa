@@ -44,8 +44,8 @@ If cOpc $ "E" //Encripta arquivo(s)
 	cCommand +='PUSHD "'+cDir+'" '+CRLF 
 	cCommand +='FOR /F "tokens=*" %%F IN ' 
 	cCommand +="('DIR *"+cExt+" /B') DO ( " +CRLF 
+	//cCommand +='gpg --armor --batch --yes --recipient "'+cId+'" --encrypt %%F) '+CRLF 
 	cCommand +='gpg --batch --yes --recipient "'+cId+'" --encrypt %%F) '+CRLF 
-//	cCommand +='gpg --armor --batch --yes --recipient "'+cId+'" --encrypt %%F) '+CRLF  
 	cCommand +='POPD '+CRLF 
 	cCommand +='EXIT '+CRLF 
 ElseIf cOpc $ "D"//Desencripta arquivo(s)

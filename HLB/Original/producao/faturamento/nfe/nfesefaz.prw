@@ -2607,7 +2607,7 @@ If cTipo == "1"
 			          	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 						//³  Indicador de Produção em escala relevante, conforme Cláusula 23 do Convenio ICMS 52/2017
 						//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ 						
-						/*If AliasIndic("D3E")
+						If AliasIndic("D3E")
 							dbSelectArea("D3E")
 							dbSetOrder(1)
 							cIndEscala :=""
@@ -2618,7 +2618,7 @@ If cTipo == "1"
 									EndIF	
 								EndIF
 							EndIF	
-						EndIF*/
+						EndIF
 						
 						cTPNota := NfeTpNota(aNota,aNfVinc,cVerAmb,aNfVincRur,aRefECF,cD2Cfop)
 						
@@ -3206,7 +3206,7 @@ If cTipo == "1"
 									cCodIss := AllTrim((cAliasSD2)->D2_CODISS)
 									If AliasIndic("CDN") .And. CDN->(dbSeek(xFilial("CDN")+cCodIss))
 										cCodIss := AllTrim(CDN->CDN_CODLST)
-									EndIf 
+									EndIf
 									[Depois] */
 									cCodIss := AllTrim((cAliasSD2)->D2_CODISS)
 									If AliasIndic("CDN") .And. CDN->(dbSeek(xFilial("CDN")+cCodIss))

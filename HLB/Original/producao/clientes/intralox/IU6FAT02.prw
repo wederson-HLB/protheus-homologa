@@ -5,27 +5,29 @@
 Funcao      : IU6FAT02
 Parametros  : Nenhum
 Retorno     : Nenhum
-Objetivos   : Importação de arquivos para o faturamento no sistema    
+Objetivos   : ImportaÃ§Ã£o de arquivos para o faturamento no sistema    
 Autor     	: Wederson L. Santana 
 Data     	: 13/07/05
-Obs         : Alteração no processo solicitado por Fabio Silva e Fabio Aguilar - chamado 4694 
+Obs         : AlteraÃ§Ã£o no processo solicitado por Fabio Silva e Fabio Aguilar - chamado 4694 
 TDN         : 
-Revisão     : Tiago Luiz Mendonça 
+RevisÃ£o     : Tiago Luiz MendonÃ§a 
 Data/Hora   : 14/03/2012
-Módulo      : Faturamento.
+MÃ³dulo      : Faturamento.
 */
+//ImportaÃ§Ã£o clientes
 
 *--------------------------*
   User Function IU6FAT02()        
 *--------------------------*      
 
-lCliente   :=.F.
-lPedido    :=.F.
-lProduto   :=.F.
-lBOM       :=.F.
-_cCHAVEPRO := SPACE(15)
+lCliente      :=.F.
+lPedido       :=.F.
+lProduto      :=.F.
+lBOM          :=.F.
+_cCHAVEPRO    :=SPACE(15)
+Private cType :="Arquivos de Dados (*.txt) |*.txt|"
 
-wdir := 'V:\Team\EBS Shared Prod\receivables\Brasil'//RRP - 15/10/2012 - Alteração do diretório padrão conforme chamado 007670
+wdir := 'V:\Team\EBS Shared Prod\receivables\Brasil'//RRP - 15/10/2012 - Alteraï¿½ï¿½o do diretï¿½rio padrï¿½o conforme chamado 007670
 //wdir := 'V:\TEAM\INTRALOX BRASIL INVOICING\PRYOR'
 //wdir := 'D:\Arquivos\Clientes\Intralox\Team\'  //diretorio local para teste
 
@@ -37,8 +39,9 @@ wdir := 'V:\Team\EBS Shared Prod\receivables\Brasil'//RRP - 15/10/2012 - Alteraç
 @ 55,040 CheckBox "Recebe Arquivo de Pedidos"  Var lPedido 
 @ 65,040 CheckBox "Recebe Arquivo de Produtos" Var lProduto 
 @ 75,040 CheckBox "Recebe Arquivo de Clientes" Var lCliente 
-@ 15,100 Get wdir Picture "@!" Size 150,150 //Valid Execute(Existe)
+@ 15,100 Get wdir Picture "@!" Size 150,150 //Valid //Execute(Existe)
 
+@ 50,250 BmpButton Type 14 Action (wdir:=cGetFile(cType, ("Abrir arquivos "+SubStr(cType,1,7)),,,.T.,GETF_NETWORKDRIVE+GETF_LOCALHARD+GETF_LOCALFLOPPY))
 @ 65,250 BmpButton Type 01 Action Processa({|| fOkProc() },"Selecionando Registros...")
 @ 80,250 BmpButton Type 02 Action Close(oDlg)
 
@@ -49,6 +52,8 @@ Return
 //--------------------------------------------------
 
 Static Function fOkProc()
+Local nTamSA1P := TAMSX3("A1_P_COD")[1]
+Local nTamSA1  := TAMSX3("A1_COD")[1]
 
 Close(oDlg)
 wdir := alltrim(wdir)
@@ -71,8 +76,9 @@ If ! (lPedido .or. lCliente .or. lProduto)
 endif
 
 if lPedido 
-   If ! file(wdir+"\ORDERS\ORDERS.TXT")
-        msgbox("Arquivo "+wdir+"\ORDERS\ORDERS.TXT nao encontrado","Fim de Processamento","ALERT")
+   If ! file(wdir)//file(wdir+"\ORDERS\ORDERS.TXT")
+        //msgbox("Arquivo "+wdir+"\ORDERS\ORDERS.TXT nao encontrado","Fim de Processamento","ALERT")
+        MsgInfo("Arquivo nÃ£o encontrado: "+Alltrim(wdir)," A t e n Ã§ Ã£ o")
         Close(oDlg)
         Return nil
    endif     
@@ -191,11 +197,11 @@ if lCliente
    //append from (wdir+"CUSTOMERS.TXT") SDF
    dbgotop()
    do while ! CLIENTE->(eof())
-      SA1->(DbSetOrder(1))
-      if ! SA1->(dbseek(xfilial("SA1")+CLIENTE->A1_COD,.f.))
+      SA1->(DbSetOrder(3))
+      if ! SA1->(dbseek(xfilial("SA1")+CLIENTE->A1_CGC,.f.))
          if reclock("SA1",.T.)
             SA1->A1_FILIAL   := xfilial("SA1")
-            SA1->A1_COD      := CLIENTE->A1_COD
+            SA1->A1_COD      := SubStr(CLIENTE->A1_COD,(nTamSA1P-nTamSA1)+1,nTamSA1)
             SA1->A1_LOJA     := "01"
             SA1->A1_RISCO    := "A"
             SA1->A1_NOME     := CLIENTE->A1_NOME
@@ -205,7 +211,7 @@ if lCliente
             // SA1->A1_ENDFAT2  := CLIENTE->A1_ENDFAT2
             SA1->A1_MUN      := If(Empty(CLIENTE->A1_MUN),CLIENTE->A1_CIDENT,CLIENTE->A1_MUN)
             SA1->A1_EST      := If(Empty(CLIENTE->A1_EST),CLIENTE->A1_ESTENT,CLIENTE->A1_EST)
-            SA1->A1_TIPO     := if(CLIENTE->A1_TIPO='C','F',CLIENTE->A1_TIPO)
+            SA1->A1_TIPO     := If(CLIENTE->A1_TIPO='C','F',CLIENTE->A1_TIPO)
             //TLM
             If !Empty(CLIENTE->A1_BAIRRO)
                SA1->A1_BAIRRO   := CLIENTE->A1_BAIRRO
@@ -231,6 +237,8 @@ if lCliente
             SA1->A1_CEPE     := CLIENTE->A1_CEPENT
             SA1->A1_MUNE     := CLIENTE->A1_CIDENT
             SA1->A1_ESTE     := CLIENTE->A1_ESTENT
+            SA1->A1_P_COD    := CLIENTE->A1_COD
+            
          endif
       else
          if reclock("SA1",.F.)
@@ -271,6 +279,8 @@ if lCliente
             SA1->A1_CEPE     := CLIENTE->A1_CEPENT
             SA1->A1_MUNE     := CLIENTE->A1_CIDENT
             SA1->A1_ESTE     := CLIENTE->A1_ESTENT
+            SA1->A1_P_COD    := CLIENTE->A1_COD
+            
          endif
       endif
 
@@ -286,12 +296,13 @@ If lPedido
              {"C5_COBRANC","C",  6,0},;
              {"C5_RAZAOSO","C", 40,0},;
              {"C5_PEDCLIE","C", 20,0},;
+             {"C5_ITMCLIE","C", 06,0},;
              {"C6_DTFAT"  ,"C",  8,0},;
              {"C5_CONDPAG","C",  3,0},;
              {"C5_PEDIDO" ,"C",  6,0},;
              {"C5_DTPEDID","C",  8,0},;
              {"C6_SEQUENC","C",  3,0},;
-             {"C6_PRODUTO","C", 12,0},;
+             {"C6_PRODUTO","C", 15,0},;
              {"C6_QTDE"   ,"N", 10,2},;
              {"C6_UNITARI","N", 14,2},;
              {"C6_ICMS"   ,"N",  5,2},;
@@ -363,7 +374,7 @@ If lPedido
                       MsUnlock()
 	                Endif   
 		        Endif 
-	           RecLock("SC6",.T.)
+	          RecLock("SC6",.T.)
               Replace SC6->C6_FILIAL   With xFilial("SC6")
               Replace SC6->C6_ITEM     With StrZero(i++,2)
               //Replace SC6->C6_ITEM     With SOMA1(i)
@@ -382,6 +393,7 @@ If lPedido
               Replace SC6->C6_LOCAL    With SB1->B1_LOCPAD
               Replace SC6->C6_ENTREG   With ctod(PEDIDO->C6_DTFAT)
               Replace SC6->C6_PEDCLI   With PEDIDO->C5_PEDCLIE
+              Replace SC6->C6_P_ITCLI  With PEDIDO->C5_ITMCLIE
               Replace SC6->C6_DESCR01  With PEDIDO->C6_DESCR01 
               Replace SC6->C6_DESCR02  With PEDIDO->C6_DESCR02 
               Replace SC6->C6_DESCR03  With PEDIDO->C6_DESCR03 
@@ -560,9 +572,9 @@ Return(lRet)
 //-----------------------------------------------------------------//
 //--Wederson L. Santana - Pryor Tecnology - 14/07/05               //
 //-----------------------------------------------------------------//
-//--Cria Parametros utilizados pela rotina se não existir          //
+//--Cria Parametros utilizados pela rotina se nï¿½o existir          //
 //-----------------------------------------------------------------//
-//--29/08/05 --> Carrega as TES conforme condições infomadas por   //
+//--29/08/05 --> Carrega as TES conforme condiï¿½ï¿½es infomadas por   //
 //--pela Roseli/Rosana.                                                   //
 //-----------------------------------------------------------------//
 
@@ -711,7 +723,7 @@ If! DbSeek("  MV_FATES12")
 	X6_PROPRI	:= "U"
 	MsUnLock()
 EndIf
-//--------------------------------------------------------------------------------Serviços
+//--------------------------------------------------------------------------------Serviï¿½os
 If! DbSeek("  MV_FATES13")
 	RecLock("SX6",.T.)
 	X6_VAR		:= "MV_FATES13"
@@ -763,7 +775,7 @@ Endif
 Return(_cRet)             
 
 //--------------------------------------------------------//
-//--Ponto de entrada na exclusão do pedido                //
+//--Ponto de entrada na exclusï¿½o do pedido                //
 //--------------------------------------------------------//
 //--Wederson L. Santana                                   //
 //--------------------------------------------------------//

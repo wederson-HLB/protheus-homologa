@@ -2,12 +2,12 @@
 
 User Function LP610_15()
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Declaracao de variaveis utilizadas no programa atraves da funcao    ³
-//³ SetPrvt, que criara somente as variaveis definidas pelo usuario,    ³
-//³ identificando as variaveis publicas do sistema utilizadas no codigo ³
-//³ Incluido pelo assistente de conversao do AP5 IDE                    ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+//?Declaracao de variaveis utilizadas no programa atraves da funcao    ?
+//?SetPrvt, que criara somente as variaveis definidas pelo usuario,    ?
+//?identificando as variaveis publicas do sistema utilizadas no codigo ?
+//?Incluido pelo assistente de conversao do AP5 IDE                    ?
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
           
 
     _CFOP1 := "5101/6101/5102/6102/5103/6103/5104/6104/5105/6105/5106/6106/5107/6107/5108/6108/5109/6109/"
@@ -93,18 +93,18 @@ ElseIf ALLTRIM(SD2->D2_CF) $ _CFOP5
    _cntCred:="35101001"
 EndIf  
 
-//RSB - 30/08/2017 - Inclusão de regra para centro de custo, dependendo do Codigo do ISS (D2_CODISS).
+//RSB - 30/08/2017 - Inclus? de regra para centro de custo, dependendo do Codigo do ISS (D2_CODISS).
 If SM0->M0_CODIGO $ '4Z' 
 	If !Empty(SD2->D2_CODISS)
 		If ALLTRIM(SD2->D2_CODISS) $ '05762'
 			_cntCred:="311130011"
-	   	Elseif ALLTRIM(SD2->D2_CODISS) $ '02917/02919'	  //CAS - 02/04/2018 - Ajuste para a empresa Viavi, D2_CODISS=2919. Ticket #30432
+	   	Elseif ALLTRIM(SD2->D2_CODISS) $ '02917/02919'	//CAS - 02/04/2018 - Ajuste para a empresa Viavi, D2_CODISS=2919. Ticket #30432
 	   		_cntCred:="311130012"
-		Elseif ALLTRIM(SD2->D2_CODISS) $ '02879/02881'	  //CAS - 02/04/2018 - Ajuste para a empresa Viavi, D2_CODISS=2881. Ticket #30432
+		Elseif ALLTRIM(SD2->D2_CODISS) $ '02879/02881'	//CAS - 02/04/2018 - Ajuste para a empresa Viavi, D2_CODISS=2881. Ticket #30432
 			_cntCred:="311130013"
-		Elseif ALLTRIM(SD2->D2_CODISS) $ '02798/02800'	  //CAS - 02/04/2018 - Ajuste para a empresa Viavi, D2_CODISS=2800. Ticket #30432
+		Elseif ALLTRIM(SD2->D2_CODISS) $ '02798/02800'	//CAS - 02/04/2018 - Ajuste para a empresa Viavi, D2_CODISS=2800. Ticket #30432
 			_cntCred:="311130014"
-                Elseif ALLTRIM(SD2->D2_CODISS) $ '02692'  //PAULO SILVA - EZ4:) - 21/08/2019 - Ajuste para a empresa Cod. 4Z - IS Informática Software. Ticket #14952
+		Elseif ALLTRIM(SD2->D2_CODISS) $ '02692'    	//Paulo Silva - EZ4 - 15/04/2020 - IS INFORMATICA - CHAMADO - 22070
 			_cntCred:="311130010"
 		Endif	
 	Else

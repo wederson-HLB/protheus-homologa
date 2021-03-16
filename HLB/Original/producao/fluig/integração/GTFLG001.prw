@@ -6,7 +6,7 @@
 #DEFINE ENTER CHR(13)+CHR(10)
 
 *----------------------------------------------------------------*
-WsService GTFLG001 Description "Integra√ß√£o GT de Fluig x Protheus"
+WsService GTFLG001 Description "Integracao GT de Fluig x Protheus - Emer.C"
 *----------------------------------------------------------------*
 WsData cCodEmp		as String
 WsData cCodAmb		as String
@@ -107,7 +107,7 @@ WsMethod GETIMP		Description "Retorna impostos do pedido informado de acordo com
 WsMethod GETVLDCAD	Description "Valida se o cadastro existe de acordo com cadastro selecionado e o CNPJ da empresa."
 
 EndWsService
-
+ 
 //Defini√ß√£o do Array Retorno
 *------------------*
 WSSTRUCT GETCUSTORET
@@ -371,6 +371,7 @@ Return .T.
 *----------------------------------------------------------------*
 WsMethod GETAMB WsReceive cCNPJ wsSend aRetAmb WsService GTFLG001
 *----------------------------------------------------------------*
+Local cDbAlias := GetSrvProfString('DBALIAS','')
 //Caso parametro esteja em branco encerra a rotina.
 If EMPTY(cCNPJ)
 	Return .F.
@@ -382,9 +383,17 @@ If Subs(Upper(AllTrim(GetEnvServer())),1,3) == "P11"
 	cQry += " Where M0_CGC = '" + cCNPJ + "' "
 	cQry += " AND AMB <> 'P11_TESTE' "
 Else
-	cQry += " From P12_01.dbo.TotvsSigamatAmb "
-	cQry += " Where M0_CGC = '" + cCNPJ + "' "
-	cQry += " AND AMB <> 'P12_TESTE' "
+    If! "HOM" $ cDbAlias
+	    cQry += " From P12_01.dbo.TotvsSigamatAmb "
+	    cQry += " Where M0_CGC = '" + cCNPJ + "' "
+	    conout("GTFLG001 - Executando em ambiente: "+GetEnvServer())
+	    cQry += " AND AMB <> 'P12_TESTE' "//produ√ß√£o
+	Else 
+	    cQry += " From P12_01_HOM.dbo.TotvsSigamatAmb "
+	    cQry += " Where M0_CGC = '" + cCNPJ + "' "
+	    conout("GTFLG001 - Executando em ambiente: "+GetEnvServer())
+	    cQry += " AND AMB <> 'P12_TESTE' "//homologaÁ„o
+	EndIf 	
 Endif
 
 If Select("TMP") <> 0
@@ -396,7 +405,7 @@ DbUseArea(.T.,"TOPCONN",TCGENQRY(,,cQry),"TMP",.F.,.F.)
 TMP->(DBGoTop())
 While TMP->(!EOF())
 	aAdd(::aRetAmb,WSClassNew("GETAMBRET"))
-	aTail(::aRetAmb):Ambiente	:= ALLTRIM(TMP->AMB)
+	aTail(::aRetAmb):Ambiente	:= Iif("HOM" $ cDbAlias,ALLTRIM(TMP->AMB)+"_HOM",ALLTRIM(TMP->AMB))
 	aTail(::aRetAmb):Codigo		:= ALLTRIM(TMP->M0_CODIGO)
 	aTail(::aRetAmb):Filial		:= ALLTRIM(TMP->M0_CODFIL)
 	TMP->(DbSkip())
@@ -707,7 +716,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetCTES,WSClassNew("GETCTESRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:1 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetCTES):TES	:= aDado
 		Break
 	EndIf
@@ -1166,7 +1175,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetProd,WSClassNew("GETPRDRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:2 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetProd):Produtos	:= aDado
 		Break
 	EndIf
@@ -1227,7 +1236,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetFornece,WSClassNew("GETFORRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:3 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetFornece):Fornecedores	:= aDado
 		Break
 	EndIf
@@ -1383,7 +1392,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetCPag,WSClassNew("GETCPGRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:4 Erro na busca de registros no Banco de Dados. "+cQry+"."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados. "+cQry+"."
 		aTail(::aRetCPag):CondPag	:= aDado
 		Break
 	Else
@@ -1396,7 +1405,7 @@ BEGIN SEQUENCE
 
 	cQry := " Select * "
 	cQry += " From " + aEmp[3] + ".dbo." + RetTabName("SE4") + " "
-	cQry += " Where D_E_L_E_T_ <> '*' AND (E4_TIPO <> 9 OR (E4_TIPO = 9 AND E4_COND = '%')) "
+	cQry += " Where D_E_L_E_T_ <> '*' AND (E4_TIPO <> '9' OR (E4_TIPO = '9' AND E4_COND = '%')) "
 
 	If Select("TMP") <> 0
 		TMP->(DbCloseArea())
@@ -1405,7 +1414,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetCPag,WSClassNew("GETCPGRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:5 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetCPag):CondPag	:= aDado
 		Break
 	EndIf
@@ -1473,7 +1482,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetCISS,WSClassNew("GETCISSRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:6 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetCISS):ISS	:= aDado
 		Break
 	EndIf
@@ -1535,7 +1544,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetCCT,WSClassNew("GETCCTRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:7 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetCCT):CentroCusto	:= aDado
 		Break
 	EndIf
@@ -1596,7 +1605,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetCCont,WSClassNew("GETCCONRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:8 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetCCont):ContaContabil	:= aDado
 		Break
 	EndIf
@@ -1657,7 +1666,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetTransp,WSClassNew("GETTRSPRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:9 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetTransp):Transport	:= aDado
 		Break
 	EndIf
@@ -1718,7 +1727,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetEst,WSClassNew("GETESTADRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:10 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetEst):Estados	:= aDado
 		Break
 	EndIf
@@ -1779,7 +1788,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetPaiBC,WSClassNew("GETPABCRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:11 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetPaiBC):PaisBacen	:= aDado
 		Break
 	EndIf
@@ -1840,7 +1849,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetPaiRF,WSClassNew("GETPARFRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:12 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetPaiRF):PaisRecFederal	:= aDado
 		Break
 	EndIf
@@ -1904,7 +1913,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetCodMun,WSClassNew("GETMUNRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:13 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetCodMun):Municipios	:= aDado
 		Break
 	EndIf
@@ -1950,7 +1959,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetSeries,WSClassNew("GETSERIRET"))
 		aTail(::aRetSeries):Serie			:= "Erro"
-		aTail(::aRetSeries):ProximoNumero	:= "14 Erro na busca de registros no Banco de Dados."
+		aTail(::aRetSeries):ProximoNumero	:= " Erro na busca de registros no Banco de Dados."
 		Break
 	EndIf
 
@@ -2006,7 +2015,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetMensNF,WSClassNew("GETMENSNFRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:15 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetMensNF):Mensagens	:= aDado
 		Break
 	EndIf
@@ -2033,9 +2042,10 @@ WsMethod GETNFENTR WsReceive cChave,cFornecedor,cLoja,cProduto wsSend aRetNFEntr
 *--------------------------------------------------------------------------------------------------*
 Local i, aDado := {}
 Local aCampos := {"D1_DOC","D1_SERIE","D1_TIPO","D1_ITEM","D1_UM","D1_QUANT","D1_VUNIT","D1_TOTAL"}
+Local cDbAlias := GetSrvProfString('DBALIAS','')
 
 BEGIN SEQUENCE
-
+    conout("BuscaEmpresas")
 	If Len(aEmp := BuscaEmpresas(cChave)) == 0
 		aAdd(::aRetNFEntr,WSClassNew("GETNFENTRRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
@@ -2050,8 +2060,13 @@ BEGIN SEQUENCE
 	cQry += "		SD1.D1_FILIAL, SD1.D1_COD, SD1.D1_TIPO, SD1.D1_DOC, SD1.D1_SERIE, SD1.D1_FILIAL, SD1.D1_FORNECE,	"
 	cQry += "		SD1.D1_LOJA, SD1.D1_QTDEDEV, SD1.D1_VALDEV, SD1.D1_ORIGLAN, SD1.D1_TES,	"
 	cQry += "		SD1.D1_ITEM, SD1.D1_UM, SD1.D1_QUANT, SD1.D1_VUNIT, SD1.D1_TOTAL	"
-	cQry += "		FROM	"  +	aEmp[3] + ".dbo." + RetTabName("SF1")+" SF1, "
-	cQry +=  						aEmp[3] + ".dbo." + RetTabName("SD1")+"	SD1	"			
+	If Alltrim(cDbAlias) == Alltrim(aEmp[3])
+		cQry += "		FROM	"  +RetTabName("SF1")+" SF1, "
+		cQry +=  					RetTabName("SD1")+"	SD1	"			
+	Else	
+		cQry += "		FROM	"  +	aEmp[3] + ".dbo." + RetTabName("SF1")+" SF1, "
+		cQry +=  						aEmp[3] + ".dbo." + RetTabName("SD1")+"	SD1	"			
+	EndIf	
 	cQry += "		WHERE "
 	cQry += "			SF1.F1_FILIAL = '"+xFilial("SF1")+"' AND	"
 	cQry += "			SF1.F1_FORNECE = '"+cFornecedor+"' AND	"
@@ -2070,30 +2085,41 @@ BEGIN SEQUENCE
 	If Select("TMP") <> 0
 		TMP->(DbCloseArea())
 	EndIf     
-
+    //conout("..."+cQry)
 	If TCSQLExec(cQry) < 0
+	    conout("Erro na busca de registros no Banco de Dados.")
 		aAdd(::aRetNFEntr,WSClassNew("GETNFENTRRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:16 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetNFEntr):NFEntrada	:= aDado
 		Break
 	EndIf
 
-	DbUseArea(.T.,"TOPCONN",TCGENQRY(,,cQry),"TMP",.F.,.F.)
+	DbUseArea(.T.,"TOPCONN",TCGENQRY(,,ChangeQuery(cQry)),"TMP",.F.,.F.)
 
 	TMP->(DBGoTop())
-	While TMP->(!EOF())
+	If! TMP->(EOF())
+		While TMP->(!EOF())
+			aAdd(::aRetNFEntr,WSClassNew("GETNFENTRRET"))
+			aDado := {}
+			For i := 1 To Len(aCampos)
+				aAdd(aDado,WSClassNew("stDadoGet"))
+				aTail(aDado):Campo	:= ALLTRIM(cValToChar(TMP->&(aCampos[i])))
+			Next i
+			aTail(::aRetNFEntr):NFEntrada	:= aDado
+			TMP->(DbSkip())
+		EndDo
+	Else
+ 		//conout("Dados n„o encontrados")
 		aAdd(::aRetNFEntr,WSClassNew("GETNFENTRRET"))
-		aDado := {}
-		For i := 1 To Len(aCampos)
-			aAdd(aDado,WSClassNew("stDadoGet"))
-			aTail(aDado):Campo	:= ALLTRIM(cValToChar(TMP->&(aCampos[i])))
-		Next i
+		aAdd(aDado,WSClassNew("stDadoGet"))
+		aTail(aDado):Campo	:= "Erro: Verifique os par‚metros informados. N„o foram encontrados registros para a pesquisa."
 		aTail(::aRetNFEntr):NFEntrada	:= aDado
-		TMP->(DbSkip())
-	EndDo
-END SEQUENCE
+	EndIf 	
 
+	
+END SEQUENCE
+conout("fim")
 Return .T.
 
 *-----------------------------------------------------------------------------------------------*
@@ -2137,7 +2163,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetLote,WSClassNew("GETLOTERET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:17 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetLote):Lotes	:= aDado
 		Break
 	EndIf
@@ -2198,7 +2224,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetArmaz,WSClassNew("GETARMAZRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:18 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetArmaz):Armazens	:= aDado
 		Break
 	EndIf
@@ -2248,7 +2274,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetNFSaid,WSClassNew("GETNFSAIDRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:19 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetNFSaid):NFSaida	:= aDado
 		Break
 	EndIf
@@ -2298,7 +2324,7 @@ BEGIN SEQUENCE
 	If TCSQLExec(cQry) < 0
 		aAdd(::aRetPed,WSClassNew("GETPEDRET"))
 		aAdd(aDado,WSClassNew("stDadoGet"))
-		aTail(aDado):Campo	:= "Erro:20 Erro na busca de registros no Banco de Dados."
+		aTail(aDado):Campo	:= "Erro: Erro na busca de registros no Banco de Dados."
 		aTail(::aRetPed):Pedido	:= aDado
 		Break
 	EndIf
@@ -2658,9 +2684,13 @@ Local aCab := {}, aItem := {}, aItens := {}, i, aCpsObrig := {}
 Local cPedido := "", cErro := ""
 Local nPosEmissao := 0
 Local dBkpDtBase:= CtoD("//")
-Private lMsErroAuto := .F.
+Local cArqLog :=""
 
-conout("GTFLG001: SETPSEMNF inicio")
+Private lMsHelpAuto := .F. 
+Private lMsErroAuto := .F. 
+Private cPath       := GetSrvProfString("Startpath","") 
+
+conout("GTFLG001: SETPSEMNF inicio...")
 
 aAdd(aCpsObrig,"C5_TIPO")
 aAdd(aCpsObrig,"C5_TIPOCLI")
@@ -2768,8 +2798,18 @@ BEGIN SEQUENCE
 	END TRANSACTION
 
 	If lMsErroAuto
-		cErro += MostraErro()
-		Break
+		//cErro += "Erro na inclus„o do pedido de venda "+cSeqNumC5
+	    cArqLog := "WS_PV_"+cSeqNumC5+"_"+DTOS(dDataBase) + Left(Time(),2) + Right(time(),2) + ".LOG" 
+                                  
+        MostraErro(cPath, cArqLog ) 
+	    
+		conout("GTFLG001: SETPSEMNF - Dados do pedido inv·lido(s). Detalhes em : "+cPath+cArqLog)
+
+		aAdd(::aRetSts,WSClassNew("SETSTSRET"))
+	    aTail(::aRetSts):Codigo		:= "Erro"
+	    aTail(::aRetSts):Descricao	:= "Dados do pedido inv·lidos. Detalhes em : "+cPath+cArqLog
+      
+        RETURN .T.
 	Else
 		cPedido := SC5->C5_NUM
 		//Apagfa o conteudo do campo FCI quando esta em branco no Fluig.(quando em branco, o fluig envia um ponto apenas)
@@ -3101,7 +3141,7 @@ Return .T.
 Static Function BuscaEmpresas(cCNPJ)
 *-----------------------------------*
 Local aEmp := {}, nHandle := 0
-
+Local cDbAlias := GetSrvProfString('DBALIAS','')
 Begin Sequence
 
 	If Empty(cCNPJ)
@@ -3116,10 +3156,10 @@ Begin Sequence
 		If (nHandle := TCLink("MSSQL7/P1108_01","10.0.30.5",7891)) < 0
 			Break
 		Endif
-	Else
-		If (nHandle := TCLink("MSSQL7/P12117_01","10.0.30.56",7891)) < 0
-			Break
-		EndIf
+	//Else
+		//If (nHandle := TCLink("MSSQL7/P12125","10.0.30.56",7891)) < 0
+		//	Break
+		//EndIf
 	Endif	
 
 	cQry := " Select * "
@@ -3129,10 +3169,17 @@ Begin Sequence
 		conout("GTFLG001 - Executando em ambiente: "+GetEnvServer())
 		cQry += " AND AMB <> 'P11_TESTE' "//produ√ß√£o
 	Else
-		cQry += " From P12_01.dbo.TotvsSigamatAmb "
-		cQry += " Where M0_CGC = '" + cCNPJ + "' "
-		conout("GTFLG001 - Executando em ambiente: "+GetEnvServer())
-		cQry += " AND AMB <> 'P12_TESTE' "//produ√ß√£o
+	    If! "HOM" $ cDbAlias
+    		cQry += " From P12_01.dbo.TotvsSigamatAmb "
+    		cQry += " Where M0_CGC = '" + cCNPJ + "' "
+    		conout("GTFLG001 - Executando em ambiente: "+GetEnvServer()+" - DB: "+cDbAlias)
+    		cQry += " AND AMB <> 'P12_TESTE' "//homologaÁ„o
+		Else
+		    cQry += " From P12_01_HOM.dbo.TotvsSigamatAmb "
+		    cQry += " Where M0_CGC = '" + cCNPJ + "' "
+		    conout("GTFLG001 - Executando em ambiente: "+GetEnvServer()+" - DB: "+cDbAlias)
+		    cQry += " AND AMB <> 'P12_TESTE' "//homologaÁ„o
+		EndIf 	
 	Endif	
 
 	TCQuery cQry ALIAS "EMP" NEW
@@ -3141,7 +3188,7 @@ Begin Sequence
 	If EMP->(!Eof())
 		aAdd(aEmp,ALLTRIM(EMP->M0_CODIGO))
 		aAdd(aEmp,ALLTRIM(EMP->M0_CODFIL))
-		aAdd(aEmp,ALLTRIM(EMP->AMB))
+		aAdd(aEmp,Iif("HOM" $ cDbAlias,ALLTRIM(EMP->AMB)+"_HOM",ALLTRIM(EMP->AMB)))
 		aAdd(aEmp,ALLTRIM(EMP->SERV))
 		aAdd(aEmp,ALLTRIM(EMP->PORTA))
 	EndIf
@@ -3166,7 +3213,7 @@ Static Function RetTabName(cAlias)
 Local oServ
 Local cTabela := ""
 Local cQry := ""
-
+//Wederson
 //Verifica se possui a tabela de nomes do SX2 no banco de dados.
 If Select("ID") <> 0
 	ID->(DbCloseArea())	
@@ -3219,7 +3266,8 @@ If EMPTY(cTabela)
 		//cTabela := oServ:CALLPROC("U_GTGEN040",aEmp[1],cAlias)//executa a fun√ß√£o
 		cTabela := U_GTGEN040(aEmp[1],cAlias)  
 		RpcDisconnect(oServ)
+		conout("GTFLG001: RpcConnect - TABELA : '"+cTabela+"'")
 	//EndIf          
 EndIf
-
+conout("Tabela --> "+ctabela)
 Return ALLTRIM(cTabela)

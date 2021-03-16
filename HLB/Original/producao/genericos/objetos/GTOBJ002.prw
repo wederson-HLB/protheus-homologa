@@ -5,9 +5,9 @@ Classe      : GTIntNfServ
 Descricao   : Objeto de integracao de notas fiscais de servico.
               atraves do arquivo gerado pela prefeitura.
 Autor       : Eduardo C. Romanini
-Alterações  : 	06/03/2015 - Leandro Brito - Desenvolvimento da Integracao de Notas Fiscais de Serviços Prestados  
-				06/03/2015 - Leandro Brito - Desenvolvimento Layout Nota Carioca - Serviços Prestados
-				18/09/2015 - Leandro Brito - Desenvolvimento Layout Nota Paulista  - Serviços Prestados	 
+Alteraï¿½ï¿½es  : 	06/03/2015 - Leandro Brito - Desenvolvimento da Integracao de Notas Fiscais de Serviï¿½os Prestados  
+				06/03/2015 - Leandro Brito - Desenvolvimento Layout Nota Carioca - Serviï¿½os Prestados
+				18/09/2015 - Leandro Brito - Desenvolvimento Layout Nota Paulista  - Serviï¿½os Prestados	 
 Data        : 25/05/2013
 */                   
 *----------------*
@@ -560,7 +560,7 @@ For nI:=1 To Len(::aNotas)
 		 		lMsErroAuto := .F.
 	            
 				//integracao do fornecedor.
-		   		MSExecAuto({|x,y| Mata020(x,y)},aForn,3)
+		   		MSExecAuto({|x,y| Mata020(x,y)},aForn,3)  //Cadastro de fornecedores
 	
 				If lMsErroAuto
 					cLog += MostraErro(cPathLog)
@@ -834,7 +834,6 @@ Static Function TelaPreInt(oGTIntNfServ)
 *--------------------------------------*
 Local nI := 0
 Local nX := 0
-
 Local cPesq   		:= Space(14)
 Local cCmbIndice 	:= ""
 
@@ -896,7 +895,7 @@ If ( oGTIntNfServ:cTipoNF == 'T' )  //** servicos Tomados
 					);	
 			  )}
     
-	//RRP - Inclusão de filtro por CNPJ no Browser.
+	//RRP - Inclusï¿½o de filtro por CNPJ no Browser.
 	//Filtro Inicial BKP
 	aNfsIni := aClone(aNfs)
 
@@ -1028,7 +1027,7 @@ Next nR
 If lAchou
 	aNfs:= aClone(aFiltro)
 Else
-	MsgInfo("Filtro não retornou nenhum registo!","HLB BRASIL")
+	MsgInfo("Filtro nï¿½o retornou nenhum registo!","HLB BRASIL")
 EndIf
 
 Return aNfs
@@ -2628,7 +2627,7 @@ For nI:=1 To Len(::aNotas)
 						{"A1_LOJA"  , ::aNotas[nI][8]                ,nil},;
 		          	 	{"A1_PESSOA"  ,If(Len(AllTrim( ::oIntArq:aDetalhes[nPosNf][27])) <14,"F","J"),nil},;
 		          	 	{"A1_TIPO"  ,'F',nil},;		          	 	
-            	       {"A1_NOME"  ,Upper(::oIntArq:aDetalhes[nPosNf][30]),nil},;
+            	        {"A1_NOME"  ,Upper(::oIntArq:aDetalhes[nPosNf][30]),nil},;
                     	{"A1_NREDUZ",Upper(::oIntArq:aDetalhes[nPosNf][30]),nil},;
                     	{"A1_INSCR"   ,If( Val( ::oIntArq:aDetalhes[nPosNf][29] ) > 0 , ::oIntArq:aDetalhes[nPosNf][29] , '' ) ,nil},;
                     	{"A1_INSCRM"   ,If( Val( ::oIntArq:aDetalhes[nPosNf][28] ) > 0 , ::oIntArq:aDetalhes[nPosNf][28] , '' ),nil},;                    	
@@ -2999,12 +2998,12 @@ Local cChar  := ""
 Local nX     := 0 
 Local nY     := 0
 Local cVogal := "aeiouAEIOU"
-Local cAgudo := "áéíóú"+"ÁÉÍÓÚ"
-Local cCircu := "âêîôû"+"ÂÊÎÔÛ"
-Local cTrema := "äëïöü"+"ÄËÏÖÜ"
-Local cCrase := "àèìòù"+"ÀÈÌÒÙ" 
-Local cTio   := "ãõÃÕ"
-Local cCecid := "çÇ"
+Local cAgudo := "ï¿½ï¿½ï¿½ï¿½ï¿½"+"ï¿½ï¿½ï¿½ï¿½ï¿½"
+Local cCircu := "ï¿½ï¿½ï¿½ï¿½ï¿½"+"ï¿½ï¿½ï¿½ï¿½ï¿½"
+Local cTrema := "ï¿½ï¿½ï¿½ï¿½ï¿½"+"ï¿½ï¿½ï¿½ï¿½ï¿½"
+Local cCrase := "ï¿½ï¿½ï¿½ï¿½ï¿½"+"ï¿½ï¿½ï¿½ï¿½ï¿½" 
+Local cTio   := "ï¿½ï¿½ï¿½ï¿½"
+Local cCecid := "ï¿½ï¿½"
 Local cMaior := "&lt;"
 Local cMenor := "&gt;"
 

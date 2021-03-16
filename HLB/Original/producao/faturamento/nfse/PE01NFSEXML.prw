@@ -15,7 +15,7 @@ Data/Hora   : 14/09/2016
 *--------------------------------*
 Local aRet		:= {}
 Local aArea		:= {}
-Local aDest	    := ParamIXB[01] 
+Local aDest	    := ParamIXB[01]
 
 Local cNatOper  := ParamIXB[02]
 Local cDescrNFSe:= ParamIXB[03]
@@ -33,11 +33,11 @@ If cEmpAnt $ '40'
 	cQry := ""
 	cQry += " Select Top 1 * "
 	cQry += " From "+RetSQLNAME("SE1")
-	cQry += " Where D_E_L_E_T_ <> '*'"
+	cQry += " Where D_E_L_E_T_ <> '*'" 
 	cQry += "		AND E1_FILIAL = '"+xFilial("SE1")+"'"
 	cQry += "		AND E1_CLIENTE = '"+SF2->F2_CLIENTE+"'"
 	cQry += "		AND E1_LOJA = '"+SF2->F2_LOJA+"'"
-	cQry += "		AND E1_PREFIXO = '"+SF2->F2_SERIE+"'"
+	cQry += "		AND E1_PREFIXO = '"+SF2->F2_SERIE+"'" 
 	cQry += "		AND E1_NUM = '"+SF2->F2_DOC+"'"
 	cQry += "		AND E1_PARCELA = '"+" "+"'"
 	cQry += "		AND E1_TIPO = '"+"NF"+"'"
@@ -52,6 +52,9 @@ If cEmpAnt $ '40'
 	If QRY->(!EOF())
 		SE1->(DbGoTo(QRY->R_E_C_N_O_))
 		nAbatim := SomaAbat(QRY->E1_PREFIXO,QRY->E1_NUM,QRY->E1_PARCELA,"R",QRY->E1_MOEDA,dDataBase,QRY->E1_CLIENTE,QRY->E1_LOJA)  
+        nVlrIR  := QRY->E1_IRRF
+       nTotAbat := SomaAbat(SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,"R",SE1->E1_MOEDA,dDataBase,SE1->E1_CLIENTE, SE1->E1_LOJA, xFilial("SE1", SE1->E1_FILORIG), dDataBase, SE1->E1_TIPO)
+
 		If !Empty(QRY->E1_VENCTO)
 			cNatOper += "Vencimento: "+DtoC(StoD(QRY->E1_VENCTO))+" "     
 		EndIf		
@@ -59,10 +62,12 @@ If cEmpAnt $ '40'
 
 	// TLM - 20140205 - Chamado 014257 Tratamento do valor liquido ( F2_VALBRUT-F2_VALCOFI-F2_VALCSLL-F2_VALPIS-F2_VALIRRF) 
 	//cNatOper+=" VALOR LIQUIDO: "+Alltrim(Str(SF2->F2_VALBRUT-SF2->F2_VALCOFI-SF2->F2_VALCSLL-SF2->F2_VALPIS-SF2->F2_VALIRRF))
-	cNatOper+=" VALOR LIQUIDO: "+Alltrim(Str(SF2->F2_VALFAT - nAbatim )) //JSS - 16/12/2014 Alterado pois estava reduzindo o valor de PCC em notas menores q 5k.
-
-//VOGEL
-//RRP - 20/09/2016 - Descrição da nota de serviço
+	If QRY->E1_CLIENTE = "005699" .And. QRY->E1_LOJA = "01"
+	  cNatOper+=" VALOR LIQUIDO: "+Alltrim(Str(SF2->F2_VALFAT - nVlrIR )) //SSS - 15/01/2021 Alterado para reduzir o valor de IRRF do valor total da nota
+	Else  
+      cNatOper+=" VALOR LIQUIDO: "+Alltrim(Str(SF2->F2_VALFAT - nAbatim ))//JSS - 16/12/2014 Alterado pois estava reduzindo o valor de PCC em notas menores q 5k. 
+    EndIf
+	
 ElseIf cEmpAnt $ u_EmpVogel()
 	
 	aArea := SC6->(GetArea())
@@ -88,9 +93,7 @@ ElseIf cEmpAnt $ "ZJ" //LinkedIn
 	//Retirando a descrição do serviço que carrega no SX5
 	//cNatOper  := If(FindFunction('CleanSpecChar'),CleanSpecChar(Alltrim(SC5->C5_MENNOTA)),SC5->C5_MENNOTA)+" "
 	cNatOper	:= ""
-	
 	aArea := GetArea()
-
 	cMsgServ	:= ""
 	XPCC_COF 	:= XPCC_CSLL := XPCC_PIS := 0
 	nIrrf		:= nISS := nInss := nValLiq := 0

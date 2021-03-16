@@ -605,12 +605,12 @@ Begin Sequence
    //Fim DRL - Tratamento do campo usado - SX3
    ElseIf cAlias == "SX6"
       If !Empty(SX6->X6_CONTEUD)
-         aSxx[13] := SX6->X6_CONTEUD
+         //aSxx[13] := SX6->X6_CONTEUD          //CAS - 15/09/2020 Comentada linha para pegar conteudo do Array passado no USX3081
       EndIf
       If !Empty(SX6->X6_CONTSPA)
          aSxx[14] := SX6->X6_CONTSPA
       EndIf
-      If !Empty(SX6->X6_CONTEUD)
+      If !Empty(SX6->X6_CONTENG)
          aSxx[15] := SX6->X6_CONTENG
       EndIf
       If aSxx[5] == Nil .Or. Empty(aSxx[5])

@@ -37,11 +37,12 @@ _cfop1+= "1301/2301/1302/2302/1303/2303/1304/2304/1305/2305/1306/2306/"         
 _cfop1+= "1949/2949/3949/"                                                            			   		// IMPORT. OUTRAS
 
 _ctes1:= "08P/49P/48P/46O/"                                                 					 		// SERVICOS TOMADOS (O8P)
-_ctes2:= "110/2DR"                                                 					 		// SERVICOS TOMADOS (O8P)
+_ctes2:= "110/2DR"
+_ctes3:= "2XT/2XS/2VO/2WM/2W9/3CW"                                                 					 		// SERVICOS TOMADOS (O8P)
                                            
 _cfop2:= "1351/2351/1352/2352/1353/2353/1354/2354/1355/2355/1356/2356/1556/2556/3556/1653/2908/1908/"	// COMPRA SERV.TRANSP                                            
 
-_cfop2+= "2653/1933/2933/1922/1551/2551/1406/2406/1407/2407/"
+_cfop2+= "2653/1933/2933/1922/2922/1551/2551/1406/2406/1407/2407/"
 
 _cfop3:= "1122/2122/1124/2124/1125/2125/"	                                                         	//Industrialização    
 
@@ -58,11 +59,19 @@ If EMPTY(SD1->D1_CONHEC)
 	.OR. SF1->F1_TIPO $ 'D'
     	_valResult:=0 
 
-   // Paulo Silva = Chamado: #12087	
-      ELSEIF (ALLTRIM(SD1->D1_CF) $ _cfop5) .AND. (SM0->M0_CODIGO $ 'T4')
+    // Paulo Silva = Chamado: #12087	
+    ELSEIF (ALLTRIM(SD1->D1_CF) $ _cfop5) .AND. (SM0->M0_CODIGO $ 'T4')
       _valResult:= SD1->D1_TOTAL
-
- 	// Daniel Fonseca de Lira - Chamado 007788 - Erika 
+	  
+	// PAULO SILVA - SOLARIS RETENCAO DE IMPOSTOS 03/01/2020 CH#20752
+    ELSEIF (ALLTRIM(SD1->D1_CF) $ '1949/2949/3949/2933/1933/3933') .AND. SM0->M0_CODIGO $ 'HH/HJ/UT/'
+    	_valResult:= SD1->D1_TOTAL-(SD1->D1_VALISS+SD1->D1_VALIRR+SD1->D1_VALINS)-SD1->D1_VALDESC
+		
+    // PAULO SILVA - 19/01/2020  - #20752
+    ELSEIF (ALLTRIM(SD1->D1_TES) $ '2XT/2XS/2VO/2WM/2W9/3CW') .AND. SM0->M0_CODIGO $ 'HH/HJ'
+        _valResult:= SD1->D1_TOTAL
+	   
+	// Daniel Fonseca de Lira - Chamado 007788 - Erika 
 	/* ELSEIF (ALLTRIM(SD1->D1_CF) = '1117') .AND. SM0->M0_CODIGO == 'MN'   //solicitação Erika - Lapa 
     	_valResult:= SD1->D1_TOTAL */
  	ElseIf (ALLTRIM(SD1->D1_CF) $ '1406/1126') .AND. SM0->M0_CODIGO == 'P0'   //JSS - Auxliando EBF - Ajustado para solucionar o caso 022146
@@ -80,10 +89,23 @@ If EMPTY(SD1->D1_CONHEC)
 	ELSEIF (ALLTRIM(SD1->D1_CF) $ '1949/2949') .AND. SM0->M0_CODIGO == 'B1' //(ALLTRIM(SD1->D1_TES) $ '46O') RRP - 18/12/2015 - Solicitado por email. Daniel Florence.
 		_valResult:=(SD1->D1_TOTAL+SD1->D1_VALIPI+SD1->D1_ICMSRET-SD1->D1_II-SD1->D1_VALINS-SD1->D1_VALIRR) 
     
-	//CAS - 07-08-2017 - Ticket #4491-Solaris-Alteração de parametrização dos lan?mentos cont?eis - NF Entrada
+	//PAULO SILVA 11/03/2020 - Solaris-Alteração de parametrização dos lancamentos contabeis - NF Entrada
 	ELSEIF (ALLTRIM(SD1->D1_CF) $ '1407/1556/1653/2556/2653') .AND. SM0->M0_CODIGO $ 'HH/HJ'   
-    	_valResult:= (SD1->D1_TOTAL+SD1->D1_VALIPI)  
+    //	_valResult:= (SD1->D1_TOTAL+SD1->D1_VALIPI) 
+    	_valResult:= (SD1->D1_TOTAL+SD1->D1_DESPESA+SD1->D1_VALFRE+SD1->D1_SEGURO+SD1->D1_VALIPI)-SD1->D1_VALDESC 
 		
+	// PAULO SILVA - 03/01/2020 E # - Adicionei a empresa HH
+	ElseIf (ALLTRIM(SD1->D1_TES) $ '2XT/2XS/2VO/2WM/2W9') .AND. SM0->M0_CODIGO $ 'HH'
+       _valResult:= SD1->D1_TOTAL-(SD1->D1_VALICM+SD1->D1_ICMSCOM+SD1->D1_VALIPI+SD1->D1_ICMSRET+SD1->D1_VALIMP5+SD1->D1_VALIMP6+SD1->D1_DESPESA+SD1->D1_VALFEEF+SD1->D1_VLSLXML+SD1->D1_VALDESC)          
+        	
+    // PAULO SILVA - ADICIONEI A EMPRESA 9X CH#20137
+    ELSEIF (ALLTRIM(SD1->D1_CF) $ '1949/2949/3949/2933/1933/3933') .AND. SM0->M0_CODIGO $ '9X'
+    	_valResult:= SD1->D1_TOTAL-(SD1->D1_VALISS-SD1->D1_VALCSL-SD1->D1_VALIRR-SD1->D1_VALPIS-SD1->D1_VALCOF-SD1->D1_VALINS)-SD1->D1_VALDESC
+	
+	// PAULO SILVA - Notas de Servicos - COGNIZANTE - S2 CH#21340 (VALIDADO - RAFAEL AZARIAS. 25/03/2020)
+    ELSEIF (ALLTRIM(SD1->D1_CF) $ '1353/2353/3353/1933/2933/3933/1923/2923/3923/1949/2949/3949/') .AND. SM0->M0_CODIGO $ 'S2'
+    	_valResult:= SD1->D1_TOTAL-(SD1->D1_VALISS+SD1->D1_VALIRR+SD1->D1_VALINS)
+	
 	//JSS - Add o campo SD1->D1_VALFRE solicitado no chamado 021936
 	ELSEIF SM0->M0_CODIGO $ 'ZX/ZW/ZV/ZU/ZY/0B/0C/0E/'
 		_valResult:=(SD1->D1_TOTAL+SD1->D1_VALFRE+SD1->D1_VALIPI+SD1->D1_ICMSRET-SD1->D1_II-SD1->D1_VALISS-SD1->D1_VALINS-SD1->D1_VALIRR) 		
@@ -111,8 +133,8 @@ If EMPTY(SD1->D1_CONHEC)
 		_valResult:= SD1->D1_TOTAL + SD1->D1_VALIPI
    
 	//AOA - 22/04/2015 - Resolver chamado 025757
-	ElseiF (ALLTRIM(SD1->D1_CF) $ _cfop2) .AND. SM0->M0_CODIGO $ '7F/JO/K1/50/HL/O5/OD/WA/BJ/9J/8Z/G2/N5/28/BI/MM/7N/S2/VW/XC/10/OU/EI/FG/H9/RY/NN/K2/BT/9X/IN/GN/4Z/SS/M1/RF/RT/ZJ/MR/ZR/MA/MB/S1/JV/40/ED/QU/7I/LB/JP/R7/DW/AT/26/SC/S6/2E/6Q/XR/7M/6T/TP/D8/7G/41/TM/UZ/HH/HJ/M7/QN/0F'		//CAS - 04/06/2019 - TAXID(abater o desconto)
-         _valResult:= (SD1->D1_TOTAL+SD1->D1_DESPESA+SD1->D1_VALFRE+SD1->D1_SEGURO+SD1->D1_VALIPI)-SD1->D1_VALDESC
+	ElseiF (ALLTRIM(SD1->D1_CF) $ _cfop2) .AND. SM0->M0_CODIGO $ '7F/JO/K1/50/HL/O5/OD/WA/BJ/9J/8Z/G2/N5/28/BI/MM/7N/S2/VW/XC/10/OU/EI/FG/H9/RY/NN/K2/BT/9X/IN/GN/4Z/SS/M1/RF/RT/ZJ/MR/ZR/MA/MB/S1/JV/40/ED/QU/7I/LB/JP/R7/DW/AT/26/SC/S6/2E/6Q/XR/7M/6T/TP/D8/7G/41/TM/UZ/HJ/M7/QN/0F/V6/V7/X3'		//CAS - 04/06/2019 - TAXID(abater o desconto)
+         _valResult:= (SD1->D1_TOTAL+SD1->D1_DESPESA+SD1->D1_VALFRE+SD1->D1_SEGURO+SD1->D1_VALIPI)-(SD1->D1_VALDESC-SD1->D1_VALINS - SD1->D1_VALISS - SD1->D1_VALIRR) //SD1->D1_VALINS - SD1->D1_VALISS - SD1->D1_VALIRR #CHAMADO #20764
 
 	//CAS - 01/06/2017 - Tratamento para atender o chamado 036811.         
 	ElseiF (ALLTRIM(SD1->D1_CF) $ _cfop2) .AND. SM0->M0_CODIGO == '1Z' 

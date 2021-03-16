@@ -3,28 +3,28 @@
 #INCLUDE "TOPCONN.ch"
 
 /*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³	  º Autor ³  Matheus       º Data ³ 17/02/2011		      º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDescricao ³ Fonte para gerar relatório em excel, Posição dos produtos  º±±
-±±ºDescricao ³ vendidos   												  º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½
+ï¿½ï¿½ï¿½Programa  ï¿½	  ï¿½ Autor ï¿½  Matheus       ï¿½ Data ï¿½ 17/02/2011		      ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¹ï¿½ï¿½
+ï¿½ï¿½ï¿½Descricao ï¿½ Fonte para gerar relatï¿½rio em excel, Posiï¿½ï¿½o dos produtos  ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½Descricao ï¿½ vendidos   												  ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¹ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Funcao      : PRYRVENO 
 Parametros  : Nenhum
 Retorno     : Nenhum
-Objetivos   : Fonte para gerar relatório em excel, Posição dos produtos vendidos 
+Objetivos   : Fonte para gerar relatï¿½rio em excel, Posiï¿½ï¿½o dos produtos vendidos 
 Autor     	: Matheus Massarotto  	 	
 Data     	: 17/02/2011
 Obs         : 
 TDN         : 
-Revisão     : Tiago Luiz Mendonça 
+Revisï¿½o     : Tiago Luiz Mendonï¿½a 
 Data/Hora   : 15/03/2012
-Módulo      : Gestão Pessoal.
+Mï¿½dulo      : Gestï¿½o Pessoal.
 Cliente     : Todos.
 */
 
@@ -32,13 +32,13 @@ Cliente     : Todos.
  User Function PRYRVENO
 *-----------------------*
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Declaracao de Variaveis                                             ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+//ï¿½ Declaracao de Variaveis                                             ï¿½
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 Local cDesc1         := "Este programa tem como objetivo imprimir relatorio "
 Local cDesc2         := "de acordo com os parametros informados pelo usuario."
-Local cDesc3         := "Relatório de Vendas"
+Local cDesc3         := "Relatï¿½rio de Vendas"
 Local cPict          := ""                                                                                                                
 Local titulo       := "RELATORIO DE VENDAS" //- DATA DE "+mv_par01+" ATE "+mv_par02+" / RESPONSAVEL "+mv_par03+" Ate "+mv_par04+""
 Local nLin         := 80
@@ -60,13 +60,16 @@ Private cbcont     := 00
 Private CONTFL     := 01
 Private m_pag      := 01
 Private wnrel      := "PRYRVENO" // Coloque aqui o nome do arquivo usado para impressao em disco
-
+Private cPlanImp := "SD2"
+Private cTitPlan := 'Relatorio'
+//Private cArquivo   := "C:\temp\"+titulo
+Private cArquivo   := GetTempPath()+titulo
 
 if !cEmpAnt $ "ED"
-	Alert("Relatório não disponível para esta empresa!")
+	Alert("Relatï¿½rio nï¿½o disponï¿½vel para esta empresa!")
 	return
 endif
-//Definição das perguntas.
+//Definiï¿½ï¿½o das perguntas.
 
 U_PUTSX1( "RVOKUMA_P", "01", "Produto De:", "Produto De:", "Produto De:", "", "C",15,00,00,"G","" , "SB1","","","MV_PAR01")
 U_PUTSX1( "RVOKUMA_P", "02", "Produto Ate:", "Produto Ate:", "Produto Ate:", "", "C",15,00,00,"G","" , "SB1","","","MV_PAR02")
@@ -76,22 +79,23 @@ U_PUTSX1( "RVOKUMA_P", "05", "Data De:", "Data De:", "Data De:", "", "D",08,00,0
 U_PUTSX1( "RVOKUMA_P", "06", "Data Ate:", "Data Ate:", "Data Ate:", "", "D",08,00,00,"G","U_ValRVEOku(MV_PAR06)" , "","","","MV_PAR06")
 U_PUTSX1( "RVOKUMA_P", "07", "Grupo De:", "Grupo De:", "Grupo De:", "", "C",4,00,00,"G","" , "SBM","","","MV_PAR07")
 U_PUTSX1( "RVOKUMA_P", "08", "Grupo Ate:", "Grupo Ate:", "Grupo Ate:", "", "C",4,00,00,"G","" , "SBM","","","MV_PAR08")
-U_PUTSX1( "RVOKUMA_P", "09", "Gera Excel?:", "Gera Excel?", "Gera Excel?", "", "N",1,00,00,"C","" , "","","","MV_PAR09","Sim","","","","Não") 
-U_PUTSX1( "RVOKUMA_P", "10", "Cons. Param. Abaixo?:", "Cons. Param. Abaixo?", "Cons. Param. Abaixo?", "", "N",1,00,00,"C","" , "","","","MV_PAR10","Sim","","","","Não") 
-U_PUTSX1( "RVOKUMA_P", "11", "Cons. Tes Duplicata?:", "Cons. Tes Duplicata?", "Cons. Tes Duplicata?", "", "N",1,00,00,"C","" , "","","","MV_PAR11","Sim","","","","Não") 
+U_PUTSX1( "RVOKUMA_P", "09", "Gera Excel?:", "Gera Excel?", "Gera Excel?", "", "N",1,00,00,"C","" , "","","","MV_PAR09","Sim","","","","Nï¿½o") 
+U_PUTSX1( "RVOKUMA_P", "10", "Cons. Param. Abaixo?:", "Cons. Param. Abaixo?", "Cons. Param. Abaixo?", "", "N",1,00,00,"C","" , "","","","MV_PAR10","Sim","","","","Nï¿½o") 
+U_PUTSX1( "RVOKUMA_P", "11", "Cons. Tes Duplicata?:", "Cons. Tes Duplicata?", "Cons. Tes Duplicata?", "", "N",1,00,00,"C","" , "","","","MV_PAR11","Sim","","","","Nï¿½o") 
 
 Private cPerg := "RVOKUMA_P"
 Private cString:="SD2"
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Monta a interface padrao com o usuario...                           ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+//ï¿½ Monta a interface padrao com o usuario...                           ï¿½
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 
 If !Pergunte(cPerg,.T.)
 	Return()
 EndIf   
+/*
 
 If MV_PAR09==2
 	wnrel := SetPrint(cString,NomeProg,cPerg,@titulo,cDesc1,cDesc2,cDesc3,.T.,aOrd,.T.,Tamanho,,.T.)
@@ -108,18 +112,19 @@ If MV_PAR09==2
 	
 	nTipo := If(aReturn[4]==1,15,18)
 	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Processamento. RPTSTATUS monta janela com a regua de processamento. ³       
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+	//ï¿½ Processamento. RPTSTATUS monta janela com a regua de processamento. ï¿½       
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	
-	RptStatus({|| ³RUNREPORT(Cabec1,Cabec2,Titulo,nLin) },Titulo)
+	RptStatus({|| RUNREPORT(Cabec1,Cabec2,Titulo,nLin) },Titulo)
 Else
-	RptStatus({|| ³RUNREPORT(Cabec1,Cabec2,Titulo,nLin) },Titulo)
+	RptStatus({|| RUNREPORT(Cabec1,Cabec2,Titulo,nLin) },Titulo)
 EndIf
+*/
+	RptStatus({|| RUNREPORT() },Titulo)
+	Return
 
-Return
-
-Static Function ³RUNREPORT(Cabec1,Cabec2,Titulo,nLin)
+Static Function RUNREPORT()
                                                          
 Local cQry1:=""
 Local nTotQtde:=0
@@ -135,7 +140,7 @@ Local nTotMargem:=0
 Local nTotMarPorc:=0
 
 //RRP - 23/10/2013 - Ajuste no select para efetuar um calculo diferente para as notas complementares de ICMS. Chamado 014227.
-//Junção dos dois Selects A e B 
+//Junï¿½ï¿½o dos dois Selects A e B 
 cQry1 :=" SELECT A.D2_COD "+CRLF 
 cQry1 +=" ,A.B1_DESC "+CRLF
 cQry1 +=" ,A.QTDE AS QTDE "+CRLF 
@@ -154,7 +159,7 @@ cQry1 +=" ,A.B1_GRUPO "+CRLF
 cQry1 +=" FROM "+CRLF
 
 cQry1 +="( "+CRLF
-//Select que trás todas as notas que não são de complemento ICMS D2_TIPO = I
+//Select que trï¿½s todas as notas que nï¿½o sï¿½o de complemento ICMS D2_TIPO = I
 cQry1 +=" SELECT D2_COD "+CRLF
 cQry1 +=" ,B1_DESC "+CRLF 
 cQry1 +=" ,SUM(D2_QUANT) AS QTDE "+CRLF 
@@ -222,28 +227,28 @@ cQry1 +=" GROUP BY D2_COD,B1_DESC,B1_GRUPO "+CRLF
 cQry1 +=" ) AS B ON A.D2_COD=B.D2_COD "+CRLF
  
 cQry1 +=" ORDER BY D2_COD "
-
+/*
 If tcsqlexec(cQry1)<0
-	Alert("Ocorreu um problema na busca das informações!!")
+	Alert("Ocorreu um problema na busca das informaï¿½ï¿½es!!")
 	return
 EndIf
+*/
 
 //memowrite("C:\Grant Thorntom\Querys\cQry2.sql",cQry1)  
 dbUseArea(.T.,"TOPCONN",TcGenQry(,,cQry1),"TSD2",.T.,.T.)                                                         
 
-				//#################### REGUA CABEÇALHO ###################\\ 
+				//#################### REGUA CABEï¿½ALHO ###################\\ 
 				
 		//		     10   	   20 	  	 30		   40		 50	       60        70        80        90       100       110       120       130       140       150       160       170       180       190       200       210       220       230
 		//	 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890					
 		//   XXXXXXXXXXXXXXX  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  XXXXXXXXXXXXX  XXXXXXXXXX  XXXXXXXXXX  XXXXXXXXXX  XXXXXXXXXX       XXXXXXXXXX     XXXXXXXXXX  XXXXXXXXXX     XXXXXXXXXX  XXXXXXXXXX  XXXX
                                         
-Cabec1 := 	"PRODUTO          DESCRICAO                                           QUANTIDADE     TOTAL       VLR.ICMS    VLR.IPI     VL.TOTAL VENDAS  VL.PIS/COFINS  CUSTO       VENDA LIQUIDA  MARGEM      MARGEM %    GRUPO
+//Cabec1 := 	"PRODUTO          DESCRICAO                                           QUANTIDADE     TOTAL       VLR.ICMS    VLR.IPI     VL.TOTAL VENDAS  VL.PIS/COFINS  CUSTO       VENDA LIQUIDA  MARGEM      MARGEM %    GRUPO
 
                                                                                                      
 Private aDadTemp:={}
-Private nDad:=0
 
-//Criação dos campos da tabela temporária
+//Criaï¿½ï¿½o dos campos da tabela temporï¿½ria
 
 AADD(aDadTemp,{"Produto","C",15,0})
 AADD(aDadTemp,{"Descricao","C",30,0})
@@ -260,105 +265,59 @@ AADD(aDadTemp,{"Margem","C",14,0})
 AADD(aDadTemp,{"Margem_Por","C",14,0})
 AADD(aDadTemp,{"Grupo","C",4,0})
 
+//Vitor EZ4 -> chamado 22371 (alterando tipo de relatorio de DBF para XML EXCEL)
+//Vitor EZ4 -> chamado 22371 (Deste ponto em diante alteramos a criaÃ§Ã£o de tabela temporaria)
+//Vitor EZ4 -> chamado 22371 (atÃ© a linha 471)
 //Criando nome temporario
-cNome := CriaTrab(Nil,.F.)//CriaTrab(aDadTemp,.t.)
-dbCreate(cNome,aDadTemp,"DBFCDXADS")
-dbUseArea(.T.,"DBFCDXADS",cNome,"DADXLS1",.F.,.F.)
- 
-cIndex:=CriaTrab(Nil,.F.)
-IndRegua("DADXLS1",cIndex,"Produto",,,"Selecionando Registro...")
+//cNome := CriaTrab(Nil,.F.)//CriaTrab(aDadTemp,.t.)
 
-DbSelectArea("DADXLS1")
-DbSetIndex(cIndex+OrdBagExt())
-DbSetOrder(1)
 
 DbSelectArea("TSD2")
 TSD2->(DBGotop())
-//SetRegua(TSD2->(RecCount()))
+SetRegua(TSD2->(RecCount()))
 SetRegua(RecCount())
 
-While TSD2->(!EOF())
 
-If MV_PAR09==2
-   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-   //³ Verifica o cancelamento pelo usuario...                             ³
-   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+oTempTable := FWTemporaryTable():New( "EZ4" )
 
-   If lAbortPrint
-      @nLin,00 PSAY "*** CANCELADO PELO OPERADOR ***"
-      Exit
-   Endif
+oTemptable:SetFields( aDadTemp )
+oTempTable:AddIndex("cIndex", {"Produto"} )
 
-   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-   //³ Impressao do cabecalho do relatorio. . .                            ³
-   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 
-   If nLin > 55 // Salto de Página. Neste caso o formulario tem 55 linhas...
-      Cabec(Titulo,Cabec1,Cabec2,NomeProg,Tamanho,nTipo)
-      nLin := 8
-   Endif                              
-EndIf
+oTempTable:Create()
+
+TSD2->(DBGotop())
+SetRegua(TSD2->(RecCount()))
+
+
+While TSD2->(!EOF())  //carrega tabela temporï¿½ria para, abrir arquivo no excel.
+
+	Reclock("EZ4",.T.)
+
+	EZ4->Produto:=ALLTRIM(TSD2->D2_COD)
+	EZ4->Descricao:=ALLTRIM(TSD2->B1_DESC)
+	EZ4->Quantidade:=TSD2->QTDE
+	EZ4->Vl_Total:=ROUND(TSD2->TOTAL,2)
+	EZ4->Vl_ICMS:=ROUND(TSD2->ICMS,2)
+	EZ4->Vl_ST:=ROUND(TSD2->ST,2)
+	EZ4->Vl_IPI:=ROUND(TSD2->IPI,2)
+	EZ4->Vl_Tot_Ven:=ROUND(TSD2->VALTOTAL_VENDAS,2)
+	EZ4->PIS_COFINS:=ROUND(TSD2->PIS_COFINS,2)
+	EZ4->Custo:=ROUND(TSD2->D2_CUSTO1,2)
+	EZ4->Venda_Liq:=ROUND(TSD2->VENDLIQ,2)
+	EZ4->Margem:=STRTRAN(ALLTRIM( IIF(ROUND(TSD2->MARGEN,2)<0,"("+ALLTRIM(STR(ABS(ROUND(TSD2->MARGEN,2))))+")",STR(ROUND(TSD2->MARGEN,2)) ) ),".",",")
+	EZ4->Margem_Por:=STRTRAN(ALLTRIM(STR(ROUND(TSD2->MARGEMPORC,2)))+"%",".",",")
+	EZ4->Grupo:=ALLTRIM(TSD2->B1_GRUPO)
   
-//Impressão em arquivo do siga
-If MV_PAR09==2
+	EZ4->(MsUnlock())
+	TSD2->(dbSkip()) // Avanca o ponteiro do registro no arquivo
 
-   @nLin,01  PSAY ALLTRIM(TSD2->D2_COD)
-   @nLin,17  PSAY ALLTRIM(TSD2->B1_DESC)
-   @nLin,70  PSAY ALLTRIM(STR(TSD2->QTDE))   
-   @nLin,85  PSAY ALLTRIM(STR(ROUND(TSD2->TOTAL,2)))
-   @nLin,97  PSAY ALLTRIM(STR(ROUND(TSD2->ICMS,2)))
-   @nLin,109  PSAY ALLTRIM(STR(ROUND(TSD2->IPI,2)))
-   @nLin,121 PSAY ALLTRIM(STR(ROUND(TSD2->VALTOTAL_VENDAS,2)))            
-   @nLin,138 PSAY ALLTRIM(STR(ROUND(TSD2->PIS_COFINS,2)))
-   @nLin,153 PSAY ALLTRIM(STR(ROUND(TSD2->D2_CUSTO1,2)))
-   @nLin,165 PSAY ALLTRIM(STR(ROUND(TSD2->VENDLIQ,2)))   
-   @nLin,180 PSAY ALLTRIM( IIF(ROUND(TSD2->MARGEN,2)<0,"("+ALLTRIM(STR(ABS(ROUND(TSD2->MARGEN,2))))+")",STR(ROUND(TSD2->MARGEN,2)) ) )
-   @nLin,192 PSAY ALLTRIM(STR(ROUND(TSD2->MARGEMPORC,2)))+"%"
-   @nLin,204 PSAY ALLTRIM(TSD2->B1_GRUPO)        
-             
-EndIf 
-
-//Totalizadores
-nTotQtde+=TSD2->QTDE
-nTotTotal+=TSD2->TOTAL
-nTotICMS+=TSD2->ICMS
-nTotST+=TSD2->ST
-nTotIPI+=TSD2->IPI
-nTotVendas+=TSD2->VALTOTAL_VENDAS
-nTotPC+=TSD2->PIS_COFINS
-nTotCusto+=TSD2->D2_CUSTO1
-nTotVLiq+=TSD2->VENDLIQ
-nTotMargem+=TSD2->MARGEN
-
-
-//carrega tabela temporária para, abrir arquivo no excel.
-Reclock("DADXLS1",.T.)
-
-DADXLS1->Produto:=ALLTRIM(TSD2->D2_COD)
-DADXLS1->Descricao:=ALLTRIM(TSD2->B1_DESC)
-DADXLS1->Quantidade:=TSD2->QTDE
-DADXLS1->Vl_Total:=ROUND(TSD2->TOTAL,2)
-DADXLS1->Vl_ICMS:=ROUND(TSD2->ICMS,2)
-DADXLS1->Vl_ST:=ROUND(TSD2->ST,2)
-DADXLS1->Vl_IPI:=ROUND(TSD2->IPI,2)
-DADXLS1->Vl_Tot_Ven:=ROUND(TSD2->VALTOTAL_VENDAS,2)
-DADXLS1->PIS_COFINS:=ROUND(TSD2->PIS_COFINS,2)
-DADXLS1->Custo:=ROUND(TSD2->D2_CUSTO1,2)
-DADXLS1->Venda_Liq:=ROUND(TSD2->VENDLIQ,2)
-DADXLS1->Margem:=STRTRAN(ALLTRIM( IIF(ROUND(TSD2->MARGEN,2)<0,"("+ALLTRIM(STR(ABS(ROUND(TSD2->MARGEN,2))))+")",STR(ROUND(TSD2->MARGEN,2)) ) ),".",",")
-DADXLS1->Margem_Por:=STRTRAN(ALLTRIM(STR(ROUND(TSD2->MARGEMPORC,2)))+"%",".",",")
-DADXLS1->Grupo:=ALLTRIM(TSD2->B1_GRUPO)
-  
-   nLin := nLin + 1 // Avanca a linha de impressao     
-
-  
-DADXLS1->(MsUnlock())
-   TSD2->(dbSkip()) // Avanca o ponteiro do registro no arquivo
 EndDo
+
 
 //TOTAIS
 
-//Impressão em arquivo do siga
+//Impressï¿½o em arquivo do siga
 If MV_PAR09==2
 
 
@@ -376,36 +335,38 @@ If MV_PAR09==2
              
 EndIf 
 
-//carrega tabela temporária para, abrir arquivo no excel.
-Reclock("DADXLS1",.T.)
+ //carrega tabela temporï¿½ria para, abrir arquivo no excel.
+/*
+Reclock("EZ4",.T.)
 
-DADXLS1->Quantidade:=nTotQtde
-DADXLS1->Vl_Total:=ROUND(nTotTotal,2)
-DADXLS1->Vl_ICMS:=ROUND(nTotICMS,2)
-DADXLS1->Vl_ST:=ROUND(nTotST,2)
-DADXLS1->Vl_IPI:=ROUND(nTotIPI,2)
-DADXLS1->Vl_Tot_Ven:=ROUND(nTotVendas,2)
-DADXLS1->PIS_COFINS:=ROUND(nTotPC,2)
-DADXLS1->Custo:=ROUND(nTotCusto,2)
-DADXLS1->Venda_Liq:=ROUND(nTotVLiq,2)
-DADXLS1->Margem:=STRTRAN(ALLTRIM( IIF(ROUND(nTotMargem,2)<0,"("+ALLTRIM(STR(ABS(ROUND(nTotMargem,2))))+")",STR(ROUND(nTotMargem,2)) ) ),".",",")
-DADXLS1->Margem_Por:=STRTRAN(ALLTRIM(STR(ROUND((nTotMargem/nTotVLiq)*100,2)))+"%",".",",")
+EZ4->Quantidade:=nTotQtde
+EZ4->Vl_Total:=ROUND(nTotTotal,2)
+EZ4->Vl_ICMS:=ROUND(nTotICMS,2)
+EZ4->Vl_ST:=ROUND(nTotST,2)
+EZ4->Vl_IPI:=ROUND(nTotIPI,2)
+EZ4->Vl_Tot_Ven:=ROUND(nTotVendas,2)
+EZ4->PIS_COFINS:=ROUND(nTotPC,2)
+EZ4->Custo:=ROUND(nTotCusto,2)
+EZ4->Venda_Liq:=ROUND(nTotVLiq,2)
+EZ4->Margem:=STRTRAN(ALLTRIM( IIF(ROUND(nTotMargem,2)<0,"("+ALLTRIM(STR(ABS(ROUND(nTotMargem,2))))+")",STR(ROUND(nTotMargem,2)) ) ),".",",")
+EZ4->Margem_Por:=STRTRAN(ALLTRIM(STR(ROUND((nTotMargem/nTotVLiq)*100,2)))+"%",".",",")
 
-DADXLS1->(MsUnlock())
+EZ4->(MsUnlock())
+*/
 
 
-DADXLS1->(DbCloseArea())
+//EZ4->(DbCloseArea())
 
 If MV_PAR09==2
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Finaliza a execucao do relatorio...                                 ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+	//ï¿½ Finaliza a execucao do relatorio...                                 ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	
 	SET DEVICE TO SCREEN
 	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Se impressao em disco, chama o gerenciador de impressao...          ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+	//ï¿½ Se impressao em disco, chama o gerenciador de impressao...          ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	
 	If aReturn[5]==1
 	   dbCommitAll()
@@ -417,38 +378,104 @@ If MV_PAR09==2
 	MS_FLUSH()
 EndIf
 
-TSD2->(DBCloseArea())
+//TSD2->(DBCloseArea())
 
 //Se for para imprimir no excel
-If MV_PAR09==1
-	If !ApOleClient("MsExcel")
-	     MsgStop("Microsoft Excel nao instalado.")
-	     Return
-	EndIf 
+//If MV_PAR09==1
+	//If !ApOleClient("MsExcel")
+	    // MsgStop("Microsoft Excel nao instalado.")
+	    // Return
+	//EndIf 
 		
-		cArqOrig := "\"+CURDIR()+cNome+".DBF"
-	   	cPath     := AllTrim(GetTempPath())                                                   
+	//	cArqOrig := "\"+CURDIR()+cNome+".DBF"
+	//   	cPath     := AllTrim(GetTempPath())                                                   
 	   	
-		IF CpyS2T( cArqOrig , cPath, .T. )
-			oExcelApp:=MsExcel():New()
-			oExcelApp:WorkBooks:Open(cPath+cNome+".DBF")  
-			oExcelApp:SetVisible(.T.)   
-		ELSE
-			MSGALERT("ERRO AO TENTAR REALIZAR A CÓPIA DA TABELA TEMPORARIA (FERROR):"+STR(FERROR(),4),"ERRO FERROR -> CPYS2T")
-		ENDIF
+		//IF CpyS2T( cArqOrig , cPath, .T. )
+			//oExcelApp:=MsExcel():New()
+			//oExcelApp:WorkBooks:Open(cPath+cNome+".DBF")  
+			//oExcelApp:SetVisible(.T.)   
+		//ELSE
+			//MSGALERT("ERRO AO TENTAR REALIZAR A Cï¿½PIA DA TABELA TEMPORARIA (FERROR):"+STR(FERROR(),4),"ERRO FERROR -> CPYS2T")
+		//ENDIF
 	
-	sleep(05)	
-EndIf 
+	//sleep(05)	
+//EndIf 
 
-//Apaga tabela temporária
-Erase &cNome+".DBF"            
+//Criando o objeto que irÃ¡ gerar o conteÃºdo do Excel
+oFWMsExcel := FWMSExcel():New()     
+
+oFWMsExcel:AddworkSheet(cPlanImp) //NÃ£o utilizar nÃºmero junto com sinal de menos. Ex.: 1-   
+//Criando a Tabela                                                                          
+oFWMsExcel:AddTable(cPlanImp,cTitPlan)                                                      
+//Criando Colunas                                                                           
+                              
+//Saida                                                                                     
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Produto" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Descricao" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Quantidade" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Vl_Total" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Vl_ICMS" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Vl_ST" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Vl_IPI" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Vl_Tot_Ven" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"PIS_COFINS" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Custo" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Venda_Liq" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Margem" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Margem_Por" ,1) 
+	oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"Grupo" ,1) 
+
+                                                                                            
+EZ4->(dbGoTop())     
+
+Do while EZ4->(!Eof())                                                      
+                                                                                
+            //Criando as Linhas                                                 
+                                                                                
+            oFWMsExcel:AddRow(cPlanImp,cTitPlan,{;                            
+												EZ4->Produto	,;
+												EZ4->Descricao	,;
+												EZ4->Quantidade	,;
+												EZ4->Vl_Total	,;
+												EZ4->Vl_ICMS	,;
+												EZ4->Vl_ST		,;
+												EZ4->Vl_IPI		,;
+												EZ4->Vl_Tot_Ven	,;
+												EZ4->PIS_COFINS	,;
+												EZ4->Custo		,;
+												EZ4->Venda_Liq	,;
+												EZ4->Margem		,;
+												EZ4->Margem_Por	,;
+												EZ4->Grupo		} )		     
+        EZ4->(dbskip())                                      
+                                                                                
+EndDo      
+
+EZ4->(dbGoTop()) 
+
+//Ativando o arquivo e gerando o xml                                            
+oFWMsExcel:Activate()                                                           
+oFWMsExcel:GetXMLFile(cArquivo)                                                 
+                                                                                
+//Abrindo o excel e abrindo o arquivo xml                                       
+oExcel := MsExcel():New()                 //Abre uma nova conexÃ£o com Excel     
+oExcel:WorkBooks:Open(cArquivo)           //Abre uma planilha                   
+oExcel:SetVisible(.T.)                    //Visualiza a planilha                
+oExcel:Destroy()     	                                                          
+
+EZ4->(DbCloseArea())
+TSD2->(DBCloseArea())
+
+
+//Apaga tabela temporï¿½ria
+//Erase &cNome+".DBF"            
 
 Return
 
 /*
  ----------------------------------------------------
-|	Função para validar se a data da                 |
-|   Pergunta está vazia. Obs: Ñ permite Data Vazia.  |
+|	Funï¿½ï¿½o para validar se a data da                 |
+|   Pergunta estï¿½ vazia. Obs: ï¿½ permite Data Vazia.  |
  ----------------------------------------------------
 */
 

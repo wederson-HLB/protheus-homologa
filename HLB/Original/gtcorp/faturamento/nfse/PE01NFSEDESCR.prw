@@ -27,7 +27,7 @@ Local cSerie  := PARAMIXB[4]
 Local cNota   := PARAMIXB[5]
 Local cClieFor:= PARAMIXB[6]
 Local cLoja   := PARAMIXB[7]
-Local cCarTrb := PARAMIXB[8] 
+Local cCarTrb := PARAMIXB[8]
 Local lDescXML:= PARAMIXB[9]
 Local lCampinas:=PARAMIXB[10]
 Local aProd	  := If(Len(PARAMIXB) > 10,PARAMIXB[11],{})
@@ -258,7 +258,7 @@ if (!lDescXML .AND. cEmpAnt == "Z4" .AND. cCodMun == "3550308") .OR. (lDescXML .
 		
 		EndIf
 		If !Empty(cCarTrb)  //Carga Tributária - Lei 12.741
-			c_Serv +=+ Chr(13)+Chr(10)+ cCarTrb + Chr(13)+Chr(10)
+			c_Serv += cCarTrb + Chr(13)+Chr(10)
 		EndIf
 		
 		If !lDescXML

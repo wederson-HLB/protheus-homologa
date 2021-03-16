@@ -58,7 +58,7 @@ Local aArea	  := {}
 
 aArea := GetArea()  
 //RRP - 05/04/2018 - Ajuste para consultar dinamicamente os ambientes
-nConP1200 := TcLink( "MSSQL7/P12117_00","10.0.30.56",7891 )
+nConP1200 := TcLink( "MSSQL7/P12_00","172.16.16.152",7891 )  //CAS - 10/02/2020 Alterado dados da conex„o evido a Atual.Release e servidor (MSSQL7/P12_00 e 172.16.16.152)
 If nConP1200 # 0
 
 	//ValidaÁ„o se a inclus„o da TES estÅEno ambiente produÁ„o ou homologaÁ„o

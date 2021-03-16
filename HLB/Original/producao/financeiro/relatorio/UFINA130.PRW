@@ -8,7 +8,7 @@
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
 ±±³Fun‡…o    ³ FinA130  ³ Autor ³ Wagner Xavier         ³ Data ³ 23/06/92 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³Descri‡…o ³ Programa de atualiza‡„o de Bancos - CNAB                   ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³Sintaxe   ³ FinA130()                                                  ³±±
@@ -1829,23 +1829,25 @@ STATIC FUNCTION TABDIR(cTabAlias,nReg,nOpc)
 	LOCAL cCodEmp := SM0->M0_CODIGO//+"-"+
 	LOCAL cNomEmp := FwCutOff(IF(AT("/",STRTRAN(ALLTRIM(LEFT(SM0->M0_NOME,30))," ","/"))==0,ALLTRIM(LEFT(SM0->M0_NOME,30)),SUBSTR(STRTRAN(ALLTRIM(LEFT(SM0->M0_NOME,30))," ","/"),1, AT("/",STRTRAN(ALLTRIM(LEFT(SM0->M0_NOME,30))," ","/"))-1)),.T.)
 	LOCAL aFArq := {}
-	LOCAL cUnidade := IF(cCodEmp == "99","D:\ASTAGE\",ALLTRIM(SUPERGETMV("MV_P_00132",.F.,"\\SRVDCASTAGE01\E$\ASTAGE\")))
+	//LOCAL cUnidade := IF(cCodEmp == "99","D:\ASTAGE\",ALLTRIM(SUPERGETMV("MV_P_00132",.F.,"\\SRVDCASTAGE01\E$\ASTAGE\")))
+	LOCAL cUnidade := IF(cCodEmp == "99","D:\ASTAGE\",ALLTRIM(SUPERGETMV("MV_P_00132",.F.,"\\SRVDCASTAGE01\E$\FINNET\")))  //CAS - 04/11/2019 FINNET	
 	LOCAL cCorpCli := IF(SUPERGETMV("MV_P_00122",.F.,.F.),"CORP","CLI")
-
-	AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"01","P","REM"})
-	AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"02","P","RET"})
-	AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"03","P","BKP"})
-	AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"04","R","REM"})
-	AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"05","R","RET"})
-	AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"06","R","BKP"})
-	AADD(aFArq,{cUnidade+"EXTRATO\"+cCorpCli+"\"+cCodEmp,"07","",""})
-	AADD(aFArq,{cUnidade+"COMP\"+cCorpCli+"\"+cCodEmp,"08","",""})
-
+    
+	//CAS - 04/11/2019 FINNET
+	AADD(aFArq,{cUnidade+"O0055FINNET\SAIDA\"       	,"01","P","REM"}) 	//AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"01","P","REM"})  
+	AADD(aFArq,{cUnidade+"O0055FINNET\ENTRADA\"     	,"02","P","RET"}) 	//AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"02","P","RET"})
+	AADD(aFArq,{cUnidade+"O0055FINNET\ENTRADA\BACKUP\"	,"03","P","BKP"}) 	//AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"03","P","BKP"})
+	AADD(aFArq,{cUnidade+"O0055FINNET\SAIDA\"		 	,"04","R","REM"})	//AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"04","R","REM"})
+	AADD(aFArq,{cUnidade+"O0055FINNET\ENTRADA\"		 	,"05","R","RET"}) 	//AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"05","R","RET"})
+	AADD(aFArq,{cUnidade+"O0055FINNET\ENTRADA\BACKUP\"	,"06","R","BKP"}) 	//AADD(aFArq,{cUnidade+"CNAB\"+cCorpCli+"\"+cCodEmp,"06","R","BKP"})
+	AADD(aFArq,{cUnidade+"O0055FINNET\ENTRADA\"		 	,"07","",""}) 		//AADD(aFArq,{cUnidade+"EXTRATO\"+cCorpCli+"\"+cCodEmp,"07","",""})
+	AADD(aFArq,{cUnidade+"COMP\"+cCorpCli+"\"+cCodEmp	,"08","",""}) 		//AADD(aFArq,{cUnidade+"COMP\"+cCorpCli+"\"+cCodEmp,"08","",""})
+    /*
 	IF !MsFile(RetSqlName(cTable),,"TOPCONN")
 		MSGALERT("NECESSARIO APLICAR UPDATE PARA CRIAÇÃO DO ALIAS:"+cTable+ENTER+" POR FAVOR INFORMAR O SUPORTE","NÃO EXISTE ALIAS: "+cTable)
 		RETURN .F.
 	ENDIF
-
+    */
 	IF SELECT(RetSqlName("Z0D")) == 0
 
 		IF EMPTY(nOpc)
@@ -1864,7 +1866,7 @@ STATIC FUNCTION TABDIR(cTabAlias,nReg,nOpc)
 					IF !(cTable)->(dbSeek(xFilial(cTable) + (cTabAlias)->EE_CODIGO + (cTabAlias)->EE_AGENCIA + (cTabAlias)->EE_CONTA + (cTabAlias)->EE_SUBCTA + aFArq[c,2])) .AND. (cTabAlias)->EE_P_ACCES = "1"
 						(cTable)->(dbAppend( .F. ))
 						(cTable)->Z0D_FILIAL  := xFilial(cTable)
-						(cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
+					    (cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
 						(cTable)->Z0D_OPERA   := aFArq[c,2]
 						(cTable)->Z0D_BANCO   := (cTabAlias)->EE_CODIGO
 						(cTable)->Z0D_AGE     := (cTabAlias)->EE_AGENCIA
@@ -1897,7 +1899,8 @@ STATIC FUNCTION TABDIR(cTabAlias,nReg,nOpc)
 					IF !lRegistro .AND. (cTabAlias)->EE_P_ACCES = "1"
 						(cTable)->(dbAppend( .F. ))
 						(cTable)->Z0D_FILIAL  := xFilial(cTable)
-						(cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
+					  //(cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
+						(cTable)->Z0D_DIR     := aFArq[c,1]								//CAS - 04/11/2019
 						(cTable)->Z0D_OPERA   := aFArq[c,2]
 						(cTable)->Z0D_BANCO   := (cTabAlias)->EE_CODIGO
 						(cTable)->Z0D_AGE     := (cTabAlias)->EE_AGENCIA
@@ -1930,7 +1933,8 @@ STATIC FUNCTION TABDIR(cTabAlias,nReg,nOpc)
 
 					IF lRegistro .AND. (cTabAlias)->EE_P_ACCES = "1" .AND. (cTable)->Z0D_ALTERA != "1"
 						(cTable)->(DBRLock())
-						(cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
+					  //(cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
+					    (cTable)->Z0D_DIR     := aFArq[c,1]								//CAS - 04/11/2019
 						(cTable)->Z0D_DTCRI   := DATE()
 						(cTable)->Z0D_HRCRI   := StrTran( TIME(),":","" )
 						(cTable)->Z0D_USCRI   := LEFT(UsrFullName( RetCodUsr() ), 60)
@@ -1940,7 +1944,8 @@ STATIC FUNCTION TABDIR(cTabAlias,nReg,nOpc)
 					ELSEIF !lRegistro .AND. (cTabAlias)->EE_P_ACCES = "1"
 						(cTable)->(dbAppend( .F. ))
 						(cTable)->Z0D_FILIAL  := xFilial(cTable)
-						(cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
+					  //(cTable)->Z0D_DIR     := aFArq[c,1]+iif(AT("EXTRATO",aFArq[c,1])<>0,"-"+cNomEmp,"")+"\"+AllTrim((cTabAlias)->EE_CODIGO)+"\"+AllTrim(StrTran(StrTran((cTabAlias)->EE_CONTA,"-","" ),".","" ))+AllTrim((cTabAlias)->EE_DVCTA)+iif(EMPTY(aFArq[c,3]),"\",iif(!EMPTY(aFArq[c,4]),"\"+aFArq[c,3]+"\"+aFArq[c,4]+"\","\"+aFArq[c,3]+"\"))
+					    (cTable)->Z0D_DIR     := aFArq[c,1]								//CAS - 04/11/2019
 						(cTable)->Z0D_OPERA   := aFArq[c,2]
 						(cTable)->Z0D_BANCO   := (cTabAlias)->EE_CODIGO
 						(cTable)->Z0D_AGE     := (cTabAlias)->EE_AGENCIA
@@ -1961,11 +1966,13 @@ STATIC FUNCTION TABDIR(cTabAlias,nReg,nOpc)
 
 
 	ENDIF
-
+            
+	//CAS - 04/11/2019 Comentado para nao chamar mais a Funcao GERAFOLD
+	/*
 	IF !EMPTY(nOpc)
 		GERAFOLD(cTabAlias,nReg,nOpc)//CRIAR OS DIRETORIOS PARA O BANCO
 	ENDIF
-
+    */
 	RETURN .T.
 	*=====================================================================================================================================*
 

@@ -24,7 +24,7 @@ If AllTrim(Upper(cEspecie)) $ "NF/NFF/"
 	cRet := "01"
 //JSS - 19/10/2012 - Tratamento para que as especies entre aspás não seja considerada no arquivo do SPED.   
 //JSS - 08/11/2012 - Tratamente para que as especies que estiverem em branco não seja consideradas no SPED.	
-ElseIf AllTrim(Upper(cEspecie)) $ "EXTR/FAT/FORA/NADA/NFCF/NFCFG/NFDS/NFFA/NFPS/NFS/NFSS/NFST/OUTRO/R/RED/RPA/RPS/" .OR. Empty(cEspecie)       
+ElseIf AllTrim(Upper(cEspecie)) $ "EXTR/FAT/FORA/NADA/NFCF/NFCFG/NFDS/NFFA/NFPS/NFS/NFSS/NFST/OUTRO/R/RED/RPA/RPS/BOLET/FATUR" .OR. Empty(cEspecie)   //CAS - 10/03/2021 Adicionado BOLET/FATUR      
 	cRet := "  "
 
 //Tratamento para que a especie NF-E seja considerada como nota fiscal eletronica.

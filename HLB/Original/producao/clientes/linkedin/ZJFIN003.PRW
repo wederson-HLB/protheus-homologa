@@ -14,11 +14,17 @@ Data        :07/05/2018
 Mï¿½dulo      :Faturamento
 */
 /*
-Wederson L. Santana  - 05/11/19
-Manutenção fonte específico.
+Autor       : Wederson L. Santana  
+Data        : 05/11/19
+Objetivos   :
 Tratamento para o campo específico C5_P_MAIL. Campo será utilizado para envio da NFS/Boleto para os e-mails adicionais.
 Os e-mails que forem informados neste campo, deverão ser separados com o character "/" (barra).
-
+*/
+/*
+Autor       : Wederson L. Santana  
+Data        : 19/12/19
+Objetivos   :
+Alteração da mensagem enviada no assunto e corpo do e-mail.
 */
 *-------------------------*
  User Function ZJFIN003()
@@ -210,11 +216,12 @@ While Temp1->(!EOF())
 			cEmail += '<p align="center"><font face="verdana" size="2">
 			cEmail += '<b><u>Nota Fiscal de Serviço LinkedIn </u></b></p>'
 			
-			cSubject:= "[LINKEDIN]Boleto: "+AllTrim(Temp1->F2_DOC)
+			cSubject:= "[LINKEDIN]Nota fiscal: "+AllTrim(Temp1->F2_DOC)
 						
 			cEmail += '<p align="left">Prezado(a) cliente,</p> '
 			cEmail += '<br />'
-			cEmail += '<p align="left">Em caso de dúvidas entrar em contato pelo e-mail :  linkedin.faturamento@hlb.com.br</p> '
+			cEmail += '<p align="left">Segue o boleto anexado e abaixo o link para a nota fiscal eletrônica.</p> '
+            cEmail += '<p align="left">Em caso de dúvida, escreva para nosso time de faturamento: linkedin.faturamento@hlb.com.br</p> '
 			cEmail += '<br />'
 			cEmail += '<p align="left"><b>Nota Fiscal de Serviço/Boleto: </b>'+AllTrim(Temp1->F2_DOC)+' </p> '
 			cEmail += '<p align="left"><b>Cliente: </b> '+Temp1->A1_NOME+'('+Temp1->A1_COD +') </p> '
@@ -235,6 +242,9 @@ While Temp1->(!EOF())
 				cEmail += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CNPJ do Prestador de Serviços: '+Transform(StrZero(Val(AllTrim(SM0->M0_CGC)),14),"@R 99.999.999/9999-99")+'<br>'			
 	
 				cEmail += '<br />'
+	            cEmail += '<p align="left">Por gentileza confirmar o recebimento desta NF através do e-mail linkedin.cobranca@hlb.com.br </p> '
+				cEmail += '<br />'
+	
 				cEmail += '<p align="left">De acordo com a reforma tributária do ISS, o serviço prestado pela Linkedin se enquadra na obrigação da emissão da Nota Fiscal de Serviço.</p> '
 				cEmail += '<br />'
 				
@@ -248,7 +258,7 @@ While Temp1->(!EOF())
 		   //	cEmail += '<p align="left">AR Department</p> '
 			cEmail += '<p align="left">Linkedin</p></font> 
 			cEmail += '<p align="center"><font face="verdana" size="2">
-			cEmail += '<b><u> </u>Automatic message, no answer.</b></p>'
+			cEmail += '<b><u> </u></b></p>'
 			cEmail += '</body></html>'
 			
 			//Wederson - 05/11/2019

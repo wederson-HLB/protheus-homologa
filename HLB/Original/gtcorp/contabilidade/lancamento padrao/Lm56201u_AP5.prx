@@ -20,7 +20,7 @@ DbSeek(xfilial()+SE5->E5_NATUREZ)
 If !Eof()
    If SUBSTR(SED->ED_CONTA,1,1) $ ("6")
 	      _CDEBITO:="1000"
-   Endif
+	Endif
    IF cEmpAnt $ "E1"
 	   IF SUBSTR(SED->ED_CONTA,1,1) $ ("6")
 	      _CDEBITO:="4000"

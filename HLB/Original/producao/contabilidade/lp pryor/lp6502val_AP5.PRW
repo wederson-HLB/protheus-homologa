@@ -94,10 +94,18 @@ If EMPTY(SD1->D1_CONHEC)
    ELSEIF (SF4->F4_DUPLIC=="N" .AND. !(SD1->D1_TES$_cTes5) .AND. !(SD1->D1_TES$_cTes4)) .OR. SD1->D1_TES$(_cTes6)
 	
       _valResult:=0
+      
+    //PAULO SILVA - EZ4 - 20/01/2020 - NOTA DE SERVIÇO OKUMA    
+   ELSEIF (ALLTRIM(SD1->D1_CF) $ "1900/2900/2933/1933/1949") .AND. (SM0->M0_CODIGO $ "ED")
+    	_valResult:=SD1->D1_TOTAL-(SD1->D1_VALIRR-SD1->D1_VALISS-SD1->D1_VALINS)
   
    //PAULO SILVA - EZ4 - 19/08/2019    
-   ELSEIF SM0->M0_CODIGO $'BI'
-    _valResult:=SD1->D1_TOTAL-SD1->D1_VALIRR-SD1->D1_VALISS-SD1->D1_VALINS
+   ELSEIF SM0->M0_CODIGO $'BI/XR'
+       _valResult:=SD1->D1_TOTAL-SD1->D1_VALIRR-SD1->D1_VALISS-SD1->D1_VALINS
+       
+    //PAULO SILVA - EZ4 - 23/10/2019    
+   ELSEIF SM0->M0_CODIGO $'UY'
+    	_valResult:=SD1->D1_TOTAL-SD1->D1_VALCSL-SD1->D1_VALCOF-SD1->D1_VALPIS 
   
    ELSEIF SD1->D1_TES$(_cTes1+_cTes2+_cTes3)
 	
@@ -134,7 +142,7 @@ If EMPTY(SD1->D1_CONHEC)
 		_valResult:=(SD1->D1_TOTAL-(SD1->D1_VALISS+SD1->D1_VALINS))	  // TOTAL - PIS
 	    //MSM - 23/04/2012 - Retirado a parte da verificação da versão, pois não funciona a variável cVersao com rpcconnect
 	 	/*if cVersao = 'P10'
-			_valResult:=(SD1->D1_TOTAL-(SD1->D1_VALISS+SD1->D1_VALINS))	  // TOTAL - PIS
+		_valResult:=(SD1->D1_TOTAL-(SD1->D1_VALISS+SD1->D1_VALINS))	  // TOTAL - PIS
 		else
 			_valResult:=(SD1->D1_TOTAL-(SD1->D1_VALISS+SD1->D1_VALINS)-(SD1->D1_VALCOF+SD1->D1_VALCSLL+SD1->D1_VALPIS))	  // TOTAL - PIS
 		endif*/

@@ -6,14 +6,14 @@
 Funcao      : XCFAT001
 Parametros  : Nenhum
 Retorno     : Nenhum
-Objetivos   : Gerar planilha com dados de vendas baseado nas notas de saída do sistema.
-Autor     	: Tiago Luiz Mendonça
+Objetivos   : Gerar planilha com dados de vendas baseado nas notas de saï¿½da do sistema.
+Autor     	: Tiago Luiz Mendonï¿½a
 Data     	: 13/02/2013                       
 Obs         : 
 TDN         : 
-Revisão     : 
+Revisï¿½o     : 
 Data/Hora   : 
-Módulo      : Faturamento 
+Mï¿½dulo      : Faturamento 
 Cliente     : Dialogic
 */
 
@@ -38,6 +38,9 @@ Private cArqOrig := ""
 Private cArqPath := ""
 Private cTes     := ""
 Private cPerg    := "XCFAT001"
+Private cPlanImp := "SF2"
+Private cTitPlan := 'Relatorio de vendas'
+
 
 Private dDataIni
 Private dDataFim
@@ -45,7 +48,7 @@ Private dDataFim
 Private aCampos  := {}
 
 If !(cEmpAnt $ "XC/KX")
-   MsgAlert("Rotina não disponivel para essa empresa","Atenção")
+   MsgAlert("Rotina nï¿½o disponivel para essa empresa","Atenï¿½ï¿½o")
    Return .F.
 EndIf                 
 
@@ -144,7 +147,7 @@ Else
 
 	EndIf
 
-
+/*
 //cNome  := CriaTrab(aCampos,.t.)
 //RRP - 06/03/2019 - Ajuste para gerar em DBF o relatorio
 cNome  := CriaTrab(Nil,.F.)
@@ -157,7 +160,16 @@ cIndex:=CriaTrab(Nil,.F.)
 IndRegua("WORK",cIndex,"TRX_NUMBER+ITEM_NUMBE",,,"Selecionando Registro...")
 DbSetIndex(cIndex+OrdBagExt())
 DbSetOrder(1)
+*/
+oTempTable := FWTemporaryTable():New( "WORK" )
 
+oTemptable:SetFields( aCampos )
+oTempTable:AddIndex("cIndex", {"TRX_NUMBER","ITEM_NUMBE"} )
+
+//------------------
+//CriaÃ§Ã£o da tabela
+//------------------
+oTempTable:Create()
   
 tamanho  :=	'G'
 limite   :=	220
@@ -219,7 +231,7 @@ Return .T.
         
 Local cAux     := "" 
 Local cVal     := ""  
-
+Local cArquivo := GetTempPath()+'RelVend.xml'    //CAS - 18/02/2020
 Local nAux	   := 0
 Local nValIRRF := 0
 
@@ -235,7 +247,7 @@ MontaQry1()
 QRB->(DbGoTop())
                   
 If QRB->(Eof())
-	MsgAlert("Sem dados para consulta, revise os parâmetros.","Atenção")
+	MsgAlert("Sem dados para consulta, revise os parï¿½metros.","Atenï¿½ï¿½o")
 	QRB->(DbCloseArea())
 	WORK->(DbCloseArea())
  	Return .F.
@@ -244,8 +256,8 @@ EndIf
 //Grava primeiro a linha de itens sem impostos     
 Do While QRB->(!Eof())  
                    
-	// Execeções para TES
-    // WFA - 22/05/2018 - Inclusão de CFOPs de Exportação. Ticket: #35083
+	// Execeï¿½ï¿½es para TES
+    // WFA - 22/05/2018 - Inclusï¿½o de CFOPs de Exportaï¿½ï¿½o. Ticket: #35083
  	If !((QRB->D2_TES $ cTES) .OR. (SUBSTR(QRB->D2_CF, 0, 1) == "7"))
   		QRB->(DbSkip())
 		loop
@@ -266,7 +278,7 @@ Do While QRB->(!Eof())
 	SF4->(DbSetOrder(1))
  	SF4->(DbSeek(xFilial()+QRB->D2_TES))
     
-    /* Execeções para tipo                             
+    /* Execeï¿½ï¿½es para tipo                             
     	
 		1=Hardware;
 		2=Software;
@@ -340,7 +352,7 @@ Do While QRB->(!Eof())
 		Work->IPI          := 00.00 
 		Work->ICMS         := 00.00 	
 	
-	Else  
+	Else 
 
 
 		cVal   	   		:=	Alltrim(Transform(SC5->C5_P_TX ,"@E 99999999.99")) 
@@ -383,8 +395,8 @@ QRB->(DbGoTop())
 
 Do While QRB->(!Eof())  
                    
-	// Execeções para TES
-	// WFA - 22/05/2018 - Inclusão de CFOPs de Exportação. Ticket: #35083
+	// Execeï¿½ï¿½es para TES
+	// WFA - 22/05/2018 - Inclusï¿½o de CFOPs de Exportaï¿½ï¿½o. Ticket: #35083
  	If !((QRB->D2_TES $ cTES) .OR. (SUBSTR(QRB->D2_CF, 0, 1) == "7"))
   		QRB->(DbSkip())
 		loop
@@ -405,7 +417,7 @@ Do While QRB->(!Eof())
 	SF4->(DbSetOrder(1))
  	SF4->(DbSeek(xFilial()+QRB->D2_TES))
     
-    /* Execeções para tipo                             
+    /* Execeï¿½ï¿½es para tipo                             
     	
 		1=Hardware;
 		2=Software;
@@ -610,16 +622,15 @@ EndDo
  SomaLin()  
  
 @ nLin,000 PSAY replicate("_",220)                          
-
  
 Roda(nCntImpr,"",tamanho)  
-
+/*
 DbselectArea("WORK") 
 DbCloseArea("WORK") 
-   
+*/   
 If nGera == 1      
-
-	cArqOrig := "\SYSTEM\"+cNome+".dbf"
+/*
+	cArqOrig := "\SYSTEM\"+cNome+".dbf" 
 	cPath     := AllTrim(GetTempPath())                                                   
 	CpyS2T( cArqOrig , cPath, .T. )
 	                              
@@ -632,19 +643,88 @@ If nGera == 1
 	
 	Else 
 		
-		Alert("Excel não instalado") 
+		Alert("Excel nï¿½o instalado") 
 	
 	EndIf
     FErase(cArqOrig)
+*/
+	   //Criando o objeto que irÃ¡ gerar o conteÃºdo do Excel
+	   oFWMsExcel := FWMSExcel():New()             
+	   //Aba 01 - Teste
+	   oFWMsExcel:AddworkSheet(cPlanImp) //NÃ£o utilizar nÃºmero junto com sinal de menos. Ex.: 1-
+	   //Criando a Tabela
+	   oFWMsExcel:AddTable(cPlanImp,cTitPlan)
+       //Criando Colunas
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"CUST_NUMB ",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"CUST_NAME ",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"TRANS_DATE",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"TRX_NUMBER",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"PO_NUMBER ",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"ITEM_NUMBE",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"QUANTITY " ,1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"UNIT_SELLI",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"ORDER_TOTA",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"LINE_TYPE ",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"IRRF_PIS_C",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"ISS     	" ,1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"IPI     	" ,1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"ICMS   	" ,1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"ACCEPTANCE",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"CONTRACTNU",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"PROPOSALNU",1)   
+       oFWMsExcel:AddColumn(cPlanImp,cTitPlan,"PAYMENTTER",1)   
+         
+       Work->(dbGoTop())                                                                                          
+       Do while Work->(!Eof())                                                                                    
+                                                                                                                   
+            //Criando as Linhas                                                                                    
+                                                                                                                   
+            oFWMsExcel:AddRow(cPlanImp,cTitPlan,{;                                                                 
+                                                  Work->CUST_NUMB            ,;        
+                                                  Work->CUST_NAME            ,;        
+                                                  alltrim(Work->TRANS_DATE)  ,;        
+                                                  Work->TRX_NUMBER           ,;        
+                                                  Work->PO_NUMBER            ,;        
+                                                  Work->ITEM_NUMBE 	         ,;        
+                                                  Work->QUANTITY  			 ,;        
+                                                  Work->UNIT_SELLI  		 ,;        
+                                                  Work->ORDER_TOTA  		 ,;        
+                                                  Work->LINE_TYPE            ,;        
+                                                  Work->IRRF_PIS_C           ,;        
+                                                  Work->ISS     		     ,;        
+                                                  Work->IPI     		     ,;        
+                                                  Work->ICMS   		         ,;        
+                                                  Work->ACCEPTANCE           ,;        
+                                                  Work->CONTRACTNU           ,;        
+                                                  Work->PROPOSALNU           ,;                                                       
+                                                  Work->PAYMENTTER   } )                                                                                    
+           Work->(dbskip())                                                                                       
+       EndDo 
+	 
+	   //Ativando o arquivo e gerando o xml  
+	   oFWMsExcel:Activate()
+	   oFWMsExcel:GetXMLFile(cArquivo)
+			
+	   //Abrindo o excel e abrindo o arquivo xml
+	   oExcel := MsExcel():New()             //Abre uma nova conexÃ£o com Excel
+	   oExcel:WorkBooks:Open(cArquivo)     //Abre uma planilha
+	   oExcel:SetVisible(.T.)                 //Visualiza a planilha
+	   oExcel:Destroy()     	
 EndIf
-  
 
+dbSelectArea("QRB")
+DbCloseArea("QRB") 
+
+dbSelectArea("WORK")       //CAS - 18/02/2020
+DbCloseArea("WORK")        //CAS - 18/02/2020
+
+/*
 dbSelectArea("QRB")
 DbCloseArea("QRB") 
 
 Erase &cNome+".DBF"
 Erase &cNome+".DTC"
-
+*/
 
 Return
 
@@ -700,7 +780,7 @@ Next nI
 Return       
                
 
-// Conta quantos itens tem por nota fiscal de saída
+// Conta quantos itens tem por nota fiscal de saï¿½da
 *----------------------------------------------------*
    Static Function COUNT(cDoc,cSerie,cCliente,cLoja)
 *----------------------------------------------------*

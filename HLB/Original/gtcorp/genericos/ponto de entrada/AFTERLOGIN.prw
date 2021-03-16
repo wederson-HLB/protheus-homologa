@@ -17,16 +17,12 @@ User Function AFTERLOGIN()
 //Testa para verificar se a chamada é por JOBS
 If Select("SX3")<=0
 	Return
-EndIf			       
+EndIf			                  
 
-If cEmpAnt == "X2"
-   MV_CRNEG += Alltrim(SuperGetMV("MV_XXTPFN", .F.,"|PCL"))
+If ValidaEmerg()
+	ALERT("Acesso não Autorizado!")
+	KillApp( .T. )         
 EndIf
-
-//If ValidaEmerg()
-//	ALERT("Acesso não Autorizado!")
-//	KillApp( .T. )         
-//EndIf
 
 Return
            

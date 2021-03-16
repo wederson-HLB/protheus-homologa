@@ -466,7 +466,7 @@ Group Producao
       End
       Folder Updates
          VSSPath=Nova Pasta2
-         FilesCount=138
+         FilesCount=139
          File \Producao\Genericos\Updates\USIX003.PRW
              Type=T
          End
@@ -881,6 +881,9 @@ Group Producao
          File \producao\genericos\updates\USX6041.prw
              Type=T
          End
+         File \producao\genericos\updates\USX6042.prw
+             Type=T
+         End
       End
       Folder Objetos
          VSSPath=Nova Pasta3
@@ -1132,7 +1135,7 @@ Group Producao
       End
    End
    Project Clientes
-      FoldersCount=118
+      FoldersCount=119
       Folder Trading
          VSSPath=Nova Pasta1
          FilesCount=1
@@ -1142,7 +1145,7 @@ Group Producao
       End
       Folder Shiseido
          VSSPath=Nova Pasta2
-         FilesCount=69
+         FilesCount=70
          File \Producao\Clientes\Shiseido\Integracao Armazem\R7GEN001.prw
              Type=T
          End
@@ -1348,6 +1351,9 @@ Group Producao
              Type=T
          End
          File \producao\clientes\shiseido\portal\Mobile_PedNaoAtend.prw
+             Type=T
+         End
+         File \producao\clientes\shiseido\portal\EZ4_INTERFACE.prw
              Type=T
          End
       End
@@ -3354,6 +3360,16 @@ Group Producao
              Type=T
          End
       End
+      Folder Temasek
+         VSSPath=Nova Pasta119
+         FilesCount=2
+         File \producao\clientes\Temasek\EZImport.prw
+             Type=T
+         End
+         File \producao\clientes\Temasek\Q6EST001.prw
+             Type=T
+         End
+      End
    End
    Project PCP
       FoldersCount=1
@@ -3404,9 +3420,6 @@ Group Producao
              Type=T
          End
          File \producao\estoque\ponto de entrada\UMATA456.prw
-             Type=T
-         End
-         File \producao\estoque\ponto de entrada\SD1100I.PRW
              Type=T
          End
          File \producao\estoque\ponto de entrada\MT20FOPOS.PRW
@@ -3472,13 +3485,16 @@ Group Producao
          File \producao\estoque\ponto de entrada\MA261IN.prw
              Type=T
          End
-         File \producao\estoque\ponto de entrada\GQREENTR.prw
-             Type=T
-         End
          File \producao\estoque\ponto de entrada\MA103F4I.prw
              Type=T
          End
          File \producao\estoque\ponto de entrada\MA103F4H.prw
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\SD1100I.PRW
+             Type=T
+         End
+         File \producao\estoque\ponto de entrada\GQREENTR.prw
              Type=T
          End
       End
