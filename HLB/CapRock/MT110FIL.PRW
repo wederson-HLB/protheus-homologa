@@ -14,9 +14,7 @@ Local aAlias    := GetArea()
 If cEmpAnt $ "XF"   
 
     If! __cUserId $ AllTrim(cIdGestor)
-
-        _cFiltro:="C1_USER ='"+__cUserId+"'"  
-        
+        cFiltro:="C1_USER ='"+__cUserId+"'"  
     EndIf    
 
 EndIf
