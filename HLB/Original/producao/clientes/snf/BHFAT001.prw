@@ -215,12 +215,11 @@ ELSE
       EndIf
    EndIf 
    IF !EMPTY(cCC)
-      SEND MAIL FROM cFrom TO cTo CC cCC;
-      BCC "renato.rezende@hlb.com.br";
+      SEND MAIL FROM cFrom TO cTo; 
+      BCC  cCC;  //"renato.rezende@hlb.com.br"; //wederson 22/03/2021
       SUBJECT cSubject BODY cBody1 ATTACHMENT cAttachment RESULT lOK
    ELSE
       SEND MAIL FROM cFrom TO cTo;
-      BCC "renato.rezende@hlb.com.br";
       SUBJECT cSubject BODY cBody1 ATTACHMENT cAttachment RESULT lOK
    ENDIF   
    If !lOK 
