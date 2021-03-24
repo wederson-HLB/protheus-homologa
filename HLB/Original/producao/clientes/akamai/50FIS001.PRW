@@ -112,31 +112,31 @@ mv_par03	:=	2
 
 If cEmpAnt == "UT".Or.cEmpAnt == "99"
 
-If l920Auto
-	aAutoCab   := xAutoCab
-	aAutoItens := xAutoItens
-	DEFAULT nOpcAuto := 3
-	MBrowseAuto(nOpcAuto,Aclone(aAutoCab),"SF2")
-Else
-    PRIVATE cCadastro	:= OemToAnsi("Importador Notas Fiscais de Saida - G.I.M Amazzoni") 
+	If l920Auto
+		aAutoCab   := xAutoCab
+		aAutoItens := xAutoItens
+		DEFAULT nOpcAuto := 3
+		MBrowseAuto(nOpcAuto,Aclone(aAutoCab),"SF2")
+	Else
+    	PRIVATE cCadastro	:= OemToAnsi("Importador Notas Fiscais - Akamai") 
 
-	cFiltraSD2 := "	R_E_C_N_O_ IN ( "
-	cFiltraSD2 += "				SELECT R_E_C_N_O_ "
-	cFiltraSD2 += "				FROM  "
-	cFiltraSD2 += "					" + RetSqlName("SD2") "
-	cFiltraSD2 += "				WHERE D_E_L_E_T_ = ' ' AND D2_ORIGLAN = 'HB')"
+		cFiltraSD2 := "	R_E_C_N_O_ IN ( "
+		cFiltraSD2 += "				SELECT R_E_C_N_O_ "
+		cFiltraSD2 += "				FROM  "
+		cFiltraSD2 += "					" + RetSqlName("SD2") "
+		cFiltraSD2 += "				WHERE D_E_L_E_T_ = ' ' AND D2_ORIGLAN = 'HB')"
 
-    MBrowse( 6, 1,22,75,"SD2",aFixe,"D2_TES",,,,aCores,,,,,,,,cFiltraSD2) 
-EndIf
+    	MBrowse( 6, 1,22,75,"SD2",aFixe,"D2_TES",,,,aCores,,,,,,,,cFiltraSD2) 
+	EndIf
 else
-    MsgINfo("Espec�fico G.I.M.","A t e n � � o")
+    MsgINfo("Espec�fico Akamai","A t e n � � o")
 EndIf	
 Return
 
 //-------------------------------------------------------------------
 //Wederson
 
-User Function UTXmlExc()
+User Function 50XmlExc()
 Local aArea  :=GetArea()
 Local aVetor :={}
 Local aSB2   :={}
@@ -262,7 +262,7 @@ RestArea(aArea)
 Return(Nil)
 //-------------------------------------------------------------------
 
-User Function UTNFSAI(cAlias,nReg,nOpcx)
+User Function 50NFSAI(cAlias,nReg,nOpcx)
 Local lMA920AQISS := .F.
 Local aArea		  := GetArea()
 
@@ -318,17 +318,17 @@ PRIVATE aGetCpo := {"D2_COD"		,"D2_UM"		,"D2_QUANT"		,"D2_PRCVEN"	,;
 	                "D2_CUSTO3" ,"D2_CUSTO4" ,"D2_CUSTO5","D2_CCUSTO","D2_ITEMORI",;
 	                "D2_ITEMCC" , "D2_CLVL", "D2_BASEDES", "D2_ICMSCOM", "D2_DIFAL", "D2_ALFCCMP", "D2_VFCPDIF"}
 
-Private bFolderRefresh	:= {|| (UTFRefresh(aObj))}
+Private bFolderRefresh	:= {|| (50FRefresh(aObj))}
 Private bGDRefresh
-Private bRefresh		:= {|| (UTRefresh(@a920Var,l920Inclui)),(Eval(bFolderRefresh))}
-Private bListRefresh	:= {|| (UTFisToaCols()),Eval(bRefresh),Eval(bGdRefresh)}
+Private bRefresh		:= {|| (50Refresh(@a920Var,l920Inclui)),(Eval(bFolderRefresh))}
+Private bListRefresh	:= {|| (50FisToaCols()),Eval(bRefresh),Eval(bGdRefresh)}
 Private aRemito			:= {}	//Array com os remitos de cada item do acols
 
 If SD2->(ColumnPos("D2_TPREPAS")) > 0
 	aAdd(aGetCpo,"D2_TPREPAS")
 EndIf
 
-If IsInCallStack('UTFIS001')
+If IsInCallStack('50FIS001')
 	bGDRefresh := If (Type("l920Auto") != "L" .or. !l920Auto,{|| (oGetDados:oBrowse:Refresh()) },{|| nil })
 Else
 	bGDRefresh := {|| nil }
@@ -392,7 +392,7 @@ c920NFIni	:= If(l920Inclui,aAUTOCAB[AScan(aAUTOCAB, {|x| AllTrim(x[1]) == "F2_DO
 c920Vend	:= If(l920Inclui,aAUTOCAB[AScan(aAUTOCAB, {|x| AllTrim(x[1]) == "F2_VEND1"})][2]	 ,SF2->F2_VEND1)		
 
 //wederson
-SetKey(VK_F4,{||UTNfOri()})
+SetKey(VK_F4,{||50NfOri()})
 
 c920SClie := If(cTipo$"DB",OemToAnsi("Fornecedor"),OemToAnsi("Cliente")) //###
 dDtdigit  := IIf(!Empty(SF2->F2_DTDIGIT),SF2->F2_DTDIGIT,SF2->F2_EMISSAO)
@@ -411,7 +411,7 @@ aAdd(aGetCpo,"D2_VLIMPOR")
 
 FillGetDados(nOpcx,"SD2",1,/*cSeek*/,/*cWhile*/,/*uSeekFor*/,/*aNoFields*/,aGetCpo,/*lOnlyYes*/,/*cQuery*/,{|| MaCols920(l920Inclui,l920Altera,l920Deleta,@lContinua,@aPedidos,@aRecSE1,@aRecSE2,@aRecSF3,@a920Var,@aTitles) },l920Inclui,/*aHeaderAux*/,/*aColsAux*/,/*bAfterCols*/,/*bbeforeCols*/,/*bAfterHeader*/,/*cAliasQry*/,/*bCriaVar*/,.T.)
 
-UTFRat(@aHeadAGH,@aColsAGH)
+50FRat(@aHeadAGH,@aColsAGH)
 
 nOpc := 1
 
@@ -481,7 +481,7 @@ Return nOpc
 
 //-------------------------------------------------------------------
 
-Static Function UTFRefresh(aObj)
+Static Function 50FRefresh(aObj)
 Local nx
 If Type("l920Auto") !="L" .or. !l920Auto
 	For nx := 1 to Len(aObj)
@@ -492,7 +492,7 @@ Return .T.
 
 //-------------------------------------------------------------------
 
-Static Function UTRefresh(a920Var,l920Inclui)
+Static Function 50Refresh(a920Var,l920Inclui)
 Local aArea		:= GetArea()			// Guarda a area do SF2
 Local aAreaSD2	:= SD2->(GetArea())	// Guarda a area do SD2
 Local aAreaSF4	:= SF4->(GetArea())
@@ -609,7 +609,7 @@ Return .T.
 
 //-------------------------------------------------------------------
 
-Static Function UTCabOk(oTipo,oNota,oEmis,oClie,oLoja)
+Static Function 50CabOk(oTipo,oNota,oEmis,oClie,oLoja)
 Local lRet 	:= .F.
 
 Do Case
@@ -638,7 +638,7 @@ Return lRet
 
 //-------------------------------------------------------------------
 
-User Function UTVFold(cReferencia,xValor,lRefre)
+User Function 50VFold(cReferencia,xValor,lRefre)
 Local aArea	:= GetArea()
 
 If lRefre==Nil
@@ -659,13 +659,13 @@ Return .T.
 
 //-------------------------------------------------------------------
 
-Static Function UTFieldOk()
+Static Function 50FieldOk()
 Eval(bRefresh)
 Return .T.
 
 //-------------------------------------------------------------------
 
-Static Function UTDel(o)
+Static Function 50Del(o)
 Local nPosItD2	:= 	aScan(aHeader,{|aX| aX[2]==PadR("D2_ITEM",Len(SX3->X3_CAMPO))})
 Local nI		:=	0
 Local nPosCalc	:=	0
@@ -691,7 +691,7 @@ Return .T.
 
 //-------------------------------------------------------------------
 
-Static Function UTLinOk()
+Static Function 50LinOk()
 Local lRet 		:= .T.
 Local nPosCod	:= aScan(aHeader,{|x| Alltrim(x[2]) == "D2_COD" })
 Local nPosQuant:= aScan(aHeader,{|x| Alltrim(x[2]) == "D2_QUANT"})
@@ -752,7 +752,7 @@ Return lRet
 
 //-------------------------------------------------------------------
 
-Static Function UTTudok()
+Static Function 50Tudok()
 Local lRet   := .T.
 Local nItens := 0
 Local nx     := 0
@@ -775,21 +775,6 @@ If nItens == 0
 	lRet := .F.
 EndIf
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ-Ä¿
-//³ Conforme situacao do parametro abaixo, integra com o SIGAGSP ³
-//³             MV_SIGAGSP - 0-Nao / 1-Integra                   ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ-ÄÄÙ
-If GetNewPar("MV_SIGAGSP","0") == "1" .And. FindFunction('GSPF030')
-	lRet:= GSPF030()
-EndIf
-
-If nModulo == 72
-	lRet := KEXF870(lRet)
-EndIf
-
-If (ExistBlock("MT100TOK"))
-	lRet := ExecBlock("MT100TOK",.F.,.F.,{lRet})
-EndIf
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Verifica se o Registro esta Bloqueado.³
@@ -822,7 +807,7 @@ Return lRet
 
 //-------------------------------------------------------------------
 
-Static Function UTFisToaCols()
+Static Function 50FisToaCols()
 
 Local nx
 Local ny
@@ -832,8 +817,8 @@ Local nPosRef
 For ny := 1 to Len(aCols)
 	For nx	:= 1 to Len(aHeader)
 		cValid	:= AllTrim(UPPER(aHeader[nx][6]))
-		If "UTFISREF"$cValid
-			nPosRef := 	AT('UTFISREF("',cValid) + 10
+		If "50FISREF"$cValid
+			nPosRef := 	AT('50FISREF("',cValid) + 10
 			cRefCols:=	Substr(cValid,nPosRef,AT('","MT100",',cValid)-nPosRef )
 			If MaFisFound("IT",ny)
 				aCols[ny][nx]:= MaFisRet(ny,cRefCols)
@@ -846,7 +831,7 @@ Return .T.
 
 //-------------------------------------------------------------------
 
-User Function UTTipo(cTipo,oSClie,cSClie,oGClie,cCliente,cLoja,oLoja)
+User Function 50Tipo(cTipo,oSClie,cSClie,oGClie,cCliente,cLoja,oLoja)
 Local nPosTES	:= aScan(aHeader,{|x| Alltrim(x[2]) == "D2_TES"})
 Local nx
 Local nY
@@ -903,7 +888,7 @@ Return .T.
 
 //-------------------------------------------------------------------
 
-User Function UTNota(cNota,cSerie,cEspecie,dDataEmis)
+User Function 50Nota(cNota,cSerie,cEspecie,dDataEmis)
 
 Local lRet := .T.
 Local cSerId := ""
@@ -934,7 +919,7 @@ Return lRet
 
 //-------------------------------------------------------------------
 
-User Function UTEmissao(dEmissao)
+User Function 50Emissao(dEmissao)
 Local lRet	:= .T.
 
 If dEmissao > dDataBase
@@ -948,7 +933,7 @@ Return lRet
 
 //-------------------------------------------------------------------
 
-User Function UTClient(cCliente,cLoja,aInfClie,cTipo,l920Inclui)
+User Function 50Client(cCliente,cLoja,aInfClie,cTipo,l920Inclui)
 Local lRet   := .T.
 Local cAlias := ""
 
@@ -1008,7 +993,7 @@ Return lRet
 
 //-------------------------------------------------------------------
 
-Static Function UTGrava(lDeleta,aNFEletr,aDANFE,l920Inclui)
+Static Function 50Grava(lDeleta,aNFEletr,aDANFE,l920Inclui)
 LOCAL nx
 LOCAL ny
 Local lMvAtuComp:= SuperGetMV("MV_ATUCOMP",,.F.)
@@ -1113,14 +1098,14 @@ If! dbSeek(xFilial("SF2")+c920Nota+c920Serie+c920Client+c920Loja)
 		AtuComp(c920Nota,SF2->F2_SERIE,c920Especi,c920Client,c920Loja,"S",cTipo)
 	EndIf
 
-    UTFisAtuSF3(1,"S",SF2->(RecNo()))
+    50FisAtuSF3(1,"S",SF2->(RecNo()))
 	
 EndIf 
 Return .T.
 
 //-------------------------------------------------------------------
 
-Static Function UTFisAtuSF3(nCaso, cTpOper, nRecNF)
+Static Function 50FisAtuSF3(nCaso, cTpOper, nRecNF)
 Local aArea		:= GetArea()
 Local aAreaSF1	:= SF1->(GetArea())
 Local aAreaSF2	:= SF2->(GetArea())
@@ -1313,7 +1298,6 @@ DEFAULT cNfisCanc := ""
 		EndIf
 	Next   
     //wederson
-    
        
 	For nX:=1 To Len(aSFT)
 	   
@@ -1576,10 +1560,9 @@ RestArea(aArea)
 
 Return(.T.)
 
-
 //-------------------------------------------------------------------
 
-Static FUNCTION UTVlNfLote(cSerie,cNtIni,cNtFim,cEspecie,dDataEmis)
+Static FUNCTION 50VlNfLote(cSerie,cNtIni,cNtFim,cEspecie,dDataEmis)
 
 Local lRet		:=	.t.
 Local cSavAlias:=	Alias()
@@ -1652,7 +1635,7 @@ Return (lRet)
 //-------------------------------------------------------------------
 
 
-Static Function UTCbLot(oNFIni,oNFFim,oEmis,oClie,oLoja)
+Static Function 50CbLot(oNFIni,oNFFim,oEmis,oClie,oLoja)
 Local lRet 	:= .F.
 
 Do Case
@@ -1679,7 +1662,7 @@ Return lRet
 //-------------------------------------------------------------------
 
 
-Static Function UTTotal(nTotal)
+Static Function 50Total(nTotal)
 
 Local aArea		:= GetArea()
 Local nQuant	:= aCols[n][aScan(aHeader,{|x| AllTrim(x[2]) == "D2_QUANT"})]
@@ -1729,7 +1712,7 @@ Return lRet
 //-------------------------------------------------------------------
 
 
-Static Function UTCombo(cVariavel,aCombo,cCombo,aReferencia)
+Static Function 50Combo(cVariavel,aCombo,cCombo,aReferencia)
 
 Local nPos	:= aScan(aCombo,cCombo)
 
@@ -1743,7 +1726,7 @@ Return (nPos>0)
 //-------------------------------------------------------------------
 
 
-Static Function UTIniCpo(lDo)
+Static Function 50IniCpo(lDo)
 
 Local aArea		:= GetArea()
 Local nPosCod 		:= aScan(aHeader,{|x| Trim(x[2])=='D2_COD'} )
@@ -1878,10 +1861,7 @@ Return .T.
 
 //-------------------------------------------------------------------
 
-
-Static Function UTItDev(cItemOri)
-
-
+Static Function 50ItDev(cItemOri)
 Local nx
 Local cCampo
 Local nPosCod	:= 0
@@ -1945,7 +1925,6 @@ If !Empty(cItemOri)
 	EndIf
 EndIf
 
-
 RestArea(aAreaSD1)
 RestArea(aAreaSD2)
 RestArea(aArea)
@@ -1954,8 +1933,7 @@ Return lRet
 
 //-------------------------------------------------------------------
 
-
-Static Function UTFinanc(cCondicao,oDlg,aRecSE1,aRecSE2,nPosX)
+Static Function 50Financ(cCondicao,oDlg,aRecSE1,aRecSE2,nPosX)
 
 Local aMoeda	 := {}
 Local aTemp		 := {{"","","",CTOD("  /  /  "),0}} 
@@ -2060,8 +2038,7 @@ Return oList
 
 //-------------------------------------------------------------------
 
-
-Static Function UTLine(oList,aTemp,aCpos)
+Static Function 50Line(oList,aTemp,aCpos)
 Local i    := 1
 Local aRet := {}
 for i:=1 to len(aTemp[1])
@@ -2071,9 +2048,7 @@ Return aRet
 
 //-------------------------------------------------------------------
 
-
-Static Function UTPedido(nTipo,aPedido,cTexto)
-
+Static Function 50Pedido(nTipo,aPedido,cTexto)
 Local aArea      := GetArea()
 Local aSavHead   := aClone(aHeader)
 Local aSavCols   := aClone(aCols)
@@ -2155,9 +2130,7 @@ Return(.T.)
 
 //-------------------------------------------------------------------
 
-
-Static Function UTMostra(nTipo,nRecNo)
-
+Static Function 50Mostra(nTipo,nRecNo)
 Local aArea := GetArea()
 Local aSavHead   := aClone(aHeader)
 Local aSavCols   := aClone(aCols)
@@ -2178,9 +2151,7 @@ Return(.T.)
 
 //-------------------------------------------------------------------
 
-
-Static Function UTTrack()
-
+Static Function 50Track()
 Local aEnt     := {}
 Local cKey     := c920Nota + c920Serie + c920Client + c920Loja
 Local nPosItem := GDFieldPos( "D2_ITEM" )
@@ -2204,13 +2175,12 @@ Return( .T. )
 
 //-------------------------------------------------------------------
 
-
 Static Function ProcH(cCampo)
 Return aScan(aAutoCab,{|x|Trim(x[1])== cCampo })  
 
 //-------------------------------------------------------------------
 
-Static Function UTConhec() 
+Static Function 50Conhec() 
 
 Local aRotBack := AClone( aRotina ) 
 Local nBack    := N
@@ -2228,8 +2198,7 @@ Return( .t. )
 
 //--------------------------------------
 
-Static Function UTDocume( cAlias, nRec, nOpc ) 
-
+Static Function 50Docume( cAlias, nRec, nOpc ) 
 Local aArea    := GetArea() 
 Local xRet   
 
@@ -2250,8 +2219,7 @@ Return( xRet )
 
 //-----------------------------------------
 
-Static Function UTNFe(cCampo,aNFEletr)
-
+Static Function 50NFe(cCampo,aNFEletr)
 Local lRet := .T.
 
 If cPaisLoc == "BRA"
@@ -2272,31 +2240,31 @@ Return lRet
 
 //---------------------------------------------------------------
 
-Static Function UTMenu()
-     
+Static Function 50Menu()
+  
 Private aRotina := {	{ "Pesquisar"	 ,"AxPesqui"     , 0 , 1 , 0 ,.F.}}	
 						
 If l920Auto
  
-   aAdd(aRotina,{ "Incluir"	,"U_UTNFSAI()", 0 , 3 , 0 ,NIL}) // Legenda
+   aAdd(aRotina,{ "Incluir"	,"U_50NFSAI()", 0 , 3 , 0 ,NIL}) // Legenda
 
 Else
    aAdd(aRotina,{ "Visualizar"   ,"a920NFSAI"    , 0 , 2 , 0 ,NIL})	//"Visualizar"
-   aAdd(aRotina,{ "Importar XML" ,"U_UTXmlFAT()" , 0 , 3 , 0 ,NIL}) // Importar
-   aAdd(aRotina,{ "Cancelamento" ,"U_UTXmlCan()" , 0 , 3 , 0 ,NIL}) // Cancelamento
-   aAdd(aRotina,{ "Exluir"	     ,"U_UTXmlExc()" , 0 , 5 , 0 ,NIL}) // Excluir
+   aAdd(aRotina,{ "Importar XML" ,"U_50XmlFAT()" , 0 , 3 , 0 ,NIL}) // Importar
+   aAdd(aRotina,{ "Cancelamento" ,"U_50XmlCan()" , 0 , 3 , 0 ,NIL}) // Cancelamento
+   aAdd(aRotina,{ "Exluir"	     ,"U_50XmlExc()" , 0 , 5 , 0 ,NIL}) // Excluir
 EndIf
 
 Return(aRotina)
 
 //------------------------------------------------------------
 
-User Function UTXmlFAT()
-Local cPerg  		:= "UTXMLIMP1"+Space(01)
-Local cFunction		:= "UTXMLIMP"
+User Function 50XmlFAT()
+Local cPerg  		:= "50XMLIMP1"+Space(01)
+Local cFunction		:= "50XMLIMP"
 Local cTitle		:= "Importa��o de XML"
 Local bProcess		:= { |oSelf| ImportarNf(oSelf) }                   
-Local cDescription	:= "Rotina ir� gerar notas de saida de produtos atrav�s da importa��o do XML. G.I.M GIOVANNONI "
+Local cDescription	:= "Rotina ir� gerar notas de saida de produtos atrav�s da importa��o do XML. AKAMAI "
 Local cArqNtx 		:= CriaTrab( NIL, .F. )
 
 fCriaPerg(cPerg)
@@ -2304,7 +2272,7 @@ fCriaPerg(cPerg)
 tNewProcess():New(cFunction,cTitle,bProcess,cDescription,cPerg)
 
 If Len(aLogErro)>0
-    If MSGYESNO("Deseja imprimir detalhes da importa��o ?"," Importa��o XML - G.I.M.")
+    If MSGYESNO("Deseja imprimir detalhes da importa��o ?"," Importa��o XML - AKAMAI")
 	   MsgInfo("Em desenvolvimento.","A t e n � � o")
 	   //fImpLog()
 	EndIf
@@ -2314,11 +2282,11 @@ Return
 
 //------------------------------------------------------------
 
-User Function UTXmlCan()
-Local cFunction		:= "UTCANXML"
+User Function 50XmlCan()
+Local cFunction		:= "50CANXML"
 Local cTitle		:= "Importa��o de XML - Cancelamento"
 Local bProcess		:= { |oSelf| fCancNf(oSelf) }                   
-Local cDescription	:= "Rotina ir� importar a nota de saida e o seu cancelamento atrav�s da importa��o do XML. G.I.M GIOVANNONI "
+Local cDescription	:= "Rotina ir� importar a nota de saida e o seu cancelamento atrav�s da importa��o do XML. AKAMAI "
 
 Private oNFeCan
 
@@ -2346,7 +2314,7 @@ Local cStat       := ""
 Local nNotas      := 0
 Local cMotivo     := ""
 
-Private _cMeuCnpj := IIf(cEMpAnt == "99","24990900000191",SM0->M0_CGC)
+Private _cMeuCnpj := IIf(cEMpAnt == "99","13718756000112",SM0->M0_CGC)
 Private aNewClie  := {}
 Private aNewForn  := {}
 
@@ -2599,9 +2567,7 @@ If Len(aCanXml)>0
 EndIf
 Return
 
-
 //------------------------------------------------------------
-
 
 Static Function ImportarNf(oRegua)
 Local oXml
@@ -2613,7 +2579,7 @@ Local lNfe        := .F.
 Local nX
 Local aNF         := {}
 
-Private _cMeuCnpj := IIf(cEMpAnt == "99","24990900000191",SM0->M0_CGC)
+Private _cMeuCnpj := IIf(cEMpAnt == "99","13718756000112",SM0->M0_CGC)
 Private aNewClie  := {}
 Private aNewForn  := {}
 
@@ -3308,7 +3274,7 @@ Else
     EndIf 
 
     //------------------------------------------------------------------------
-	// Wederson L. Santana 02/04/2020
+	// Wederson L. Santana 15/03/2021
 	// Leitura din�mica dos itens do XML - IMPOSTOS
 	//------------------------------------------------------------------------
 
@@ -3326,11 +3292,11 @@ Else
 	
 	                     For nContIcm:=1 To Len(aSitICMS) 
                             If XmlChildEx(oNFe:_DET:_IMPOSTO:_ICMS ,aSitICMS[nContICM]) <> Nil
-        		                 lICMS := .T.
+        		                lICMS := .T.
 
-							     cCpoIPI    :="oNFe:_DET:_IMPOSTO:_IPI:"+aSitIPI[nContIpi]
-					    		 cCpoICMS   :="oNFe:_DET:_IMPOSTO:_ICMS:"+aSitICMS[nContIcm]
-					    		 cCpoCOFINS :="oNFe:_DET:_IMPOSTO:_COFINS:"+aSitCofins[nContCof]
+							    cCpoIPI    :="oNFe:_DET:_IMPOSTO:_IPI:"+aSitIPI[nContIpi]
+					    		cCpoICMS   :="oNFe:_DET:_IMPOSTO:_ICMS:"+aSitICMS[nContIcm]
+					    		cCpoCOFINS :="oNFe:_DET:_IMPOSTO:_COFINS:"+aSitCofins[nContCof]
 						 		cCpoPIS    :="oNFe:_DET:_IMPOSTO:_PIS:"+aSitPIS[nContPis]
 
 	                     		cTag11IPI  :="oNFe:_DET:_IMPOSTO:_IPI:"+aSitIPI[nContIpi]+":_PIPI:TEXT"
@@ -3470,7 +3436,6 @@ If! lCofins
 	    Return(Nil)
     EndIf
 EndIf
-
 
 aAdd(aNF,aItens)														//->> 11 - Itens da Nota Fiscal    
 aAdd(aNF,Criavar("D1_TES")) 	   							 		    //->> 12 - TES
@@ -3704,7 +3669,6 @@ For nX:= 1 To Len(aNFSOrig)
 	aAdd(aColsnfs,{aNFSOrig[nX,01],StatusNFe(@aNFsOrig[nX],@aColsLG,2),aNFSOrig[nX,02],aNFSOrig[nX,03],aNFSOrig[nX,12,11,1],aNFSOrig[nX,20],aNFSOrig[nX,21],aNFSOrig[nX,22],aNFSOrig[nX,24],.F.})
 Next nX
 
-
 //??????????????????????
 //? Log de Ocorrencias ?
 //??????????????????????
@@ -3753,7 +3717,6 @@ oFolder := TFolder():New(0,0,{ "NF de Produtos","","Log de Ocorr�ncias","Log de 
 oGetNf:=MSNewGetDados():New(34,5,128,315,2,.T.,.T.,,,,,,,,oFolder:aDialogs[1],aHeaderNF,aColsNF)
 oGetNf:oBrowse:Align 	:= CONTROL_ALIGN_ALLCLIENT
 oGetNf:OBROWSE:NFREEZE := 1
-
 
 oGetNFS:=MSNewGetDados():New(34,5,128,315,2,.T.,.T.,,,,,,,,oFolder:aDialogs[2],aHeaderNFS,aColsNFS)
 oGetNFS:oBrowse:Align 	:= CONTROL_ALIGN_ALLCLIENT
@@ -3882,12 +3845,14 @@ IF CC2->(DbSeek(xFilial("CC2")+SubStr(aCliente[1,05],3)))
 	cMunic := Alltrim(CC2->CC2_MUN)
 EndIf
 
-
 If Len(aCliente)>0
 	SA1->(dbSetOrder(3)) // por cnpj
 	If !SA1->(dbSeek(xFilial("SA1")+Alltrim(aCliente[1,11])))
 		cCodigo += GetSXENum("SA1","A1_COD")
 		ConfirmSX8()
+
+		//teste
+
 		Reclock("SA1",.T.)
 		SA1->A1_FILIAL 	:= xFilial("SA1")
 		SA1->A1_COD		:= cCodigo
@@ -3921,6 +3886,9 @@ If Len(aCliente)>0
 		SA1->A1_EMAIL	:= aCliente[1,01]
 		SA1->(MsUnlock())
 	EndIf
+
+	MSExecAuto({|x,y| Mata030(x,y)},aVetor,3)
+
 Else
 	lRet := .F.
 EndIf
